@@ -8,6 +8,7 @@ import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.zjudevelop.playerbackbend.pojo.LocalFile;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
@@ -21,6 +22,7 @@ import org.zjudevelop.playerbackbend.utils.LocalFileUtil;
  */
 
 @Service
+@Slf4j
 public class UploadServiceImpl implements UploadService {
     @Override
     public Boolean uploadfile(LocalFile file, QNDataServer dataServer) {
@@ -44,6 +46,7 @@ public class UploadServiceImpl implements UploadService {
             DefaultPutRet putRet = JSON.parseObject(response.bodyString(), DefaultPutRet.class);
             System.out.println(putRet.key);
             System.out.println(putRet.hash);
+
         } catch (QiniuException ex) {
             ex.printStackTrace();
             if (ex.response != null) {

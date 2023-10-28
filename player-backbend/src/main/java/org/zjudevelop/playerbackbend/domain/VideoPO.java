@@ -31,7 +31,7 @@ public class VideoPO {
      * 视频点赞数
      */
     @TableField("like_count")
-    private String likeCount;
+    private Long likeCount;
 
     /**
      * 视频简介

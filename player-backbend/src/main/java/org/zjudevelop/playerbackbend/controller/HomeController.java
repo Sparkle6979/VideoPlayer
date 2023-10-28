@@ -2,7 +2,6 @@ package org.zjudevelop.playerbackbend.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,9 +36,15 @@ public class HomeController {
         return RestResult.success(categoryInfoList);
     }
 
-    @RequestMapping(value = "/video")
+    @RequestMapping(value = "/videolist")
     public RestResult<List<VideoInfoDTO>> getVideoInfoListByCategoryId(@RequestParam Long categoryId){
         List<VideoInfoDTO> videoInfoList = videoService.getVideoInfoListByCategoryId(categoryId);
         return RestResult.success(videoInfoList);
+    }
+
+    @RequestMapping(value = "/videoinfo")
+    public RestResult<VideoInfoDTO> getVideoInfoByVideoId(@RequestParam Long videoId){
+        VideoInfoDTO videoInfo = videoService.getVideoInfoById(videoId);
+        return RestResult.success(videoInfo);
     }
 }

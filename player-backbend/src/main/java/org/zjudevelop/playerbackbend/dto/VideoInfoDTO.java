@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * @author sparkle6979l
@@ -18,8 +19,9 @@ public class VideoInfoDTO {
     Long videoId;
     String titile;
     String description;
+    Long likeCount;
     Long categoryId;
     String categoryName;
-    Timestamp createTime;
+    String createTime;
     String url;
 }

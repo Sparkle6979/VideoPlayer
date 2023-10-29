@@ -17,11 +17,12 @@ import java.util.Date;
 @NoArgsConstructor
 public class VideoInfoDTO {
     Long videoId;
-    String titile;
+    String title;
     String description;
     Long likeCount;
     Long categoryId;
     String categoryName;
     String createTime;
-    String url;
+    String videoUrl;
+    String coverUrl;
 }

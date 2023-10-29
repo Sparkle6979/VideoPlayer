@@ -26,11 +26,12 @@ public class DTOUtil {
     public static VideoInfoDTO makeVideoInfoDTO(VideoPO videoPO, CategoryPO categoryPO) {
         VideoInfoDTO videoInfoDTO = new VideoInfoDTO();
         videoInfoDTO.setVideoId(videoPO.getId());
-        videoInfoDTO.setTitile(videoPO.getTitle());
+        videoInfoDTO.setTitle(videoPO.getTitle());
         videoInfoDTO.setCategoryId(videoPO.getCategoryId());
         videoInfoDTO.setDescription(videoPO.getDescription());
         videoInfoDTO.setLikeCount(videoPO.getLikeCount());
-        videoInfoDTO.setUrl(videoPO.getUrl());
+        videoInfoDTO.setVideoUrl(videoPO.getVideoUrl());
+        videoInfoDTO.setCoverUrl(videoPO.getCoverUrl());
         videoInfoDTO.setCategoryName(categoryPO.getCategoryName());
         System.out.println(videoPO.getCreateTime());
         String datetime = dateFormat.format(videoPO.getCreateTime());

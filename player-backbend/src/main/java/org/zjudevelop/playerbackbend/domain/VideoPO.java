@@ -44,8 +44,14 @@ public class VideoPO {
     /**
      * 视频云服务器对应url
      */
-    private String url;
+    @TableField("video_url")
+    private String videoUrl;
 
+    /**
+     * 视频封面对应url
+     */
+    @TableField("cover_url")
+    private String coverUrl;
 
     @Override
     public boolean equals(Object o) {

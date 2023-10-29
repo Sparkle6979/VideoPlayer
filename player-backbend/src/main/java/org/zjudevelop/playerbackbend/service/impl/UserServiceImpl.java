@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService {
                 .build();
         int registerResult = userMapper.insert(user);
         log.info("registerResult: " + registerResult);
+        // TODO: fix the bug that id still auto-increment when insertion failure
         if (registerResult != 1) {
             // TODO: add specific exception class
             throw new BaseException("注册失败");

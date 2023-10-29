@@ -26,7 +26,7 @@ public class UserController {
     JwtProperties jwtProperties;
 
     /**
-     * user login
+     * 用户登录
      * */
     @PostMapping("login")
     public RestResult<UserLoginInfoDTO> login(@RequestBody org.zjudevelop.playerbackbend.dto.UserLoginDTO userLoginDTO){
@@ -56,7 +56,7 @@ public class UserController {
     }
 
     /**
-     * user registry
+     * 用户注册
      * */
     @PostMapping("register")
     public RestResult<UserRegisterInfoDTO> userRegistry(@RequestBody UserRegisterDTO userRegisterDTO) {

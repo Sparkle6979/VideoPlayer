@@ -52,4 +52,13 @@ public class UserServiceImpl implements UserService {
         }
         return user;
     }
+
+    @Override
+    public User getUserById(Long id) {
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            throw new AccountNotFoundException();
+        }
+        return user;
+    }
 }

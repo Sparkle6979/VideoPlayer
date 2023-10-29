@@ -3,6 +3,7 @@ package org.zjudevelop.playerbackbend.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.zjudevelop.playerbackbend.dto.UserInfoDTO;
 import org.zjudevelop.playerbackbend.dto.UserRegisterDTO;
 import org.zjudevelop.playerbackbend.dto.UserRegisterInfoDTO;
 import org.zjudevelop.playerbackbend.pojo.JwtProperties;
@@ -33,9 +34,9 @@ public class UserController {
         User user = null;
         try {
             user = userService.login(userLoginDTO);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            return RestResult.fail(e.getMessage());
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
+            return RestResult.fail(ex.getMessage());
         }
 
         // generate token
@@ -63,8 +64,8 @@ public class UserController {
         User user = null;
         try {
             user = userService.registry(userRegisterDTO);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
             return RestResult.fail("注册失败");
         }
 
@@ -73,5 +74,24 @@ public class UserController {
                 .username(user.getUsername())
                 .build();
         return RestResult.success(userRegisterInfoDTO);
+    }
+
+    /**
+     * 查询用户信息
+     * */
+    @GetMapping("/{id}")
+    public RestResult<UserInfoDTO> getUserInfoById(@PathVariable Long id) {
+        User user = null;
+        try {
+            user = userService.getUserById(id);
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
+            return RestResult.fail(ex.getMessage());
+        }
+        UserInfoDTO userInfoDTO = UserInfoDTO.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .build();
+        return RestResult.success(userInfoDTO);
     }
 }

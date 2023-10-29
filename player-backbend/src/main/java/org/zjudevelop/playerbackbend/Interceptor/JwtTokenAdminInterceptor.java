@@ -27,12 +27,13 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
      * @param handler
      * */
     public boolean preHandle (HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // only block the method of controller
+        // 只拦截controller的方法
+        // TODO: 区分需要鉴权和不需要鉴权的方法
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
 
-        // verify the token
+        // 验证token
         String token  = request.getHeader(jwtProperties.getUserTokenName());
         try {
             Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);

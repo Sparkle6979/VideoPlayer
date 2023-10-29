@@ -1,4 +1,4 @@
-package org.zjudevelop.playerbackbend.Interceptor;
+package org.zjudevelop.playerbackbend.interceptor;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,6 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             log.info("当前用户id： " + userId);
             return true;
         } catch (Exception ex) {
-            log.info("token不正确"); // del
             response.setStatus(401);
             return false;
         }

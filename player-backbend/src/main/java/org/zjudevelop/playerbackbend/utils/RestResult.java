@@ -1,6 +1,9 @@
 package org.zjudevelop.playerbackbend.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,8 +11,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@ApiModel("RestResult")
 public class RestResult<T> {
+    @ApiModelProperty(value = "消息", example = "OK")
     private String message;
+    @ApiModelProperty(value = "返回码", example = "200")
     private int code;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;

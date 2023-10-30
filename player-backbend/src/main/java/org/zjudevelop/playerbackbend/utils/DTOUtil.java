@@ -7,7 +7,6 @@ import org.zjudevelop.playerbackbend.dto.CategoryInfoDTO;
 import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 /**
@@ -24,25 +23,28 @@ public class DTOUtil {
     public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     public static VideoInfoDTO makeVideoInfoDTO(VideoPO videoPO, CategoryPO categoryPO) {
-        VideoInfoDTO videoInfoDTO = new VideoInfoDTO();
-        videoInfoDTO.setVideoId(videoPO.getId());
-        videoInfoDTO.setTitle(videoPO.getTitle());
-        videoInfoDTO.setCategoryId(videoPO.getCategoryId());
-        videoInfoDTO.setDescription(videoPO.getDescription());
-        videoInfoDTO.setLikeCount(videoPO.getLikeCount());
-        videoInfoDTO.setVideoUrl(videoPO.getVideoUrl());
-        videoInfoDTO.setCoverUrl(videoPO.getCoverUrl());
-        videoInfoDTO.setCategoryName(categoryPO.getCategoryName());
-        System.out.println(videoPO.getCreateTime());
         String datetime = dateFormat.format(videoPO.getCreateTime());
-        videoInfoDTO.setCreateTime(datetime);
+
+        VideoInfoDTO videoInfoDTO = VideoInfoDTO.builder()
+                .videoId(videoPO.getId())
+                .title(videoPO.getTitle())
+                .categoryId(videoPO.getCategoryId())
+                .categoryName(categoryPO.getCategoryName())
+                .description(videoPO.getDescription())
+                .likeCount(videoPO.getLikeCount())
+                .videoUrl(videoPO.getVideoUrl())
+                .coverUrl(videoPO.getCoverUrl())
+                .createTime(datetime)
+                .build();
+
         return videoInfoDTO;
     }
 
     public static CategoryInfoDTO makeCategoryInfoDTO(CategoryPO categoryPO){
-        CategoryInfoDTO categoryInfoDTO = new CategoryInfoDTO();
-        categoryInfoDTO.setCategoryId(categoryPO.getId());
-        categoryInfoDTO.setCategoryName(categoryPO.getCategoryName());
+        CategoryInfoDTO categoryInfoDTO = new CategoryInfoDTO().builder()
+                .categoryId(categoryPO.getId())
+                .categoryName(categoryPO.getCategoryName())
+                .build();
         return categoryInfoDTO;
     }
 }

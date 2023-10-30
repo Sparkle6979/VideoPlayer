@@ -33,6 +33,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         registry.addInterceptor(jwtTokenAdminInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/user/**")
+                .excludePathPatterns("/home/**")
                 .excludePathPatterns("/doc.html#/**");
     }
 

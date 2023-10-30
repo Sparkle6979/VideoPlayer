@@ -1,10 +1,7 @@
 package org.zjudevelop.playerbackbend.dto;
 
 import lombok.AllArgsConstructor;
-<<<<<<< HEAD
-=======
 import lombok.Builder;
->>>>>>> feature/videopart
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.zjudevelop.playerbackbend.pojo.LocalFile;

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.zjudevelop.playerbackbend.dao.UserMapper;
 import org.zjudevelop.playerbackbend.dto.UserLoginDTO;
 import org.zjudevelop.playerbackbend.dto.UserRegisterDTO;
-import org.zjudevelop.playerbackbend.pojo.User;
+import org.zjudevelop.playerbackbend.domain.User;
 import org.zjudevelop.playerbackbend.pojo.exception.AccountNotFoundException;
 import org.zjudevelop.playerbackbend.pojo.exception.BaseException;
 import org.zjudevelop.playerbackbend.pojo.exception.PasswordErrorException;

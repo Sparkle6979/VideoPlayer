@@ -1,4 +1,4 @@
-package org.zjudevelop.playerbackbend.pojo;
+package org.zjudevelop.playerbackbend.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

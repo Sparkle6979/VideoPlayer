@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.zjudevelop.playerbackbend.dto.*;
 import org.zjudevelop.playerbackbend.pojo.JwtProperties;
-import org.zjudevelop.playerbackbend.pojo.User;
+import org.zjudevelop.playerbackbend.domain.User;
 import org.zjudevelop.playerbackbend.service.UserService;
 import org.zjudevelop.playerbackbend.utils.JwtUtil;
 import org.zjudevelop.playerbackbend.utils.RestResult;

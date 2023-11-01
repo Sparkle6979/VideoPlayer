@@ -47,4 +47,10 @@ public class HomeController {
         VideoInfoDTO videoInfo = videoService.getVideoInfoById(videoId);
         return RestResult.success(videoInfo);
     }
+
+    @RequestMapping(value = "/categoryinfo")
+    public RestResult<CategoryInfoDTO> getCategoryInfoByCategoryId(@RequestParam Long categoryId){
+        CategoryInfoDTO categoryInfo = categoryService.getCategoryInfoById(categoryId);
+        return RestResult.success(categoryInfo);
+    }
 }

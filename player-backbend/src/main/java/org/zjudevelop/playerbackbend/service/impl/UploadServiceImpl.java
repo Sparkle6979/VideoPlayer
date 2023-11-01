@@ -14,6 +14,8 @@ import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.springframework.stereotype.Service;
+import org.zjudevelop.playerbackbend.dto.UploadFileDTO;
+import org.zjudevelop.playerbackbend.dto.UploadFileInfoDTO;
 import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
 import org.zjudevelop.playerbackbend.dto.VideoUpdateDTO;
 import org.zjudevelop.playerbackbend.pojo.LocalFile;
@@ -31,7 +33,7 @@ import org.zjudevelop.playerbackbend.utils.UploadFileUtil;
 @Slf4j
 public class UploadServiceImpl implements UploadService {
     @Override
-    public VideoInfoDTO uploadfile(VideoUpdateDTO videoUpdateDTO, QNDataServer dataServer) {
+    public VideoInfoDTO uploadvideo(VideoUpdateDTO videoUpdateDTO, QNDataServer dataServer) {
         Configuration cfg = new Configuration(Region.region0());
         cfg.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;// 指定分片上传版本
         //...其他参数参考类注释
@@ -88,5 +90,44 @@ public class UploadServiceImpl implements UploadService {
         }
 
         return Boolean.TRUE;
+    }
+
+    @Override
+    public UploadFileInfoDTO uploadfile(String localFileUrl, QNDataServer dataServer) {
+        Configuration cfg = new Configuration(Region.region0());
+        cfg.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;// 指定分片上传版本
+        //...其他参数参考类注释
+        UploadManager uploadManager = new UploadManager(cfg);
+        //...生成上传凭证，然后准备上传
+        String accessKey = dataServer.getAccessKey();
+        String secretKey = dataServer.getSecretKey();
+        String bucket = dataServer.getBucket();
+
+        Auth auth = Auth.create(accessKey, secretKey);
+        String upToken = auth.uploadToken(bucket);
+
+        // ...根据文件url生成文件名称
+        String fileName = UploadFileUtil.getFileName(localFileUrl);
+        try {
+            Response response = uploadManager.put(localFileUrl, fileName, upToken);
+            //解析上传成功的结果
+            DefaultPutRet putRet = JSON.parseObject(response.bodyString(), DefaultPutRet.class);
+//            System.out.println(putRet.key);
+//            System.out.println(putRet.hash);
+            log.info(putRet.key);
+            log.info(putRet.hash);
+        } catch (QiniuException ex) {
+            ex.printStackTrace();
+            if (ex.response != null) {
+                log.error(ex.response.toString());
+            }
+        }
+
+        String serverFileUrl = StringUtils.join(dataServer.getDomain(), "/", fileName);
+        UploadFileInfoDTO uploadFileInfoDTO = UploadFileInfoDTO.builder()
+                .serverFileUrl(serverFileUrl)
+                .serverFileName(fileName).build();
+
+        return uploadFileInfoDTO;
     }
 }

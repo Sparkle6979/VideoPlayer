@@ -9,11 +9,17 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.bytedeco.opencv.global.opencv_imgcodecs;
+import org.bytedeco.opencv.opencv_core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.springframework.stereotype.Service;
+import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
+import org.zjudevelop.playerbackbend.dto.VideoUpdateDTO;
 import org.zjudevelop.playerbackbend.pojo.LocalFile;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 import org.zjudevelop.playerbackbend.service.UploadService;
-import org.zjudevelop.playerbackbend.utils.LocalFileUtil;
+import org.zjudevelop.playerbackbend.utils.UploadFileUtil;
 
 /**
  * @author sparkle6979l
@@ -25,7 +31,7 @@ import org.zjudevelop.playerbackbend.utils.LocalFileUtil;
 @Slf4j
 public class UploadServiceImpl implements UploadService {
     @Override
-    public Boolean uploadfile(LocalFile file, QNDataServer dataServer) {
+    public VideoInfoDTO uploadfile(VideoUpdateDTO videoUpdateDTO, QNDataServer dataServer) {
         Configuration cfg = new Configuration(Region.region0());
         cfg.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;// 指定分片上传版本
         //...其他参数参考类注释
@@ -34,16 +40,38 @@ public class UploadServiceImpl implements UploadService {
         String accessKey = dataServer.getAccessKey();
         String secretKey = dataServer.getSecretKey();
         String bucket = dataServer.getBucket();
-        //如果是Windows情况下，格式是 D:\\qiniu\\test.png
-//        String localFilePath = "/home/qiniu/test.png";
-        //默认不指定key的情况下，以文件内容的hash值作为文件名
-        String key = LocalFileUtil.getFileName(file);
+
         Auth auth = Auth.create(accessKey, secretKey);
         String upToken = auth.uploadToken(bucket);
+        //如果是Windows情况下，格式是 D:\\qiniu\\test.png
+//        String localFilePath = "/home/qiniu/test.png";
+
+
+        String videoUrl = videoUpdateDTO.getVideoUrl();
+        String videoName = StringUtils.join(UploadFileUtil.getFileName(videoUrl),
+                UploadFileUtil.getFileSuffix(videoUrl));
+
         try {
-            Response response = uploadManager.put(file.getFilepath(), key, upToken);
+
+            Response videoResponse = uploadManager.put(videoUrl, videoName, upToken);
+
+
+            if(StringUtils.isNotBlank(videoUpdateDTO.getCoverUrl())){
+                Mat coverImg = opencv_imgcodecs.imread(videoUpdateDTO.getCoverUrl());
+                Response coverResponse = uploadManager.put(coverUrl,coverName,upToken);
+            }else {
+                uploadManager.p
+            }
+
+
+
+
+
+
+
             //解析上传成功的结果
-            DefaultPutRet putRet = JSON.parseObject(response.bodyString(), DefaultPutRet.class);
+            DefaultPutRet videoPutRet = JSON.parseObject(videoResponse.bodyString(), DefaultPutRet.class);
+
             System.out.println(putRet.key);
             System.out.println(putRet.hash);
 

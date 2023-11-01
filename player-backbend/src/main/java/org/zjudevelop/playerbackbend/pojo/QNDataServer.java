@@ -16,4 +16,5 @@ public class QNDataServer {
     private String AccessKey;
     private String SecretKey;
     private String Bucket;
+    private String Domain;
 }

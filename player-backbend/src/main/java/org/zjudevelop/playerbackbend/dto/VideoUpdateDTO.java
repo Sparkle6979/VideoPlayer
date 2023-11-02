@@ -19,6 +19,5 @@ public class VideoUpdateDTO {
     String titile;
     String description;
     Long categoryId;
-
     String coverUrl;
 }

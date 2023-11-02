@@ -20,12 +20,10 @@
                 <el-upload
                     :disabled="!isInput"
                     class="avatar-uploader"
-                    action="https://jsonplaceholder.typicode.com/posts/"
                     :show-file-list="false"
-                    accept=".jpg"
-                    :before-upload="beforeAvatarUpload">
-                  <el-avatar v-if="form_2.url" :src="form_2.url" class="avatar"></el-avatar>
-                  <el-avatar v-else src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" :size="150" :fit="'cover'" ></el-avatar>
+                    action=""
+                    accept=".jpg">
+                  <el-avatar :src="form_2.url ? form_2.url : defaultUserAvatar" :size="150" :fit="'cover'" ></el-avatar>
                 </el-upload>
               </el-form-item>
               <el-form-item label="账号" prop="username">
@@ -71,7 +69,7 @@
                 <template slot-scope="scope">
                   <el-button v-if="scope.row.message && scope.row.status != 2" type="text" size="small"
                   @click="reviewMsg(scope.row.name,scope.row.message)">回复</el-button>
-                  <el-button v-if="scope.row.message && scope.row.status == 2" type="text" size="small">查看</el-button>
+<!--                  <el-button v-if="scope.row.message && scope.row.status == 2" type="text" size="small">查看</el-button>-->
                 </template>
               </el-table-column>
             </el-table>
@@ -82,20 +80,25 @@
 
     <!--dialog-->
     <el-dialog
-        title="消息"
+        :title="msg.sender"
         :visible.sync="msgVisible"
         width="40%"
+        :show-close="false"
         center>
-      <div>
-        <el-tooltip effect="light" :content="msg.content" placement="right" value="true">
-          <span>{{ msg.sender }}</span>
-        </el-tooltip>
-        <el-divider></el-divider>
+      <!--  回复框  -->
+      <div v-html="commentContent">
       </div>
+      <el-input
+          type="textarea"
+          style="padding: 5px 0"
+          :rows="2"
+          placeholder="请输入内容"
+          v-model="textarea">
+      </el-input>
       <span slot="footer" class="dialog-footer">
-    <el-button @click="msgVisible = false">取 消</el-button>
-    <el-button type="primary" @click="msgVisible = false">发 送</el-button>
-  </span>
+        <el-button @click="msgVisible = false;commentContent=''">返 回</el-button>
+        <el-button type="primary" @click="replayComment">发 送</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -133,6 +136,8 @@ export default {
         "videoUrl": "http://s33fgajdq.hd-bkt.clouddn.com/%E4%BF%AE%E4%BB%99%E6%B8%B8%E6%88%8F%E5%93%AA%E5%AE%B6%E5%BC%BA%EF%BC%9F%E9%AB%98%E5%93%81%E8%B4%A8%E4%BF%AE%E4%BB%99%E6%B8%B8%E6%88%8F%E6%8E%A8%E8%8D%90%EF%BC%81.mp4"
       }
     ]
+    let textarea = '' // 评论输入框
+    let commentContent = ''
     return {
       activeIndex,
       isInput,
@@ -171,7 +176,9 @@ export default {
       }],
       msgVisible,
       msg,
-      videoList
+      videoList,
+      textarea,
+      commentContent
     }
   },
   methods:{
@@ -196,8 +203,34 @@ export default {
       this.msg.sender = sender
       this.msg.content = content
       this.msgVisible = true
+      let html = "<div class=\"el-row\" style=\"padding: 5px 0\">\n" +
+          "  <div class=\"el-col el-col-2\" style=\"text-align: right\">\n" +
+          "  <span class=\"el-avatar el-avatar--circle\" style=\"height: 40px; width: 40px; line-height: 40px;\">\n" +
+          "    <img src=\"https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png\" style=\"object-fit: cover;\">\n" +
+          "  </span>\n" +
+          "  </div>\n" +
+          "  <div class=\"el-col el-col-22\" style=\"text-align: left; padding-left: 10px\">\n" +
+          "    <div class=\"tip right\">" + content + "</div>\n" +
+          "  </div>\n" +
+          "</div>";
+      this.commentContent += html
     },
-    ...mapGetters({getName:'userName'})
+    ...mapGetters({getName:'userName'}),
+    replayComment(){
+      let html;
+      html = "<div class=\"el-row\" style=\"padding: 5px 0\">\n" +
+          "  <div class=\"el-col el-col-22\" style=\"text-align: right; padding-right: 10px\">\n" +
+          "    <div class=\"tip left\">" + this.textarea + "</div>\n" +
+          "  </div>\n" +
+          "  <div class=\"el-col el-col-2\">\n" +
+          "  <span class=\"el-avatar el-avatar--circle\" style=\"height: 40px; width: 40px; line-height: 40px;\">\n" +
+          "    <img src=\"https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png\" style=\"object-fit: cover;\">\n" +
+          "  </span>\n" +
+          "  </div>\n" +
+          "</div>";
+      this.commentContent += html
+      this.textarea = ''
+    }
   },
   activated() {
     this.activeIndex = this.$route.params.index ? this.$route.params.index : "1"
@@ -206,4 +239,22 @@ export default {
 </script>
 
 <style>
+.tip {
+  color: white;
+  text-align: center;
+  border-radius: 10px;
+  font-family: sans-serif;
+  padding: 10px;
+  width:auto;
+  display:inline-block !important;
+  display:inline;
+}
+
+.right {
+  background-color: deepskyblue;
+}
+.left {
+  background-color: forestgreen;
+}
+
 </style>

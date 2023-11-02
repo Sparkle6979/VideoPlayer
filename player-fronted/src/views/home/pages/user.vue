@@ -22,7 +22,10 @@
                     class="avatar-uploader"
                     :show-file-list="false"
                     action=""
-                    accept=".jpg">
+                    :auto-upload="false"
+                    :before-upload="beforeUpload"
+                    accept=".jpg,.png"
+                    :on-change="picturePreview">
                   <el-avatar :src="form_2.url ? form_2.url : defaultUserAvatar" :size="150" :fit="'cover'" ></el-avatar>
                 </el-upload>
               </el-form-item>
@@ -49,7 +52,7 @@
           </div>
         </el-tab-pane>
         <el-tab-pane label="消息" name="3">
-          <div>·
+          <div>
             <el-table :data="tableData" style="margin-bottom: 20px;"
                 row-key="id" :cell-style="msgTableRowClass" :show-header="true"
                 :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
@@ -184,6 +187,22 @@ export default {
   methods:{
     goBack(){
       this.$router.back()
+    },
+    beforeUpload(file){
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+      }
+      return isLt2M
+    },
+    picturePreview(file,fileList){
+      if (window.createObjectURL != undefined) {
+        this.form_2.url = window.createObjectURL(file.raw);
+      } else if (window.URL != undefined) {
+        this.form_2.url = window.URL.createObjectURL(file.raw);
+      } else if (window.webkitURL != undefined) {
+        this.form_2.url = window.webkitURL.createObjectURL(file.raw);
+      }
     },
     cancel(){
       this.resetForm('form_2');

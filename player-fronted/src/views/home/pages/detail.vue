@@ -38,11 +38,11 @@
                   width="225" height="112.5">
                 </el-col>
                 <el-col>
-                  <span style="font-size: 10px;position: absolute;top: 5px">{{item.title}}</span>
+                  <span style="font-size: 16px;position: absolute;top: 5px">{{item.title}}</span>
                   <br>
-                  <span style="font-size: 10px;position: absolute;bottom: 25px">{{item.time}}</span>
+                  <span style="font-size: 13px;position: absolute;bottom: 25px">{{item.time}}</span>
                   <br>
-                  <span style="font-size: 10px;position: absolute;bottom: 5px">播放量：{{item.watch}}</span>
+                  <span style="font-size: 13px;position: absolute;bottom: 5px">播放量：{{item.watch}}</span>
                 </el-col>
               </el-row>
             </div>
@@ -51,34 +51,16 @@
     </el-row>
     <el-row :gutter="30">
       <el-col :span="17">
-        <el-input
-            v-model="commentInput"
-            placeholder="输入评论内容"
-            clearable
-        >
+        <el-input v-model="commentInput" placeholder="输入评论内容" clearable>
           <template slot="prepend">评论</template>
-          <el-button slot="append" icon="el-icon-s-comment"></el-button>
+          <el-button slot="append" icon="el-icon-s-comment" @click="submitComment"></el-button>
         </el-input>
       </el-col>
     </el-row>
-<!--  视频详细信息   -->
+    <!--  视频详细信息   -->
     <h2>{{ videoInfo.title }}</h2>
     <el-row>
-<!--      <div class="comment-list-container">-->
-<!--        <div class="comment-list-box comment-operate-item">-->
-<!--          <ul class="comment-list" v-for="comment in commentList">-->
-<!--            &lt;!&ndash; 评论根目录 &ndash;&gt;-->
-<!--            <root :comment="comment" :blog="blog" :getCommentList="getCommentList"></root>-->
-<!--            &lt;!&ndash; 评论子目录 &ndash;&gt;-->
-<!--            <li class="replay-box" style="display: block;">-->
-<!--              <ul class="comment-list">-->
-<!--                &lt;!&ndash; 子组件递归实现 &ndash;&gt;-->
-<!--                <child :childComments="comment.child" :parentComment="comment" :blog="blog" :rootParentId="comment.id" :getCommentList="getCommentList" v-if="comment.child != null"></child>-->
-<!--              </ul>-->
-<!--            </li>-->
-<!--          </ul>-->
-<!--        </div>-->
-<!--      </div>-->
+      <Comment :comments="comments" @update="updateComment"></Comment>
     </el-row>
   </div>
 </template>
@@ -90,10 +72,13 @@ import { videoPlayer } from 'vue-video-player'
 import {getVideoById} from "@/api/video";
 import {mapState} from "vuex";
 
+import Comment from "@/views/home/components/comment";
+
 export default {
   name: "Detail",
   components:{
-    videoPlayer
+    videoPlayer,
+    Comment
   },
   data(){
     const videoInfo = ''
@@ -130,17 +115,27 @@ export default {
       description,
       commentInput,
       items : Array(3).fill(item),
-      commentNum : 1,
-      commentList : [
-        {
-          username:'123',
-          content:"456",
-        },
-        {
-          username:'123',
-          content:"456",
-        }
-      ]
+      comments:[{
+        username:'Champion',
+        date:'2023年11月2日   13:58:58',
+        content:'今日事今日毕',
+        delete:true,	//删除按钮显示
+        flag:false,
+        like:'',
+        display:false,	//显示评论区
+        numbers:2,		//点赞数
+        sons:[{
+          username:'张二噶',
+          date:'2023年11月2日   13:58:58',
+          content:'春有百花秋有月，夏有凉风冬有雪',
+          delete:true,	//删除按钮是否显示
+          like:1,
+          display:false,
+          picture:'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
+          to_username:'Champion',
+          numbers:1,		//点赞数
+        }]
+      }],
     }
 
   },
@@ -156,6 +151,25 @@ export default {
         this.playerOptions.poster = res.data.coverUrl
         this.loading = false
       })
+    },
+    updateComment(value){
+      console.log(value)
+      this.comments = value
+    },
+    // 发表评论
+    submitComment(){
+      this.current = new Date();
+      this.comments.push({
+        username:this.user.username,
+        date:this.current.getFullYear() + '年' + (this.current.getMonth() + 1) + '月' + this.current.getDate() + '日' + this.current.getHours() + ':' + this.current.getMinutes() + ':' + this.current.getSeconds(),
+        content:this.commentInput,
+        delete:true,
+        flag:false,
+        like:'',
+        display:false,	//显示评论区
+        sons:[]
+      })
+      this.commentInput = ''
     },
   },
   computed:{
@@ -175,9 +189,5 @@ export default {
 .description_text{
   font-size: 13px;
   color: #777777;
-}
-
-.comment-list-container {
-  padding-top: 12px;
 }
 </style>

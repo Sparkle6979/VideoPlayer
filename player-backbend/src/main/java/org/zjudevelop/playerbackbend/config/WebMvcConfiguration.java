@@ -34,6 +34,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/user/**")
                 .excludePathPatterns("/home/**")
+                .excludePathPatterns("/test/**")
                 .excludePathPatterns("/doc.html#/**");
     }
 

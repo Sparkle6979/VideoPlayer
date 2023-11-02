@@ -3,10 +3,12 @@ package org.zjudevelop.playerbackbend.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.zjudevelop.playerbackbend.dto.UploadFileInfoDTO;
 import org.zjudevelop.playerbackbend.dto.UploadVideoDTO;
 import org.zjudevelop.playerbackbend.pojo.LocalFile;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 import org.zjudevelop.playerbackbend.service.impl.UploadServiceImpl;
+import org.zjudevelop.playerbackbend.utils.RestResult;
 
 /**
  * @author sparkle6979l
@@ -25,10 +27,8 @@ public class TestController {
     UploadServiceImpl uploadService;
 
     @RequestMapping(value = "/upload",method = RequestMethod.GET)
-    public String uploadtest(@RequestParam String filepath){
-        UploadVideoDTO uploadVideoDTO = new UploadVideoDTO(new LocalFile(filepath),qnDataServer);
-        uploadService.uploadfile(uploadVideoDTO.getLocalFile(),uploadVideoDTO.getQnDataServer());
-        return "success";
+    public RestResult<UploadFileInfoDTO> uploadtest(@RequestParam String filepath){
+        return RestResult.success(uploadService.uploadfile(filepath,qnDataServer));
     }
 
 

@@ -9,11 +9,14 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.zjudevelop.playerbackbend.dto.UploadFileInfoDTO;
 import org.zjudevelop.playerbackbend.pojo.LocalFile;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 import org.zjudevelop.playerbackbend.service.UploadService;
 import org.zjudevelop.playerbackbend.utils.LocalFileUtil;
+import org.zjudevelop.playerbackbend.utils.UploadFileUtil;
 
 /**
  * @author sparkle6979l
@@ -25,7 +28,7 @@ import org.zjudevelop.playerbackbend.utils.LocalFileUtil;
 @Slf4j
 public class UploadServiceImpl implements UploadService {
     @Override
-    public Boolean uploadfile(LocalFile file, QNDataServer dataServer) {
+    public UploadFileInfoDTO uploadfile(String localFileUrl, QNDataServer dataServer) {
         Configuration cfg = new Configuration(Region.region0());
         cfg.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;// 指定分片上传版本
         //...其他参数参考类注释
@@ -34,31 +37,34 @@ public class UploadServiceImpl implements UploadService {
         String accessKey = dataServer.getAccessKey();
         String secretKey = dataServer.getSecretKey();
         String bucket = dataServer.getBucket();
-        //如果是Windows情况下，格式是 D:\\qiniu\\test.png
-//        String localFilePath = "/home/qiniu/test.png";
-        //默认不指定key的情况下，以文件内容的hash值作为文件名
-        String key = LocalFileUtil.getFileName(file);
+
         Auth auth = Auth.create(accessKey, secretKey);
         String upToken = auth.uploadToken(bucket);
+
+        // ...根据文件url生成文件名称
+        String fileName = StringUtils.join(UploadFileUtil.getFileName(localFileUrl),
+                UploadFileUtil.getFileSuffix(localFileUrl));
         try {
-            Response response = uploadManager.put(file.getFilepath(), key, upToken);
+            Response response = uploadManager.put(localFileUrl, fileName, upToken);
             //解析上传成功的结果
             DefaultPutRet putRet = JSON.parseObject(response.bodyString(), DefaultPutRet.class);
-            System.out.println(putRet.key);
-            System.out.println(putRet.hash);
-
+//            System.out.println(putRet.key);
+//            System.out.println(putRet.hash);
+            log.info(putRet.key);
+            log.info(putRet.hash);
         } catch (QiniuException ex) {
             ex.printStackTrace();
             if (ex.response != null) {
-                System.err.println(ex.response);
-                try {
-                    String body = ex.response.toString();
-                    System.err.println(body);
-                } catch (Exception ignored) {
-                }
+                log.error(ex.response.toString());
             }
         }
+        // 生成云服务器外链路径
+        String serverFileUrl = StringUtils.join(dataServer.getDomain(), "/", fileName);
 
-        return Boolean.TRUE;
+        UploadFileInfoDTO uploadFileInfoDTO = UploadFileInfoDTO.builder()
+                .serverFileUrl(serverFileUrl)
+                .serverFileName(fileName).build();
+
+        return uploadFileInfoDTO;
     }
 }

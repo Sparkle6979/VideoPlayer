@@ -1,7 +1,5 @@
 package org.zjudevelop.playerbackbend.utils;
 
-import org.zjudevelop.playerbackbend.pojo.LocalFile;
-
 import java.io.File;
 
 /**
@@ -9,10 +7,15 @@ import java.io.File;
  * @version 1.0
  * @data 2023/10/26 01:28
  */
-public class UploadFileUtil {
+public class FileProcessUtil {
+
     public static String getFileName(String url){
+        return new File(url).getName();
+    }
+
+    public static String getFileOriginName(String url){
         // 除去filepath前后空格
-        String filename = new File(url).getName();
+        String filename = getFileName(url);
         int ind = filename.indexOf('.');
         return filename.substring(0,ind);
     }

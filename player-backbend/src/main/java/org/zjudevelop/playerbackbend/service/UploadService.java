@@ -1,11 +1,7 @@
 package org.zjudevelop.playerbackbend.service;
 
 
-import org.zjudevelop.playerbackbend.dto.UploadFileDTO;
 import org.zjudevelop.playerbackbend.dto.UploadFileInfoDTO;
-import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
-import org.zjudevelop.playerbackbend.dto.VideoUpdateDTO;
-import org.zjudevelop.playerbackbend.pojo.LocalFile;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 
 /**
@@ -21,4 +17,6 @@ public interface UploadService {
      * @return
      */
     UploadFileInfoDTO uploadfile(String localFileUrl, QNDataServer dataServer);
+
+    UploadFileInfoDTO uploadfile(String fileName, byte[] data, QNDataServer dataServer);
 }

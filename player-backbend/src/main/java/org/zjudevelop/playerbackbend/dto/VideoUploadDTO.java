@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class VideoUpdateDTO {
+public class VideoUploadDTO {
     String videoUrl;
-    String titile;
+    String title;
     String description;
     Long categoryId;
     String coverUrl;

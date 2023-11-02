@@ -18,12 +18,15 @@ public class QNDataServerConfig {
     private String SecretKey;
     @Value("${dataserver.qndataserver.bucket}")
     private String Bucket;
+    @Value("${dataserver.qndataserver.domain}")
+    private String Domain;
     @Bean
     public QNDataServer qnDataServer(){
         QNDataServer qnDataServer = new QNDataServer();
         qnDataServer.setAccessKey(AccessKey);
         qnDataServer.setSecretKey(SecretKey);
         qnDataServer.setBucket(Bucket);
+        qnDataServer.setDomain(Domain);
         return qnDataServer;
     }
 }

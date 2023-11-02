@@ -7,6 +7,7 @@ import org.zjudevelop.playerbackbend.dao.CategoryMapper;
 import org.zjudevelop.playerbackbend.dao.VideoMapper;
 import org.zjudevelop.playerbackbend.domain.CategoryPO;
 import org.zjudevelop.playerbackbend.domain.VideoPO;
+import org.zjudevelop.playerbackbend.dto.VideoInsertDTO;
 import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
 import org.zjudevelop.playerbackbend.service.VideoService;
 import org.zjudevelop.playerbackbend.utils.DTOUtil;
@@ -48,5 +49,19 @@ public class VideoServiceImpl implements VideoService {
             result.add(videoInfoDTO);
         }
         return result;
+    }
+
+    @Override
+    public Long addVideoInfo(VideoInsertDTO videoDTO) {
+        VideoPO videoInsertPO = VideoPO.builder()
+                .videoUrl(videoDTO.getVideoUrl())
+                .title(videoDTO.getTitle())
+                .categoryId(videoDTO.getCategoryId())
+                .description(videoDTO.getDescription())
+                .coverUrl(videoDTO.getCoverUrl()).build();
+
+        int insertRows = videoMapper.insert(videoInsertPO);
+
+        return videoInsertPO.getId();
     }
 }

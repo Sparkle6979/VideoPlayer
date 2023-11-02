@@ -1,7 +1,7 @@
 package org.zjudevelop.playerbackbend.domain;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -13,8 +13,10 @@ import java.util.Objects;
  * @data 2023/10/27 19:15
  */
 @Data
+@Builder
 @TableName(value = "video")
 public class VideoPO {
+    @TableId(type = IdType.AUTO)
     private Long id;
     /**
      * 视频名称
@@ -38,7 +40,7 @@ public class VideoPO {
      */
     private String description;
 
-    @TableField("create_time")
+    @TableField(value = "create_time",fill = FieldFill.INSERT)
     private Timestamp createTime;
 
     /**

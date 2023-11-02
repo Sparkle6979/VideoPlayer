@@ -12,10 +12,10 @@ import org.bytedeco.opencv.opencv_videoio.VideoCapture;
  */
 public class VideoProcessUtil {
 
-    public static final int coverCol = 1146;
-    public static final int coverRow = 717;
-    public static final int keyFrameNum = 30;
-    public static byte[] getCoverFromVideoPath(String videoPath){
+//    private static final int coverCol = 1146;
+//    private static final int coverRow = 717;
+    private static final int keyFrameNum = 30;
+    public static byte[] getCoverFromVideoPath(String videoPath, int col,int row){
         VideoCapture videoCapture = new VideoCapture(videoPath);
 
         Mat firstFrame = new Mat();
@@ -28,7 +28,9 @@ public class VideoProcessUtil {
             if(++frameNum >= keyFrameNum)   break;
         }
 
-        return frameNum == keyFrameNum ? Mat2Bytes(keyFrame) : Mat2Bytes(firstFrame);
+        return frameNum == keyFrameNum ?
+                Mat2Bytes(keyFrame.reshape(col,row)) :
+                Mat2Bytes(firstFrame.reshape(col,row));
     }
 
     public static byte[] Mat2Bytes(Mat mat){

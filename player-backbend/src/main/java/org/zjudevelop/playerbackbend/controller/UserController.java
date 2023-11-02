@@ -181,7 +181,7 @@ public class UserController {
         List<Likes> likes = userService.getLikes(userId);
         List<Long> videoIds = likes.stream().map(Likes::getVideoId).collect(Collectors.toList());
         LikeVideosDTO likeVideosDTO = new LikeVideosDTO().builder()
-                .id(userId)
+                .userId(userId)
                 .videoIds(videoIds)
                 .build();
         return RestResult.success(likeVideosDTO);

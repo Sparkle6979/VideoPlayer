@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 public class LikeVideosDTO {
     @ApiModelProperty(value = "用户id")
-    private Long id;
+    private Long userId;
     @ApiModelProperty(value = "点赞过的视频id列表")
     private List<Long> videoIds;
 }

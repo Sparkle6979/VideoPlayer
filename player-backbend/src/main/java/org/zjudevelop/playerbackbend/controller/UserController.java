@@ -1,6 +1,7 @@
 package org.zjudevelop.playerbackbend.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public class UserController {
      * 用户登录
      * */
     @ApiOperation("用户登录")
-    @PostMapping("login")
+    @PostMapping("/login")
     public RestResult<UserLoginInfoDTO> login(@RequestBody UserLoginDTO userLoginDTO){
         User user = null;
         try {
@@ -62,7 +63,7 @@ public class UserController {
      * 用户注册
      * */
     @ApiOperation("用户注册")
-    @PostMapping("register")
+    @PostMapping("/register")
     public RestResult<UserRegisterInfoDTO> userRegistry(@RequestBody UserRegisterDTO userRegisterDTO) {
         User user = null;
         try {
@@ -98,5 +99,59 @@ public class UserController {
                 .username(user.getUsername())
                 .build();
         return RestResult.success(userInfoDTO);
+    }
+
+    /**
+     * 更新用户信息
+     * */
+    @PostMapping("/update")
+    @ApiOperation("更新用户信息")
+    public RestResult updateUserInfo(@RequestBody UserInfoUpdateDTO userInfoUpdateDTO) {
+        return RestResult.success();
+    }
+
+    /**
+     * 关注
+     * */
+    @PostMapping("/follow")
+    @ApiOperation("关注用户")
+    public RestResult follow(@RequestBody FollowDTO followDTO) {
+        return RestResult.success();
+    }
+
+    /**
+     * 查询粉丝列表
+     * */
+    @GetMapping("/follower/{id}")
+    @ApiOperation("查询粉丝列表")
+    public RestResult<FollowersDTO> getFollowers(@ApiParam("查询用户id") @PathVariable Long id) {
+        return null;
+    }
+
+    /**
+     * 查询关注列表
+     * */
+    @GetMapping("/following/{id}")
+    @ApiOperation("查询关注列表")
+    public RestResult<FollowingsDTO> getFollowings(@ApiParam("查询用户id") @PathVariable Long id) {
+        return null;
+    }
+
+    /**
+     * 点赞视频
+     * */
+    @PostMapping("/like")
+    @ApiOperation("点赞视频")
+    public RestResult like(@RequestBody LikeDTO likeDTO) {
+        return RestResult.success();
+    }
+
+    /**
+     * 查询点赞视频
+     * */
+    @GetMapping("/likes/{id}")
+    @ApiOperation("查询点赞视频")
+    public RestResult<LikeVideosDTO> getLikeVideos(@ApiParam("用户id") @PathVariable Long id) {
+        return null;
     }
 }

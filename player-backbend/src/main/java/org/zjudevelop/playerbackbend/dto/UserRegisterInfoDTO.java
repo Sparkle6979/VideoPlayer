@@ -13,7 +13,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ApiModel("用户注册返回实体")
 public class UserRegisterInfoDTO implements Serializable {
 
     @ApiModelProperty(value = "用户id", example = "29")

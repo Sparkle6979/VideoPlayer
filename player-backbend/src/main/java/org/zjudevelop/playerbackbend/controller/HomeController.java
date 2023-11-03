@@ -33,7 +33,7 @@ public class HomeController {
 
     @CheckAuth(check = false)
     @RequestMapping(value = "/category/detail",method = RequestMethod.GET)
-    public RestResult<List<CategoryInfoDTO>> getCategoryInfoList(){
+        public RestResult<List<CategoryInfoDTO>> getCategoryInfoList(){
         List<CategoryInfoDTO> categoryInfoList = categoryService.getCategoryInfoList();
         return RestResult.success(categoryInfoList);
     }

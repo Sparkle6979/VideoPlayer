@@ -16,7 +16,7 @@
               <el-button slot="append" icon="el-icon-search"></el-button>
             </el-input>
           </el-col>
-          <el-col :span="isLogin ? 4 : 2" :offset="isLogin ? 8 : 10">
+          <el-col :span="this.isLogin ? 4 : 2" :offset="isLogin ? 8 : 10">
             <el-button type="danger" v-if="!isLogin" round icon="el-icon-user" @click="toLogin">去登录</el-button>
             <div v-else>
               <el-tooltip effect="light" content="视频上传" placement="bottom">
@@ -32,10 +32,17 @@
                   <span style="margin: 10px">{{ user.username }}</span>
                 </div>
                 <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item @click.native="dialogVisible = true">关注&粉丝</el-dropdown-item>
                   <el-dropdown-item @click.native="toUserPage(1)">我的喜欢</el-dropdown-item>
                   <el-dropdown-item @click.native="toUserPage(2)">账号设置</el-dropdown-item>
                   <el-dropdown-item @click.native="toLogin" divided>退出登录</el-dropdown-item>
                 </el-dropdown-menu>
+
+                <div v-if="dialogVisible">
+                  <el-dialog :visible.sync="dialogVisible" width="35%">
+                    <Follower></Follower>
+                  </el-dialog>
+                </div>
               </el-dropdown>
             </div>
           </el-col>
@@ -43,9 +50,7 @@
       </el-header>
 
       <el-main>
-        <keep-alive>
-          <router-view></router-view>
-        </keep-alive>
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
@@ -54,16 +59,19 @@
 <script>
 import {mapMutations, mapState} from "vuex";
 import myMenu from "@/views/home/components/menu";
+import Follower from "@/views/home/pages/follower";
 
 export default {
   name: "index",
   components:{
-    myMenu
+    myMenu,Follower
   },
   data(){
     const searchInput = ''
+    const dialogVisible = false
     return {
-      searchInput
+      searchInput,
+      dialogVisible
     }
   },
   computed:{

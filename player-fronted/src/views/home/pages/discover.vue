@@ -80,11 +80,6 @@ export default {
       initialSlide: 0,
       // 循环播放
       loop: false,
-      // 标记页数
-      pagination: {
-        el: ".swiper-pagination",
-        clickable: true, // 允许分页点击跳转
-      },
       // 左右箭头
       navigation: {
         prevEl: ".swiper-button-prev",

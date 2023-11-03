@@ -177,6 +177,13 @@ export default {
   },
   mounted() {
     this.initData(this.$route.params.id)
+  },
+  watch:{
+    "$route.params.id":{
+      handler(){
+        this.initData(this.$route.params.id)
+      }
+    }
   }
 }
 </script>

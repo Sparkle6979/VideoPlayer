@@ -51,31 +51,46 @@
             </el-form>
           </div>
         </el-tab-pane>
-        <el-tab-pane label="消息" name="3">
+        <el-tab-pane label="消息中心" name="3">
           <div>
-            <el-table :data="tableData" style="margin-bottom: 20px;"
-                row-key="id" :cell-style="msgTableRowClass" :show-header="true"
-                :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
-              <el-table-column prop="date" label="时间" align="center" width="200" sortable>
-              </el-table-column>
-              <el-table-column prop="name" label="用户名" width="180"></el-table-column>
-              <el-table-column prop="createdAt" label="消息时间" align="center" ></el-table-column>
-              <el-table-column prop="message" label="消息"></el-table-column>
-              <el-table-column label="状态">
-                <template slot-scope="scope">
-                  <el-tag v-if="scope.row.status == 0" type="danger">未读</el-tag>
-                  <el-tag v-if="scope.row.status == 1" type="success">已读</el-tag>
-                  <el-tag v-if="scope.row.status == 2">已回复</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column label="操作" width="100px" fixed="right">
-                <template slot-scope="scope">
-                  <el-button v-if="scope.row.message && scope.row.status != 2" type="text" size="small"
-                  @click="reviewMsg(scope.row.name,scope.row.message)">回复</el-button>
-<!--                  <el-button v-if="scope.row.message && scope.row.status == 2" type="text" size="small">查看</el-button>-->
-                </template>
-              </el-table-column>
-            </el-table>
+            <el-tabs tab-position="left" type="border-card" style="height: 620px;overflow-y: auto;">
+              <el-tab-pane label="赞">
+                <MyMessage :messageList="zanList" :type="1"></MyMessage>
+              </el-tab-pane>
+              <el-tab-pane label="回复">
+                <div>
+                  <el-table :data="tableData" style="margin-bottom: 20px;"
+                            row-key="id" :cell-style="msgTableRowClass" :show-header="true"
+                            :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+                    <el-table-column prop="date" label="时间" align="center" width="200" sortable>
+                    </el-table-column>
+                    <el-table-column prop="name" label="用户名" width="180"></el-table-column>
+                    <el-table-column prop="createdAt" label="消息时间" align="center" ></el-table-column>
+                    <el-table-column prop="message" label="消息"></el-table-column>
+                    <el-table-column label="状态">
+                      <template slot-scope="scope">
+                        <el-tag v-if="scope.row.status == 0" type="danger">未读</el-tag>
+                        <el-tag v-if="scope.row.status == 1" type="success">已读</el-tag>
+                        <el-tag v-if="scope.row.status == 2">已回复</el-tag>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="100px" fixed="right">
+                      <template slot-scope="scope">
+                        <el-button v-if="scope.row.message && scope.row.status != 2" type="text" size="small"
+                                   @click="reviewMsg(scope.row.name,scope.row.message)">回复</el-button>
+                        <!--                  <el-button v-if="scope.row.message && scope.row.status == 2" type="text" size="small">查看</el-button>-->
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </div>
+              </el-tab-pane>
+              <el-tab-pane label="@我的">
+                <MyMessage :messageList="zanList" :type="2"></MyMessage>
+              </el-tab-pane>
+              <el-tab-pane label="私信">
+                <Im></Im>
+              </el-tab-pane>
+            </el-tabs>
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -108,12 +123,14 @@
 
 <script>
 import myVideo from "@/views/home/components/video";
+import MyMessage from '@/views/home/components/message';
+import Im from "@/views/home/components/im";
 import {mapGetters} from "vuex";
 
 export default {
   name: "user",
   components:{
-    myVideo
+    myVideo,MyMessage,Im
   },
   data(){
     const activeIndex = '1'
@@ -141,6 +158,24 @@ export default {
     ]
     let textarea = '' // 评论输入框
     let commentContent = ''
+    const zanList = [
+      {
+        id:1,
+        name:"王二虎",
+        avatar:"https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+        created_at:"2023-11-3 16:38:00",
+        videoId: 1,
+        videoCover: "https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg"
+      },
+      {
+        id:2,
+        name:"王二虎",
+        avatar:"https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+        created_at:"2023-11-3 16:38:00",
+        videoId: 1,
+        videoCover: "https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg"
+      }
+    ]
     return {
       activeIndex,
       isInput,
@@ -181,7 +216,8 @@ export default {
       msg,
       videoList,
       textarea,
-      commentContent
+      commentContent,
+      zanList,
     }
   },
   methods:{
@@ -275,5 +311,8 @@ export default {
 .left {
   background-color: forestgreen;
 }
-
+ul {
+  list-style-type: none; /* 移除默认的圆点样式 */
+  padding: 0; /* 移除默认的内边距 */
+}
 </style>

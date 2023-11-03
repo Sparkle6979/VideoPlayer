@@ -101,8 +101,6 @@ export default{
     }
   },
   methods:{
-    obtain(){
-    },
     // 评价框失焦
     lose(m){
       m.display = false
@@ -111,16 +109,11 @@ export default{
     comment_input(m){
       m.display = true
     },
-    comment_like(){
-    },
     comment_delete(m,n,w,t){
       if(n == '子级'){
         this.comments[w].sons.splice(t,1);
       }else if(n == '父级'){
         this.comments.splice(w,1)
-      }
-      if(this.comments.length == 0) {
-        this.show = false
       }
       this.$emit('update',this.comments)
     },
@@ -147,8 +140,14 @@ export default{
       this.$emit('update',this.comments)
     }
   },
-  created() {
-
+  watch:{
+    comments(newValue,oldValue){
+      if(newValue.length === 0){
+        this.show = false
+      }else{
+        this.show = true
+      }
+    }
   }
 }
 </script>

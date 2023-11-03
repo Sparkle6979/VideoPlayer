@@ -4,11 +4,20 @@
       <el-col :span="8">
         <el-card style="width: 100%; min-height: 300px; color: #333">
           <div style="padding-bottom: 10px; border-bottom: 1px solid #ccc">用户<span style="font-size: 12px">（点击聊天气泡开始聊天）</span></div>
+          <div>
+            <el-autocomplete
+                v-model="usernameInput"
+                :fetch-suggestions="querySearchAsync"
+                style="width: 100%"
+                placeholder="请输入用户名"
+                @select="handleSelect"
+            ></el-autocomplete>
+          </div>
           <div style="padding: 10px 0;display: flex;align-items: center;" v-for="user in users" :key="user.username" >
             <el-avatar :src="defaultUserAvatar"></el-avatar>
             <span>{{ user.username }}</span>
             <i class="el-icon-chat-dot-round" style="margin-left: 10px; font-size: 16px; cursor: pointer"
-               @click="chatUser = user.username"></i>
+               @click="changeChatUser(user.username)"></i>
             <span style="font-size: 12px;color: limegreen; margin-left: 5px" v-if="user.username === chatUser">chatting...</span>
           </div>
         </el-card>
@@ -50,7 +59,9 @@ export default {
       chatUser: '',
       text: "",
       messages: [],
-      content: ''
+      content: '',
+      usernameInput:'',
+      timeout: null,
     }
   },
   computed:{
@@ -74,6 +85,10 @@ export default {
           this.text = '';
         }
       }
+    },
+    changeChatUser(username){
+      this.chatUser = username
+      this.content = ''
     },
     createContent(remoteUser, nowUser, text) {  // 这个方法是用来将 json的聊天消息数据转换成 html的。
       let html
@@ -104,6 +119,27 @@ export default {
       console.log(html)
       this.content += html;
     },
+    querySearchAsync(queryString, callback) {
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        callback(
+            [
+              {
+                "value":"user1"
+              },
+              {
+                "value":"user2"
+              }
+            ]
+        )
+      }, 3000 * Math.random());
+    },
+    handleSelect(item){
+      this.usernameInput = ''
+      this.users.push({
+        username: item.value
+      })
+    }
   }
 }
 </script>

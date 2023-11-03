@@ -53,7 +53,7 @@
         </el-tab-pane>
         <el-tab-pane label="消息中心" name="3">
           <div>
-            <el-tabs tab-position="left" type="border-card" style="height: 620px;overflow-y: auto;">
+            <el-tabs tab-position="left" type="border-card" style="height: 650px;overflow-y: auto;">
               <el-tab-pane label="赞">
                 <MyMessage :messageList="zanList" :type="1"></MyMessage>
               </el-tab-pane>

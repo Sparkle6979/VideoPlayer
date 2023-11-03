@@ -41,6 +41,7 @@ export default {
       })
       getVideoListByCId(id).then((res) => {
         this.videoList = res.data
+        console.log("getVideoListByCId",res)
         this.loading = false
       })
     },

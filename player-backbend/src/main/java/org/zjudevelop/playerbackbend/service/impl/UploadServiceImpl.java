@@ -12,11 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.zjudevelop.playerbackbend.dto.UploadFileInfoDTO;
-import org.zjudevelop.playerbackbend.pojo.LocalFile;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 import org.zjudevelop.playerbackbend.service.UploadService;
-import org.zjudevelop.playerbackbend.utils.LocalFileUtil;
-import org.zjudevelop.playerbackbend.utils.UploadFileUtil;
+import org.zjudevelop.playerbackbend.utils.FileProcessUtil;
 
 /**
  * @author sparkle6979l
@@ -42,8 +40,7 @@ public class UploadServiceImpl implements UploadService {
         String upToken = auth.uploadToken(bucket);
 
         // ...根据文件url生成文件名称
-        String fileName = StringUtils.join(UploadFileUtil.getFileName(localFileUrl),
-                UploadFileUtil.getFileSuffix(localFileUrl));
+        String fileName = FileProcessUtil.getFileName(localFileUrl);
         try {
             Response response = uploadManager.put(localFileUrl, fileName, upToken);
             //解析上传成功的结果
@@ -58,9 +55,45 @@ public class UploadServiceImpl implements UploadService {
                 log.error(ex.response.toString());
             }
         }
-        // 生成云服务器外链路径
-        String serverFileUrl = StringUtils.join(dataServer.getDomain(), "/", fileName);
 
+        String serverFileUrl = StringUtils.join(dataServer.getDomain(), "/", fileName);
+        UploadFileInfoDTO uploadFileInfoDTO = UploadFileInfoDTO.builder()
+                .serverFileUrl(serverFileUrl)
+                .serverFileName(fileName).build();
+
+        return uploadFileInfoDTO;
+    }
+
+    @Override
+    public UploadFileInfoDTO uploadfile(String fileName, byte[] data, QNDataServer dataServer) {
+        Configuration cfg = new Configuration(Region.region0());
+        cfg.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;// 指定分片上传版本
+        //...其他参数参考类注释
+        UploadManager uploadManager = new UploadManager(cfg);
+        //...生成上传凭证，然后准备上传
+        String accessKey = dataServer.getAccessKey();
+        String secretKey = dataServer.getSecretKey();
+        String bucket = dataServer.getBucket();
+
+        Auth auth = Auth.create(accessKey, secretKey);
+        String upToken = auth.uploadToken(bucket);
+
+        try {
+            Response response = uploadManager.put(data, fileName, upToken);
+            //解析上传成功的结果
+            DefaultPutRet putRet = JSON.parseObject(response.bodyString(), DefaultPutRet.class);
+//            System.out.println(putRet.key);
+//            System.out.println(putRet.hash);
+            log.info(putRet.key);
+            log.info(putRet.hash);
+        } catch (QiniuException ex) {
+            ex.printStackTrace();
+            if (ex.response != null) {
+                log.error(ex.response.toString());
+            }
+        }
+
+        String serverFileUrl = StringUtils.join(dataServer.getDomain(), "/", fileName);
         UploadFileInfoDTO uploadFileInfoDTO = UploadFileInfoDTO.builder()
                 .serverFileUrl(serverFileUrl)
                 .serverFileName(fileName).build();

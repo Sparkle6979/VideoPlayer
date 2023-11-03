@@ -1,5 +1,7 @@
 package org.zjudevelop.playerbackbend.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(value = "/video")
+@Api(tags = "视频")
 public class VideoController {
     @Autowired
     private QNDataServer qnDataServer;
@@ -31,7 +34,7 @@ public class VideoController {
     @Autowired
     private VideoService videoService;
 
-//    @CheckAuth(check = false)
+    @ApiOperation("视频上传")
     @RequestMapping(value = "/upload",method = RequestMethod.POST)
     public RestResult<VideoInfoDTO> uploadVideo(@RequestBody VideoUploadDTO videoUploadDTO){
         UploadFileInfoDTO videoServerFile = uploadService.uploadfile(videoUploadDTO.getVideoUrl(), qnDataServer);
@@ -64,6 +67,7 @@ public class VideoController {
 
     }
 
+    @ApiOperation("视频搜索")
     @CheckAuth(check = false)
     @RequestMapping(value = "/search",method = RequestMethod.GET)
     public RestResult<List<VideoSearchInfoDTO>> getVideoSearchInfoByKeyword(@RequestParam String keyword) {

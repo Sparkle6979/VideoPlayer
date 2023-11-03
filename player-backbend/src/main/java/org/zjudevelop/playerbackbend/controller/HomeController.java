@@ -1,5 +1,7 @@
 package org.zjudevelop.playerbackbend.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(value = "/home")
+@Api(tags = "分类页")
 public class HomeController {
     @Autowired
     private VideoService videoService;
@@ -32,6 +35,7 @@ public class HomeController {
     private CategoryService categoryService;
 
     @CheckAuth(check = false)
+    @ApiOperation("获取所有分类信息")
     @RequestMapping(value = "/category/detail",method = RequestMethod.GET)
         public RestResult<List<CategoryInfoDTO>> getCategoryInfoList(){
         List<CategoryInfoDTO> categoryInfoList = categoryService.getCategoryInfoList();
@@ -39,19 +43,22 @@ public class HomeController {
     }
 
     @CheckAuth(check = false)
-    @RequestMapping(value = "/videolist")
+    @ApiOperation("根据categoryId获取视频信息")
+    @RequestMapping(value = "/videolist", method = RequestMethod.GET)
     public RestResult<List<VideoInfoDTO>> getVideoInfoListByCategoryId(@RequestParam Long categoryId){
         List<VideoInfoDTO> videoInfoList = videoService.getVideoInfoListByCategoryId(categoryId);
         return RestResult.success(videoInfoList);
     }
     @CheckAuth(check = false)
-    @RequestMapping(value = "/videoinfo")
+    @ApiOperation("根据videoId获取视频信息")
+    @RequestMapping(value = "/videoinfo", method = RequestMethod.GET)
     public RestResult<VideoInfoDTO> getVideoInfoByVideoId(@RequestParam Long videoId){
         VideoInfoDTO videoInfo = videoService.getVideoInfoById(videoId);
         return RestResult.success(videoInfo);
     }
     @CheckAuth(check = false)
-    @RequestMapping(value = "/categoryinfo")
+    @ApiOperation("根据categoryId获取分类信息")
+    @RequestMapping(value = "/categoryinfo", method = RequestMethod.GET)
     public RestResult<CategoryInfoDTO> getCategoryInfoByCategoryId(@RequestParam Long categoryId){
         CategoryInfoDTO categoryInfo = categoryService.getCategoryInfoById(categoryId);
         return RestResult.success(categoryInfo);

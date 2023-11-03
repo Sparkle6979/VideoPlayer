@@ -7,10 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class PlayerBackbendApplicationTests {
 
-    @Autowired
-    @Test
-    void contextLoads() {
-        String videoUrl =
-    }
+
 
 }

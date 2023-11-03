@@ -80,10 +80,11 @@
         </dependency>
 
         <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>opencv-platform</artifactId>
-            <version>4.5.1-1.5.5</version>
+            <groupId>org.jcodec</groupId>
+            <artifactId>jcodec</artifactId>
+            <version>0.2.2</version>
         </dependency>
+
 
         <dependency>
             <groupId>com.github.xiaoymin</groupId>

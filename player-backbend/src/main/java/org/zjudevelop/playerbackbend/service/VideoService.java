@@ -2,6 +2,7 @@ package org.zjudevelop.playerbackbend.service;
 
 import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
 import org.zjudevelop.playerbackbend.dto.VideoInsertDTO;
+import org.zjudevelop.playerbackbend.dto.VideoSearchInfoDTO;
 
 import java.util.List;
 
@@ -14,4 +15,6 @@ public interface VideoService {
     VideoInfoDTO getVideoInfoById(Long videoId);
     List<VideoInfoDTO> getVideoInfoListByCategoryId(Long categoryId);
     Long addVideoInfo(VideoInsertDTO videoInsertDTO);
+
+    List<VideoSearchInfoDTO> getVideoInfoByKeyword(String keyword);
 }

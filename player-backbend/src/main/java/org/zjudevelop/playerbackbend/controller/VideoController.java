@@ -3,10 +3,7 @@ package org.zjudevelop.playerbackbend.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.zjudevelop.playerbackbend.dto.*;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 import org.zjudevelop.playerbackbend.service.UploadService;
@@ -14,6 +11,8 @@ import org.zjudevelop.playerbackbend.service.VideoService;
 import org.zjudevelop.playerbackbend.utils.RestResult;
 import org.zjudevelop.playerbackbend.utils.FileProcessUtil;
 import org.zjudevelop.playerbackbend.utils.VideoProcessUtil;
+
+import java.util.List;
 
 /**
  * @author sparkle6979l
@@ -38,7 +37,7 @@ public class VideoController {
         UploadFileInfoDTO coverServerFile =  new UploadFileInfoDTO();
         if(StringUtils.isBlank(videoUploadDTO.getCoverUrl())){
             byte[] coverFromVideoPath = VideoProcessUtil.getCoverFromVideoPath(videoUploadDTO.getVideoUrl(),1146,717);
-            String coverName = StringUtils.join(FileProcessUtil.getFileName(videoUploadDTO.getVideoUrl()),".jpg");
+            String coverName = StringUtils.join(FileProcessUtil.getFileOriginName(videoUploadDTO.getVideoUrl()),".jpg");
             coverServerFile = uploadService.uploadfile(coverName, coverFromVideoPath, qnDataServer);
         }else{
             coverServerFile = uploadService.uploadfile(videoUploadDTO.getCoverUrl(), qnDataServer);
@@ -62,4 +61,12 @@ public class VideoController {
         return RestResult.success(videoInfoById);
 
     }
+
+    @RequestMapping(value = "/search",method = RequestMethod.GET)
+    public RestResult<List<VideoSearchInfoDTO>> getVideoSearchInfoByKeyword(@RequestParam String keyword) {
+        List<VideoSearchInfoDTO> videoInfoByKeyword = videoService.getVideoInfoByKeyword(keyword);
+        return RestResult.success(videoInfoByKeyword);
+    }
+
+
 }

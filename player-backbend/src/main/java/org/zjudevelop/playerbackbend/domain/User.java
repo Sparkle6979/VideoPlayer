@@ -27,6 +27,6 @@ public class User implements Serializable {
 
     private String password;
 
-    private String avatar_path;
+    private String avatarPath;
 
 }

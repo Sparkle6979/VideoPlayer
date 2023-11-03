@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,8 @@ import org.zjudevelop.playerbackbend.domain.Likes;
 import org.zjudevelop.playerbackbend.dto.*;
 import org.zjudevelop.playerbackbend.pojo.JwtProperties;
 import org.zjudevelop.playerbackbend.domain.User;
+import org.zjudevelop.playerbackbend.pojo.QNDataServer;
+import org.zjudevelop.playerbackbend.service.UploadService;
 import org.zjudevelop.playerbackbend.service.UserService;
 import org.zjudevelop.playerbackbend.utils.JwtUtil;
 import org.zjudevelop.playerbackbend.utils.RestResult;
@@ -33,6 +36,12 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    UploadService uploadService;
+
+    @Autowired
+    QNDataServer qnDataServer;
 
     @Autowired
     JwtProperties jwtProperties;
@@ -106,10 +115,9 @@ public class UserController {
             ex.printStackTrace();
             return RestResult.fail(ex.getMessage());
         }
-        UserInfoDTO userInfoDTO = UserInfoDTO.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .build();
+        UserInfoDTO userInfoDTO = new UserInfoDTO();
+        BeanUtils.copyProperties(user, userInfoDTO);
+
         return RestResult.success(userInfoDTO);
     }
 
@@ -120,16 +128,30 @@ public class UserController {
     @ApiOperation("更新用户信息")
     public RestResult updateUserInfo(@ModelAttribute UserInfoUpdateDTO userInfoUpdateDTO) {
         Long userId = BaseContext.getCurrentUserId();
-        log.info("userInfoUpdateInfo" + userInfoUpdateDTO);
+
         // save file in local path
         MultipartFile file = userInfoUpdateDTO.getFile();
         String filePath = tmpFilePath + "/" + file.getOriginalFilename();
         File localFile = new File(filePath);
         try {
             file.transferTo(localFile);
-            System.out.println("save successfully");
+            log.info("文件保存成功，保存路径为： " + filePath);
         } catch (IllegalStateException | IOException e) {
             e.printStackTrace();
+            return RestResult.fail("文件上传失败");
+        }
+
+        // upload file to server
+        String fileUrl = uploadService.uploadfile(filePath, qnDataServer).getServerFileUrl();
+        log.info("文件上传成功, url为： " + fileUrl);
+
+        User user = new User();
+        BeanUtils.copyProperties(userInfoUpdateDTO, user);
+        user.setId(userId);
+        user.setAvatarPath(fileUrl);
+        int returnValue = userService.update(user);
+        if (returnValue <= 0) {
+            return RestResult.fail("更新失败");
         }
         return RestResult.success();
     }

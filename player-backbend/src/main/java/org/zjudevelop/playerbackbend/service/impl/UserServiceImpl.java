@@ -126,4 +126,9 @@ public class UserServiceImpl implements UserService {
         List<Follows> followsList = followsMapper.selectList(wrapper);
         return followsList;
     }
+
+    @Override
+    public int update(User user) {
+        return userMapper.updateById(user);
+    }
 }

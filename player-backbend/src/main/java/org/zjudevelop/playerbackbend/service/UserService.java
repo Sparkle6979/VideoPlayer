@@ -13,6 +13,8 @@ public interface UserService {
 
     User registry(UserRegisterDTO userRegisterDTO);
 
+    int update(User user);
+
     User getUserById(Long id);
 
     int like(Likes likes);

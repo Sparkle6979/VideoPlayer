@@ -5,8 +5,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.zjudevelop.playerbackbend.common.context.BaseContext;
+import org.zjudevelop.playerbackbend.domain.Follows;
 import org.zjudevelop.playerbackbend.domain.Likes;
 import org.zjudevelop.playerbackbend.dto.*;
 import org.zjudevelop.playerbackbend.pojo.JwtProperties;
@@ -15,6 +18,8 @@ import org.zjudevelop.playerbackbend.service.UserService;
 import org.zjudevelop.playerbackbend.utils.JwtUtil;
 import org.zjudevelop.playerbackbend.utils.RestResult;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +33,12 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
     @Autowired
     JwtProperties jwtProperties;
+
+    @Value("${tmp_file_path}")
+    String tmpFilePath;
 
     /**
      * 用户登录
@@ -66,7 +75,7 @@ public class UserController {
      * 用户注册
      * */
     @ApiOperation("用户注册")
-    @PostMapping()
+    @PostMapping
     public RestResult<UserRegisterInfoDTO> userRegistry(@RequestBody UserRegisterDTO userRegisterDTO) {
         User user = null;
         try {
@@ -109,35 +118,83 @@ public class UserController {
      * */
     @PutMapping()
     @ApiOperation("更新用户信息")
-    public RestResult updateUserInfo(@RequestBody UserInfoUpdateDTO userInfoUpdateDTO) {
+    public RestResult updateUserInfo(@ModelAttribute UserInfoUpdateDTO userInfoUpdateDTO) {
+        Long userId = BaseContext.getCurrentUserId();
+        log.info("userInfoUpdateInfo" + userInfoUpdateDTO);
+        // save file in local path
+        MultipartFile file = userInfoUpdateDTO.getFile();
+        String filePath = tmpFilePath + "/" + file.getOriginalFilename();
+        File localFile = new File(filePath);
+        try {
+            file.transferTo(localFile);
+            System.out.println("save successfully");
+        } catch (IllegalStateException | IOException e) {
+            e.printStackTrace();
+        }
         return RestResult.success();
     }
 
     /**
      * 关注
      * */
-    @PostMapping("/follow")
+    @PostMapping("/follows/{followingId}")
     @ApiOperation("关注用户")
-    public RestResult follow(@RequestBody FollowDTO followDTO) {
+    public RestResult follow(@PathVariable Long followingId) {
+        Follows follows = new Follows().builder()
+                .followerId(BaseContext.getCurrentUserId())
+                .followingId(followingId)
+                .build();
+        userService.follow(follows);
         return RestResult.success();
+    }
+
+
+    /**
+     * 取消关注
+     * @Param [followingId]
+     * @return org.zjudevelop.playerbackbend.utils.RestResult
+     * */
+    @DeleteMapping("/follows/{followingId}")
+    public RestResult unfollow(@PathVariable Long followingId) {
+        Follows follows = new Follows().builder()
+                .followerId(BaseContext.getCurrentUserId())
+                .followingId(followingId)
+                .build();
+        int returnValue = userService.unfollow(follows);
+        if (returnValue <= 0) {
+            return RestResult.fail("取关失败");
+        }
+        return RestResult.success("取关成功");
     }
 
     /**
      * 查询粉丝列表
      * */
-    @GetMapping("/follower/{id}")
+    @GetMapping("/follows/follower/{id}")
     @ApiOperation("查询粉丝列表")
     public RestResult<FollowersDTO> getFollowers(@ApiParam("查询用户id") @PathVariable Long id) {
-        return null;
+        List<Follows> followsList = userService.getFollowers(id);
+        List<Long> follwersList = followsList.stream().map(Follows::getFollowerId).collect(Collectors.toList());
+        FollowersDTO followersDTO = new FollowersDTO().builder()
+                .id(id)
+                .followerIds(follwersList)
+                .build();
+        return RestResult.success(followersDTO);
     }
 
     /**
      * 查询关注列表
      * */
-    @GetMapping("/following/{id}")
+    @GetMapping("/follows/following/{id}")
     @ApiOperation("查询关注列表")
     public RestResult<FollowingsDTO> getFollowings(@ApiParam("查询用户id") @PathVariable Long id) {
-        return null;
+        List<Follows> followsList = userService.getFollowings(id);
+        List<Long> follwingsList = followsList.stream().map(Follows::getFollowingId).collect(Collectors.toList());
+        FollowingsDTO followingsDTO = new FollowingsDTO().builder()
+                .id(id)
+                .followingIds(follwingsList)
+                .build();
+        return RestResult.success(followingsDTO);
     }
 
     /**
@@ -166,8 +223,11 @@ public class UserController {
                 .userId(BaseContext.getCurrentUserId())
                 .videoId(videoId)
                 .build();
-        userService.unlike(likes);
-        return RestResult.success();
+        int returnValue = userService.unlike(likes);
+        if (returnValue <= 0) {
+            RestResult.fail("取消点赞失败");
+        }
+        return RestResult.success("取消点赞成功");
     }
 
 

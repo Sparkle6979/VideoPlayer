@@ -13,6 +13,7 @@ import org.zjudevelop.playerbackbend.common.context.BaseContext;
 import org.zjudevelop.playerbackbend.domain.Follows;
 import org.zjudevelop.playerbackbend.domain.Likes;
 import org.zjudevelop.playerbackbend.dto.*;
+import org.zjudevelop.playerbackbend.pojo.CheckAuth;
 import org.zjudevelop.playerbackbend.pojo.JwtProperties;
 import org.zjudevelop.playerbackbend.domain.User;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
@@ -54,6 +55,7 @@ public class UserController {
      * */
     @ApiOperation("用户登录")
     @PostMapping("/login")
+    @CheckAuth(check = false)
     public RestResult<UserLoginInfoDTO> login(@RequestBody UserLoginDTO userLoginDTO){
         User user = null;
         try {
@@ -85,6 +87,7 @@ public class UserController {
      * */
     @ApiOperation("用户注册")
     @PostMapping
+    @CheckAuth(check = false)
     public RestResult<UserRegisterInfoDTO> userRegistry(@RequestBody UserRegisterDTO userRegisterDTO) {
         User user = null;
         try {
@@ -106,6 +109,7 @@ public class UserController {
      * */
     @ApiOperation("查询用户信息")
     @GetMapping("/{id}")
+    @CheckAuth(check = false)
     public RestResult<UserInfoDTO> getUserInfoById(@ApiParam(value = "用户id", required = true,
             example = "1") @PathVariable Long id) {
         User user = null;
@@ -194,6 +198,7 @@ public class UserController {
      * */
     @GetMapping("/follows/follower/{id}")
     @ApiOperation("查询粉丝列表")
+    @CheckAuth(check = false)
     public RestResult<FollowersDTO> getFollowers(@ApiParam("查询用户id") @PathVariable Long id) {
         List<Follows> followsList = userService.getFollowers(id);
         List<Long> follwersList = followsList.stream().map(Follows::getFollowerId).collect(Collectors.toList());
@@ -209,6 +214,7 @@ public class UserController {
      * */
     @GetMapping("/follows/following/{id}")
     @ApiOperation("查询关注列表")
+    @CheckAuth(check = false)
     public RestResult<FollowingsDTO> getFollowings(@ApiParam("查询用户id") @PathVariable Long id) {
         List<Follows> followsList = userService.getFollowings(id);
         List<Long> follwingsList = followsList.stream().map(Follows::getFollowingId).collect(Collectors.toList());

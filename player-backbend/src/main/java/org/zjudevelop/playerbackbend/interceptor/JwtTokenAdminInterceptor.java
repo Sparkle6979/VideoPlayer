@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.zjudevelop.playerbackbend.common.context.BaseContext;
+import org.zjudevelop.playerbackbend.pojo.CheckAuth;
 import org.zjudevelop.playerbackbend.pojo.JwtProperties;
 import org.zjudevelop.playerbackbend.utils.JwtUtil;
 
@@ -28,9 +29,14 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
      * @param handler
      * */
     public boolean preHandle (HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // 只拦截controller的方法
-        // TODO: 区分需要鉴权和不需要鉴权的方法
-        if (!(handler instanceof HandlerMethod)) {
+        HandlerMethod hm = (HandlerMethod) handler;
+        boolean check = true;
+        CheckAuth methodAuth = hm.getMethodAnnotation(CheckAuth.class);
+        if (methodAuth != null) {
+            check = methodAuth.check();
+        }
+        log.info("check: " + check);
+        if (!(handler instanceof HandlerMethod) || !check) {
             return true;
         }
 

@@ -181,6 +181,7 @@ public class UserController {
      * @return org.zjudevelop.playerbackbend.utils.RestResult
      * */
     @DeleteMapping("/follows/{followingId}")
+    @ApiOperation("取关用户")
     public RestResult unfollow(@PathVariable Long followingId) {
         Follows follows = new Follows().builder()
                 .followerId(BaseContext.getCurrentUserId())

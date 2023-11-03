@@ -12,7 +12,7 @@ const request = axios.create({
 
 request.interceptors.request.use(
     (config)=>{
-        config.headers['Authorization']=tokenType + ' ' + localStorage.getItem('token')
+        config.headers['Authorization']=localStorage.getItem('token')
         return config
     },
     (error)=>{

@@ -29,14 +29,17 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
      * @param handler
      * */
     public boolean preHandle (HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        if (!(handler instanceof HandlerMethod)) {
+            return true;
+        }
+        // check annotation of CheckAuth
         HandlerMethod hm = (HandlerMethod) handler;
         boolean check = true;
         CheckAuth methodAuth = hm.getMethodAnnotation(CheckAuth.class);
         if (methodAuth != null) {
             check = methodAuth.check();
         }
-        log.info("check: " + check);
-        if (!(handler instanceof HandlerMethod) || !check) {
+        if (!check) {
             return true;
         }
 

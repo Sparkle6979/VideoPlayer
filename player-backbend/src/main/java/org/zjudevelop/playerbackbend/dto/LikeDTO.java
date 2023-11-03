@@ -7,18 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class UserRegisterInfoDTO implements Serializable {
-
-    @ApiModelProperty(value = "用户id", example = "29")
+public class LikeDTO {
+    @ApiModelProperty(value = "用户id")
     private Long id;
-
-    @ApiModelProperty(value = "用户名", example = "周兴哲")
-    private String username;
-
+    @ApiModelProperty(value = "点赞视频id")
+    private Long videoId;
 }

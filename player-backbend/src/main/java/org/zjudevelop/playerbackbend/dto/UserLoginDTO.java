@@ -11,7 +11,6 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel("用户登录实体")
 public class UserLoginDTO implements Serializable {
 
     // 用户名

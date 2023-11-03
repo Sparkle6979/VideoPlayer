@@ -6,18 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserInfoDTO {
-
-    @ApiModelProperty(value = "用户id", example = "1")
+public class FollowersDTO {
+    @ApiModelProperty(value = "用户id")
     private Long id;
-
-    @ApiModelProperty(value = "用户名", example = "admin")
-    private String username;
-
-    @ApiModelProperty(value = "头像url")
-    private String avatarPath;
+    @ApiModelProperty(value = "粉丝列表")
+    private List<Long> followerIds;
 }

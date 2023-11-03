@@ -26,6 +26,7 @@ public class TestController {
     @Autowired
     UploadServiceImpl uploadService;
 
+
     @RequestMapping(value = "/upload",method = RequestMethod.GET)
     public RestResult<UploadFileInfoDTO> uploadtest(@RequestParam String filepath){
         return RestResult.success(uploadService.uploadfile(filepath,qnDataServer));

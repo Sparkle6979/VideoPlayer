@@ -5,6 +5,7 @@ import org.zjudevelop.playerbackbend.domain.CategoryPO;
 import org.zjudevelop.playerbackbend.domain.VideoPO;
 import org.zjudevelop.playerbackbend.dto.CategoryInfoDTO;
 import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
+import org.zjudevelop.playerbackbend.dto.VideoSearchInfoDTO;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -46,5 +47,22 @@ public class DTOUtil {
                 .categoryName(categoryPO.getCategoryName())
                 .build();
         return categoryInfoDTO;
+    }
+
+    public static VideoSearchInfoDTO makeVideoSearchInfoDTO(String keyword, VideoPO videoPO,CategoryPO categoryPO){
+        VideoInfoDTO videoInfoDTO = makeVideoInfoDTO(videoPO, categoryPO);
+        VideoSearchInfoDTO videoSearchInfoDTO = VideoSearchInfoDTO.builder()
+                .keyword(keyword)
+                .videoId(videoInfoDTO.getVideoId())
+                .title(videoInfoDTO.getTitle())
+                .categoryId(videoInfoDTO.getCategoryId())
+                .categoryName(videoInfoDTO.getCategoryName())
+                .createTime(videoInfoDTO.getCreateTime())
+                .description(videoInfoDTO.getDescription())
+                .likeCount(videoInfoDTO.getLikeCount())
+                .coverUrl(videoInfoDTO.getCoverUrl())
+                .videoUrl(videoInfoDTO.getVideoUrl())
+                .build();
+        return videoSearchInfoDTO;
     }
 }

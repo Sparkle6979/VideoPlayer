@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.zjudevelop.playerbackbend.dto.*;
+import org.zjudevelop.playerbackbend.pojo.CheckAuth;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 import org.zjudevelop.playerbackbend.service.UploadService;
 import org.zjudevelop.playerbackbend.service.VideoService;
@@ -30,6 +31,7 @@ public class VideoController {
     @Autowired
     private VideoService videoService;
 
+//    @CheckAuth(check = false)
     @RequestMapping(value = "/upload",method = RequestMethod.POST)
     public RestResult<VideoInfoDTO> uploadVideo(@RequestBody VideoUploadDTO videoUploadDTO){
         UploadFileInfoDTO videoServerFile = uploadService.uploadfile(videoUploadDTO.getVideoUrl(), qnDataServer);
@@ -62,6 +64,7 @@ public class VideoController {
 
     }
 
+    @CheckAuth(check = false)
     @RequestMapping(value = "/search",method = RequestMethod.GET)
     public RestResult<List<VideoSearchInfoDTO>> getVideoSearchInfoByKeyword(@RequestParam String keyword) {
         List<VideoSearchInfoDTO> videoInfoByKeyword = videoService.getVideoInfoByKeyword(keyword);

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.zjudevelop.playerbackbend.dto.CategoryInfoDTO;
 import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
+import org.zjudevelop.playerbackbend.pojo.CheckAuth;
 import org.zjudevelop.playerbackbend.service.CategoryService;
 import org.zjudevelop.playerbackbend.service.VideoService;
 import org.zjudevelop.playerbackbend.utils.RestResult;
@@ -30,24 +31,26 @@ public class HomeController {
     @Autowired
     private CategoryService categoryService;
 
+    @CheckAuth(check = false)
     @RequestMapping(value = "/category/detail",method = RequestMethod.GET)
     public RestResult<List<CategoryInfoDTO>> getCategoryInfoList(){
         List<CategoryInfoDTO> categoryInfoList = categoryService.getCategoryInfoList();
         return RestResult.success(categoryInfoList);
     }
 
+    @CheckAuth(check = false)
     @RequestMapping(value = "/videolist")
     public RestResult<List<VideoInfoDTO>> getVideoInfoListByCategoryId(@RequestParam Long categoryId){
         List<VideoInfoDTO> videoInfoList = videoService.getVideoInfoListByCategoryId(categoryId);
         return RestResult.success(videoInfoList);
     }
-
+    @CheckAuth(check = false)
     @RequestMapping(value = "/videoinfo")
     public RestResult<VideoInfoDTO> getVideoInfoByVideoId(@RequestParam Long videoId){
         VideoInfoDTO videoInfo = videoService.getVideoInfoById(videoId);
         return RestResult.success(videoInfo);
     }
-
+    @CheckAuth(check = false)
     @RequestMapping(value = "/categoryinfo")
     public RestResult<CategoryInfoDTO> getCategoryInfoByCategoryId(@RequestParam Long categoryId){
         CategoryInfoDTO categoryInfo = categoryService.getCategoryInfoById(categoryId);

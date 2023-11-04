@@ -4,19 +4,18 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zjudevelop.playerbackbend.dao.FollowsMapper;
-import org.zjudevelop.playerbackbend.dao.LikesMapper;
-import org.zjudevelop.playerbackbend.dao.UserMapper;
-import org.zjudevelop.playerbackbend.domain.Follows;
-import org.zjudevelop.playerbackbend.domain.Likes;
+import org.zjudevelop.playerbackbend.dao.*;
+import org.zjudevelop.playerbackbend.domain.*;
 import org.zjudevelop.playerbackbend.dto.UserLoginDTO;
 import org.zjudevelop.playerbackbend.dto.UserRegisterDTO;
-import org.zjudevelop.playerbackbend.domain.User;
+import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
 import org.zjudevelop.playerbackbend.pojo.exception.AccountNotFoundException;
 import org.zjudevelop.playerbackbend.pojo.exception.BaseException;
 import org.zjudevelop.playerbackbend.pojo.exception.PasswordErrorException;
 import org.zjudevelop.playerbackbend.service.UserService;
+import org.zjudevelop.playerbackbend.utils.DTOUtil;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,6 +31,15 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private FollowsMapper followsMapper;
+
+    @Autowired
+    private CreatesMapper createsMapper;
+
+    @Autowired
+    private VideoMapper videoMapper;
+
+    @Autowired
+    private CategoryMapper categoryMapper;
 
     @Override
     public User login(UserLoginDTO userLoginDTO){
@@ -130,5 +138,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public int update(User user) {
         return userMapper.updateById(user);
+    }
+
+
+    @Override
+    public List<VideoInfoDTO> getOwnVideosById(Long userId) {
+        QueryWrapper createsWrapper = new QueryWrapper<>();
+        createsWrapper.eq("user_id", userId);
+        List<Creates> createsList = createsMapper.selectList(createsWrapper);
+
+
+        List<VideoInfoDTO> result = new ArrayList<>();
+        for (Creates creates : createsList) {
+            VideoPO videoPO = videoMapper.selectById(creates.getVideoId());
+            CategoryPO categoryPO = categoryMapper.selectById(videoPO.getCategoryId());
+            VideoInfoDTO videoInfoDTO = DTOUtil.makeVideoInfoDTO(videoPO,categoryPO);
+            result.add(videoInfoDTO);
+        }
+        return result;
     }
 }

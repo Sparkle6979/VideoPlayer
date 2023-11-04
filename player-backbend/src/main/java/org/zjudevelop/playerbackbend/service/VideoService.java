@@ -1,5 +1,7 @@
 package org.zjudevelop.playerbackbend.service;
 
+import org.zjudevelop.playerbackbend.domain.User;
+import org.zjudevelop.playerbackbend.dto.UserInfoDTO;
 import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
 import org.zjudevelop.playerbackbend.dto.VideoInsertDTO;
 import org.zjudevelop.playerbackbend.dto.VideoSearchInfoDTO;
@@ -17,4 +19,6 @@ public interface VideoService {
     Long addVideoInfo(VideoInsertDTO videoInsertDTO);
 
     List<VideoSearchInfoDTO> getVideoInfoByKeyword(String keyword);
+
+    UserInfoDTO getCreaterInfoById(Long videoId);
 }

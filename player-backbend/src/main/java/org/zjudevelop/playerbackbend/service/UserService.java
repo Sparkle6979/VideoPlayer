@@ -33,4 +33,8 @@ public interface UserService {
     List<Follows> getFollowers(Long userId);
 
     List<VideoInfoDTO> getOwnVideosById(Long userId);
+
+    boolean isAlreadyLiked(Long userId, Long videoId);
+
+    boolean isAlreadyFollowed(Long followerId, Long followingId);
 }

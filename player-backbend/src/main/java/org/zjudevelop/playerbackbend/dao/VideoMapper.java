@@ -22,6 +22,10 @@ public interface VideoMapper extends BaseMapper<VideoPO> {
             + "where category_id = #{categoryId} order by id")
     List<VideoPO> selectByCategoryId(@Param("categoryId") Long categoryId);
 
+    @Select(" select * from video " +
+            "where id = #{id} for update")
+    VideoPO selectByIdWithLock(@Param("id") Long id);
+
     @Insert("INSERT INTO video " +
             "(title, category_id, like_count, description, create_time, video_url, cover_url) " +
             "VALUES(#{title}, #{categoryId}, 0, #{description}, CURRENT_TIMESTAMP, #{videoUrl}, #{coverUrl})")
@@ -30,4 +34,5 @@ public interface VideoMapper extends BaseMapper<VideoPO> {
                           @Param("description") String description,
                           @Param("videoUrl") String videoUrl,
                           @Param("coverUrl") String coverUrl);
+
 }

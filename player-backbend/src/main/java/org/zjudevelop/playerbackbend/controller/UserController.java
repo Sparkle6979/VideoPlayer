@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.zjudevelop.playerbackbend.common.context.BaseContext;
+import org.zjudevelop.playerbackbend.domain.Creates;
 import org.zjudevelop.playerbackbend.domain.Follows;
 import org.zjudevelop.playerbackbend.domain.Likes;
 import org.zjudevelop.playerbackbend.dto.*;
@@ -275,4 +276,19 @@ public class UserController {
                 .build();
         return RestResult.success(likeVideosDTO);
     }
+
+    @GetMapping("/creates")
+    @ApiOperation("查询发布视频")
+    public RestResult<CreateVideosDTO> getCreateVideos() {
+        Long userId = BaseContext.getCurrentUserId();
+        List<Creates> creates = userService.getCreates(userId);
+        List<Long> videoIds = creates.stream().map(Creates::getVideoId).collect(Collectors.toList());
+        CreateVideosDTO createVideosDTO = new CreateVideosDTO().builder()
+                .userId(userId)
+                .videoIds(videoIds)
+                .build();
+        return RestResult.success(createVideosDTO);
+    }
+
+
 }

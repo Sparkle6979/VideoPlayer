@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author sparkle6979l
@@ -15,9 +16,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class VideoUploadDTO {
-    String videoUrl;
+    MultipartFile videoFile;
     String title;
     String description;
     Long categoryId;
-    String coverUrl;
+    MultipartFile coverFile;
 }

@@ -25,7 +25,7 @@ public class VideoProcessUtil {
 //    private static final int coverCol = 1146;
 //    private static final int coverRow = 717;
     private static final int keyFrameNum = 30;
-    public static byte[] getCoverFromVideoPath(String videoPath, int col,int row) {
+    public static byte[] getCoverFromVideoPath(String videoPath, int row,int col) {
 
         int frameNumber = keyFrameNum;
 
@@ -34,10 +34,10 @@ public class VideoProcessUtil {
         try {
             picture = FrameGrab.getFrameFromFile(new File(videoPath), frameNumber);
             BufferedImage bufferedImage = AWTUtil.toBufferedImage(picture);
-            BufferedImage resultImage = new BufferedImage(col, row, BufferedImage.TYPE_INT_RGB);
+            BufferedImage resultImage = new BufferedImage(row, col, BufferedImage.TYPE_INT_RGB);
 
             Graphics2D graphics = resultImage.createGraphics();
-            graphics.drawImage(bufferedImage,0,0,col,row,null);
+            graphics.drawImage(bufferedImage,0,0,row,col,null);
             graphics.dispose();
 
             ByteArrayOutputStream os = new ByteArrayOutputStream();

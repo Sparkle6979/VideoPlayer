@@ -5,6 +5,7 @@ import org.zjudevelop.playerbackbend.domain.Likes;
 import org.zjudevelop.playerbackbend.dto.UserLoginDTO;
 import org.zjudevelop.playerbackbend.dto.UserRegisterDTO;
 import org.zjudevelop.playerbackbend.domain.User;
+import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
 
 import java.util.List;
 
@@ -30,4 +31,6 @@ public interface UserService {
     List<Follows> getFollowings(Long userId);
 
     List<Follows> getFollowers(Long userId);
+
+    List<VideoInfoDTO> getOwnVideosById(Long userId);
 }

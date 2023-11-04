@@ -1,12 +1,18 @@
 package org.zjudevelop.playerbackbend.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zjudevelop.playerbackbend.dao.CategoryMapper;
+import org.zjudevelop.playerbackbend.dao.CreatesMapper;
+import org.zjudevelop.playerbackbend.dao.UserMapper;
 import org.zjudevelop.playerbackbend.dao.VideoMapper;
 import org.zjudevelop.playerbackbend.domain.CategoryPO;
+import org.zjudevelop.playerbackbend.domain.Creates;
+import org.zjudevelop.playerbackbend.domain.User;
 import org.zjudevelop.playerbackbend.domain.VideoPO;
+import org.zjudevelop.playerbackbend.dto.UserInfoDTO;
 import org.zjudevelop.playerbackbend.dto.VideoInsertDTO;
 import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
 import org.zjudevelop.playerbackbend.dto.VideoSearchInfoDTO;
@@ -31,6 +37,12 @@ public class VideoServiceImpl implements VideoService {
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private CreatesMapper createsMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     public VideoInfoDTO getVideoInfoById(Long videoId) {
@@ -92,5 +104,17 @@ public class VideoServiceImpl implements VideoService {
             }
         }
         return videoSearchInfoDTOS;
+    }
+
+    @Override
+    public UserInfoDTO getCreaterInfoById(Long videoId) {
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("video_id", videoId);
+
+        Creates creates = createsMapper.selectOne(wrapper);
+
+        User user = userMapper.selectById(creates.getUserId());
+
+        return DTOUtil.makeUserInfoDTO(user);
     }
 }

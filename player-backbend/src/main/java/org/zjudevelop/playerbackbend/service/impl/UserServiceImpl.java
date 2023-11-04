@@ -107,6 +107,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int unlike(Likes likes) {
+        Long userId = likes.getUserId();
+        Long videoId = likes.getVideoId();
+
+        // check if already liked
+        if (!this.isAlreadyLiked(userId, videoId)) {
+            return 0;
+        }
+
+        // update likeCount
+        VideoPO videoPO = videoMapper.selectByIdWithLock(videoId);
+        videoPO.setLikeCount(videoPO.getLikeCount() - 1);
+        videoMapper.updateById(videoPO);
+
         QueryWrapper wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", likes.getUserId());
         wrapper.eq("video_id", likes.getVideoId());

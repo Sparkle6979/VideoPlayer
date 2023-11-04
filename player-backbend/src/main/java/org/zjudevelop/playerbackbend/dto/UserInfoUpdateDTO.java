@@ -19,5 +19,5 @@ public class UserInfoUpdateDTO {
     @ApiModelProperty(value = "密码（经md5加密后）")
     private String password;
     @ApiModelProperty(value = "头像文件")
-    private MultipartFile file;
+    private MultipartFile avatarFile;
 }

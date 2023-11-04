@@ -32,4 +32,6 @@ public class VideoSearchInfoDTO {
     Boolean findDescription;
 
     Boolean findCategoryName;
+
+    Boolean isLike;
 }

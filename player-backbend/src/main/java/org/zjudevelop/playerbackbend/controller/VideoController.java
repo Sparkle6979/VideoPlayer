@@ -1,5 +1,6 @@
 package org.zjudevelop.playerbackbend.controller;
 
+import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -8,13 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.zjudevelop.playerbackbend.dto.*;
 import org.zjudevelop.playerbackbend.pojo.CheckAuth;
+import org.zjudevelop.playerbackbend.pojo.JwtProperties;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 import org.zjudevelop.playerbackbend.service.UploadService;
 import org.zjudevelop.playerbackbend.service.VideoService;
+import org.zjudevelop.playerbackbend.utils.JwtUtil;
 import org.zjudevelop.playerbackbend.utils.RestResult;
 import org.zjudevelop.playerbackbend.utils.FileProcessUtil;
 import org.zjudevelop.playerbackbend.utils.VideoProcessUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -33,6 +37,11 @@ public class VideoController {
     private UploadService uploadService;
     @Autowired
     private VideoService videoService;
+
+    @Autowired
+    private HttpServletRequest request;
+    @Autowired
+    private JwtProperties jwtProperties;
 
     @ApiOperation("视频上传")
     @RequestMapping(value = "/upload",method = RequestMethod.POST)
@@ -72,6 +81,18 @@ public class VideoController {
     @RequestMapping(value = "/search",method = RequestMethod.GET)
     public RestResult<List<VideoSearchInfoDTO>> getVideoSearchInfoByKeyword(@RequestParam String keyword) {
         List<VideoSearchInfoDTO> videoInfoByKeyword = videoService.getVideoInfoByKeyword(keyword);
+
+        String token  = request.getHeader(jwtProperties.getUserTokenName());
+
+        Long currentUserId = null;
+        if(StringUtils.isNotBlank(token)){
+            Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
+            currentUserId = Long.valueOf(claims.get("user").toString());
+        }
+
+        for (VideoSearchInfoDTO videoSearchInfoDTO : videoInfoByKeyword) {
+            if(null != currentUserId && )
+        }
         return RestResult.success(videoInfoByKeyword);
     }
 

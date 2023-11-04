@@ -1,8 +1,10 @@
 package org.zjudevelop.playerbackbend.controller;
 
+import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,11 +16,14 @@ import org.zjudevelop.playerbackbend.domain.User;
 import org.zjudevelop.playerbackbend.domain.VideoPO;
 import org.zjudevelop.playerbackbend.dto.*;
 import org.zjudevelop.playerbackbend.pojo.CheckAuth;
+import org.zjudevelop.playerbackbend.pojo.JwtProperties;
 import org.zjudevelop.playerbackbend.service.CategoryService;
 import org.zjudevelop.playerbackbend.service.UserService;
 import org.zjudevelop.playerbackbend.service.VideoService;
+import org.zjudevelop.playerbackbend.utils.JwtUtil;
 import org.zjudevelop.playerbackbend.utils.RestResult;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -44,6 +49,12 @@ public class HomeController {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private JwtProperties jwtProperties;
+
     @CheckAuth(check = false)
     @ApiOperation("获取所有分类信息")
     @RequestMapping(value = "/category/detail",method = RequestMethod.GET)
@@ -57,10 +68,22 @@ public class HomeController {
     @RequestMapping(value = "/videolist", method = RequestMethod.GET)
     public RestResult<List<VideoDisplayDTO>> getVideoInfoListByCategoryId(@RequestParam Long categoryId){
         List<VideoInfoDTO> videoInfoList = videoService.getVideoInfoListByCategoryId(categoryId);
-        Long currentUserId = BaseContext.getCurrentUserId();
 
-        List<Likes> likes = userService.getLikes(currentUserId);
 
+        String token  = request.getHeader(jwtProperties.getUserTokenName());
+
+        Long currentUserId = null;
+        if(StringUtils.isNotBlank(token)){
+            Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
+            currentUserId = Long.valueOf(claims.get("user").toString());
+        }
+
+        List<Long> likeVideoIds = userService.getLikes(currentUserId)
+                .stream()
+                .map(like -> like.getVideoId())
+                .collect(Collectors.toList());
+
+        List<VideoDisplayDTO> result = new ArrayList<>();
         for (VideoInfoDTO videoInfoDTO : videoInfoList) {
             VideoDisplayDTO build = VideoDisplayDTO.builder()
                     .videoId(videoInfoDTO.getVideoId())
@@ -73,12 +96,14 @@ public class HomeController {
                     .videoUrl(videoInfoDTO.getVideoUrl())
                     .coverUrl(videoInfoDTO.getCoverUrl())
                     .build();
-
-            if(null != currentUserId && likes.contains(new Likes()))
-
+            if(null != currentUserId && likeVideoIds.contains(videoInfoDTO.getVideoId())){
+                build.setIsLike(Boolean.TRUE);
+            }else {
+                build.setIsLike(Boolean.FALSE);
+            }
+            result.add(build);
         }
-
-        return RestResult.success(videoInfoList);
+        return RestResult.success(result);
     }
     @CheckAuth(check = false)
     @ApiOperation("根据videoId获取视频信息")

@@ -18,7 +18,7 @@
           <el-col :span="6" :offset="6">
             <el-statistic :value="info.like ? info.likeCount+1 : info.likeCount">
               <template slot="prefix">
-                <span @click="info.like = !info.like" class="like">
+                <span @click="changeLike" class="like">
                   <svg-icon name="like-on" v-show="info.like"></svg-icon>
                   <svg-icon name="like-off" v-show="!info.like"></svg-icon>
                 </span>
@@ -95,7 +95,14 @@ export default {
       setTimeout(()=>{
         this.$refs.videoPlayer.$el.addEventListener("mouseleave",this.mouseLeave)
       },50)
-    }
+    },
+    changeLike(){
+      this.$message.success({
+        message:'点赞成功',
+        duration:400
+      })
+      this.info.like = !this.info.like
+    },
   },
   watch:{
     info(newValue,oldValue){

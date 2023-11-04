@@ -5,7 +5,9 @@
     <div style="margin: 20px">
       <el-tabs v-model="activeIndex" type="card">
         <el-tab-pane label="我的喜欢" name="1">
-          <div>
+          <div v-loading="this.loading.likeVideo"
+               element-loading-text="拼命加载中"
+               element-loading-spinner="el-icon-loading">
             <el-row justify="space-around" :gutter="20">
               <el-col :span="6" v-for="(video,index) in videoList" :key="index" :offset="1">
                 <myVideo :info="video"></myVideo>
@@ -15,24 +17,23 @@
         </el-tab-pane>
         <el-tab-pane label="账号设置" name="2">
           <div>
-            <el-form :model="form_2" ref="form_2" label-width="auto" style="width: 30%">
-              <el-form-item label="头像" prop="url">
+            <el-form :model="form_2" ref="form_2" label-width="120px" style="width: 30%">
+              <el-form-item label="头像" prop="avatarPath">
                 <el-upload
                     :disabled="!isInput"
-                    class="avatar-uploader"
                     :show-file-list="false"
                     action=""
                     :auto-upload="false"
-                    :before-upload="beforeUpload"
                     accept=".jpg,.png"
+                    :limit="1"
                     :on-change="picturePreview">
-                  <el-avatar :src="form_2.url ? form_2.url : defaultUserAvatar" :size="150" :fit="'cover'" ></el-avatar>
+                  <el-avatar :src="form_2.avatarPath ? form_2.avatarPath : defaultUserAvatar" :size="150" :fit="'cover'" ></el-avatar>
                 </el-upload>
               </el-form-item>
               <el-form-item label="账号" prop="username">
                 <el-input
                     v-model.trim="form_2.username"
-                    disabled
+                    :disabled="!isInput"
                 ></el-input>
               </el-form-item>
               <el-form-item label="新密码" prop="password">
@@ -43,7 +44,7 @@
               </el-form-item>
 
               <el-form-item>
-                <el-button type="primary" v-if="isInput">确定</el-button>
+                <el-button type="primary" v-if="isInput" @click="update">确定修改</el-button>
                 <el-button type="primary" v-if="isInput" @click="cancel">取消</el-button>
                 <el-button v-if="isInput" @click="resetForm('form_2')">重置</el-button>
                 <el-button v-else @click="isInput = !isInput">编辑</el-button>
@@ -125,37 +126,36 @@
 import myVideo from "@/views/home/components/video";
 import MyMessage from '@/views/home/components/message';
 import Im from "@/views/home/components/im";
-import {mapGetters} from "vuex";
+import {mapGetters, mapState} from "vuex";
+import {getUserInfo, getUserLike, updateUserInfo} from "@/api/user";
+import {getVideoById} from "@/api/video";
 
 export default {
   name: "user",
   components:{
     myVideo,MyMessage,Im
   },
+  computed:{
+    ...mapState(['user'])
+  },
   data(){
     const activeIndex = '1'
     const isInput = false
     const form_2 = {
-      url:'',
-      username:this.getName(),
+      avatarFile:'',
+      avatarPath:this.avatarPath(),
+      username:this.username(),
       password:""
+    }
+    const loading = {
+      likeVideo:false
     }
     const msgVisible = false
     let msg = {
       sender : '',
       content : '',
     }
-    const videoList = [
-      {
-        "videoId": 5,
-        "title": "修仙游戏哪家强？高品质修仙游戏推荐！",
-        "description": "看一看有哪些值得玩的修仙游戏",
-        "likeCount": 0,
-        "createTime": "2023-10-27",
-        like:true,
-        "videoUrl": "http://s33fgajdq.hd-bkt.clouddn.com/%E4%BF%AE%E4%BB%99%E6%B8%B8%E6%88%8F%E5%93%AA%E5%AE%B6%E5%BC%BA%EF%BC%9F%E9%AB%98%E5%93%81%E8%B4%A8%E4%BF%AE%E4%BB%99%E6%B8%B8%E6%88%8F%E6%8E%A8%E8%8D%90%EF%BC%81.mp4"
-      }
-    ]
+    const videoList = []
     let textarea = '' // 评论输入框
     let commentContent = ''
     const zanList = [
@@ -218,27 +218,72 @@ export default {
       textarea,
       commentContent,
       zanList,
+      loading
     }
   },
   methods:{
+    ...mapGetters({avatarPath:'getUserAvatarPath',username:'getUserUsername'}),
     goBack(){
       this.$router.back()
     },
-    beforeUpload(file){
+    getLikeVideoList(){
+      this.loading.likeVideo = true
+      getUserLike().then((res)=>{
+        this.videoList = []
+        let count = 0
+        res.data.videoIds.forEach((id,index,arr)=>{
+          getVideoById(id).then((res)=>{
+            this.videoList.push(res.data)
+          }).finally(()=>{
+            count++
+            if (count === arr.length) {
+              this.loading.likeVideo = false
+            }
+          })
+        })
+      })
+    },
+    picturePreview(file,fileList){
       const isLt2M = file.size / 1024 / 1024 < 2;
       if (!isLt2M) {
         this.$message.error('上传头像图片大小不能超过 2MB!');
+        return
       }
-      return isLt2M
-    },
-    picturePreview(file,fileList){
       if (window.createObjectURL != undefined) {
-        this.form_2.url = window.createObjectURL(file.raw);
+        this.form_2.avatarPath = window.createObjectURL(file.raw);
       } else if (window.URL != undefined) {
-        this.form_2.url = window.URL.createObjectURL(file.raw);
+        this.form_2.avatarPath = window.URL.createObjectURL(file.raw);
       } else if (window.webkitURL != undefined) {
-        this.form_2.url = window.webkitURL.createObjectURL(file.raw);
+        this.form_2.avatarPath = window.webkitURL.createObjectURL(file.raw);
       }
+      this.form_2.avatarFile = file
+    },
+    update(){
+      const data = new FormData()
+      if(this.form_2.avatarFile){
+        data.set("file",this.form_2.avatarFile)
+      }
+      if (this.form_2.username !== this.username()){
+        data.set("username",this.form_2.username)
+      }
+      if(this.form_2.password){
+        data.set("password",this.form_2.password)
+      }
+      for(let pair of data.entries()) {
+        console.log(pair[0]+ ', '+ pair[1]);
+      }
+      updateUserInfo(data).then((res)=>{
+        console.log(res)
+        getUserInfo(this.user.id).then((res)=>{
+          console.log("user",res)
+        }).catch((error)=>{
+          console.log(error)
+          this.$message.error('获取用户信息失败！')
+        })
+      }).catch((error)=>{
+        console.log(error)
+        this.$message.error('更新用户信息失败！')
+      })
     },
     cancel(){
       this.resetForm('form_2');
@@ -270,7 +315,6 @@ export default {
           "</div>";
       this.commentContent += html
     },
-    ...mapGetters({getName:'userName'}),
     replayComment(){
       let html;
       html = "<div class=\"el-row\" style=\"padding: 5px 0\">\n" +
@@ -290,6 +334,9 @@ export default {
   activated() {
     this.activeIndex = this.$route.params.index ? this.$route.params.index : "1"
   },
+  mounted() {
+    this.getLikeVideoList()
+  }
 }
 </script>
 

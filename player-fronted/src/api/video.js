@@ -19,3 +19,17 @@ export function getVideoById(videoId){
         methods:'GET'
     })
 }
+
+export function likeVideo(videoId){
+    return request({
+        url:`/user/likes/${videoId}`,
+        method:'POST'
+    })
+}
+
+export function dislikeVideo(videoId){
+    return request({
+        url:`/user/likes/${videoId}`,
+        method:'DELETE'
+    })
+}

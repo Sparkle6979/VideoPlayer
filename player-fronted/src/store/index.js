@@ -13,12 +13,15 @@ const mutations = {
     },
 }
 let state = {
-    user : '',
+    user : {},
     isLogin : false,
 }
 const getters = {
-    userName(state){
-        return state.user.username
+    getUserUsername(){
+        return state.user.username;
+    },
+    getUserAvatarPath(){
+        return state.user.avatarPath;
     }
 }
 

@@ -42,7 +42,7 @@
 <script>
 
 import {mapMutations} from "vuex";
-import {userLogin, userRegister} from "@/api/user";
+import {getUserInfo, userLogin, userRegister} from "@/api/user";
 
 export default {
   name: "index",
@@ -75,14 +75,16 @@ export default {
         if(valid){
           this.loading = true
           userLogin(this.loginForm).then((res)=>{
-            console.log(res)
-            this.updateUser({
-              id:res.data.id,
-              username:res.data.username
-            })
             localStorage.setItem("token",res.data.token)
-            this.updateLogin(true)
-            this.$router.push('/home')
+            getUserInfo(res.data.id).then((res)=>{
+              this.updateUser({
+                id:res.data.id,
+                username:res.data.username,
+                avatarPath:res.data.avatarPath,
+              })
+              this.updateLogin(true)
+              this.$router.push('/home')
+            })
           }).catch(err => {
             console.log(err)
           }).finally(()=>{

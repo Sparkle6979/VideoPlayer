@@ -28,8 +28,8 @@
               </el-tooltip>
               <el-dropdown>
                 <div>
-                  <el-avatar icon="el-icon-user-solid"  style="vertical-align: middle"></el-avatar>
-                  <span style="margin: 10px">{{ user.username }}</span>
+                  <el-avatar :src="this.user.avatarPath"  style="vertical-align: middle"></el-avatar>
+                  <span style="margin: 10px">{{ this.user.username }}</span>
                 </div>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item @click.native="dialogVisible = true">关注&粉丝</el-dropdown-item>

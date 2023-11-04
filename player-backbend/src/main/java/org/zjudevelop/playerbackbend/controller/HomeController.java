@@ -69,15 +69,7 @@ public class HomeController {
     public RestResult<List<VideoDisplayDTO>> getVideoInfoListByCategoryId(@RequestParam Long categoryId){
         List<VideoInfoDTO> videoInfoList = videoService.getVideoInfoListByCategoryId(categoryId);
 
-
-        String token  = request.getHeader(jwtProperties.getUserTokenName());
-
-        Long currentUserId = null;
-        if(StringUtils.isNotBlank(token)){
-            Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
-            currentUserId = Long.valueOf(claims.get("user").toString());
-        }
-
+        Long currentUserId = getUserIdFromRequest(request, jwtProperties);
         List<Long> likeVideoIds = userService.getLikes(currentUserId)
                 .stream()
                 .map(like -> like.getVideoId())
@@ -147,5 +139,17 @@ public class HomeController {
     public RestResult<CategoryInfoDTO> getCategoryInfoByCategoryId(@RequestParam Long categoryId){
         CategoryInfoDTO categoryInfo = categoryService.getCategoryInfoById(categoryId);
         return RestResult.success(categoryInfo);
+    }
+
+
+    public static Long getUserIdFromRequest(HttpServletRequest request, JwtProperties jwtProperties){
+        String token  = request.getHeader(jwtProperties.getUserTokenName());
+
+        Long currentUserId = null;
+        if(StringUtils.isNotBlank(token)){
+            Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
+            currentUserId = Long.valueOf(claims.get("user").toString());
+        }
+        return currentUserId;
     }
 }

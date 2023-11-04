@@ -107,6 +107,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public int create(Creates creates) {
+        return createsMapper.insert(creates);
+    }
+
+    @Override
+    public List<Creates> getCreates(Long userId) {
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
+        List<Creates> createsList = createsMapper.selectList(wrapper);
+        return createsList;
+    }
+
+    @Override
     public int follow(Follows follows) {
         return followsMapper.insert(follows);
     }

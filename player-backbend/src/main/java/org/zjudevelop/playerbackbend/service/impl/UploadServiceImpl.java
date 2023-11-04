@@ -142,6 +142,7 @@ public class UploadServiceImpl implements UploadService {
             Response response = uploadManager.put(data, fileName, upToken);
             //解析上传成功的结果
             DefaultPutRet putRet = JSON.parseObject(response.bodyString(), DefaultPutRet.class);
+            fileName = StringUtils.isBlank(fileName) ? putRet.key : fileName;
 //            System.out.println(putRet.key);
 //            System.out.println(putRet.hash);
             log.info(putRet.key);

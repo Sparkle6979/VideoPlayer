@@ -16,11 +16,11 @@
             <time class="time">{{ info.createTime }}</time>
           </el-col>
           <el-col :span="6" :offset="6">
-            <el-statistic :value="info.like ? info.likeCount+1 : info.likeCount">
+            <el-statistic :value="info.isLike ? info.likeCount+1 : info.likeCount">
               <template slot="prefix">
                 <span @click="changeLike" class="like">
-                  <svg-icon name="like-on" v-show="info.like"></svg-icon>
-                  <svg-icon name="like-off" v-show="!info.like"></svg-icon>
+                  <svg-icon name="like-on" v-show="info.isLike"></svg-icon>
+                  <svg-icon name="like-off" v-show="!info.isLike"></svg-icon>
                 </span>
               </template>
             </el-statistic>
@@ -35,6 +35,7 @@
 import 'vue-video-player/src/custom-theme.css';
 import 'video.js/dist/video-js.css'
 import { videoPlayer } from 'vue-video-player'
+import {dislikeVideo, likeVideo} from "@/api/video";
 
 export default {
   name: "myVideo",
@@ -97,11 +98,24 @@ export default {
       },50)
     },
     changeLike(){
-      this.$message.success({
-        message:'点赞成功',
-        duration:400
-      })
-      this.info.like = !this.info.like
+      if (!this.info.isLike) {
+        likeVideo(this.info.videoId).then((res)=>{
+          console.log(res)
+          this.$message.success({
+            message:'点赞成功',
+            duration:400
+          })
+        })
+      }else{
+        dislikeVideo(this.info.videoId).then((res)=>{
+          console.log(res)
+          this.$message.warning({
+            message:'取消点赞',
+            duration:400
+          })
+        })
+      }
+      this.info.isLike = !this.info.isLike
     },
   },
   watch:{
@@ -110,10 +124,10 @@ export default {
       this.playerOptions.poster = newValue.coverUrl
       setTimeout(()=>{
         this.$refs.videoPlayer.$el.addEventListener("mouseenter",this.mouseEnter)
-      },50)
+      },100)
       setTimeout(()=>{
         this.$refs.videoPlayer.$el.addEventListener("mouseleave",this.mouseLeave)
-      },50)
+      },100)
     }
   }
 }

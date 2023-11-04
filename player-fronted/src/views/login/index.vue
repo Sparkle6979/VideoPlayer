@@ -57,7 +57,7 @@ export default {
     }
     const rules = {
       username:[{required:true,message:"请输入用户名",trigger:'blur'}],
-      password:[{required:true,message:"请输入用密码",trigger:'blur'}]
+      password:[{required:false,message:"请输入用密码",trigger:'blur'}]
     }
     const isRegister = false
     const trigger = false
@@ -75,6 +75,13 @@ export default {
         if(valid){
           this.loading = true
           userLogin(this.loginForm).then((res)=>{
+            console.log("userLogin",res)
+            if (res.code === -1) {
+              this.$message.error({
+                message:res.message,
+              })
+              return
+            }
             localStorage.setItem("token",res.data.token)
             getUserInfo(res.data.id).then((res)=>{
               this.updateUser({

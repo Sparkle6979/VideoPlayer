@@ -16,33 +16,40 @@
         <el-card style="background-color: #eeeeee">
           <el-row :gutter="20" type="flex" align="middle">
             <el-col :span="6">
-              <el-avatar :src="user.url ? user.url : defaultUserAvatar" :size="70"></el-avatar>
+              <el-avatar :src="creater.avatarPath ? creater.avatarPath : defaultUserAvatar" :size="70"></el-avatar>
             </el-col>
             <el-col :span="12">
-              <h4 class="author" :style="{'top':description.length <= 15 ? '-12px' : '0px'}">作者</h4>
-              <el-row>
-                <span class="description_text">{{description}}</span>
-              </el-row>
+              <h4 class="author">{{ creater.username }}</h4>
             </el-col>
             <el-col :span="6">
-              <el-button type="danger">关注</el-button>
+              <div v-if="creater.username != user.username">
+                <el-button type="danger" v-if="showFollow" @click.native="follow">关注</el-button>
+                <div v-else>
+                  <el-popconfirm title="确认取消关注吗?" @confirm="unFollow">
+                    <el-button type="info" slot="reference">已关注</el-button>
+                  </el-popconfirm>
+                </div>
+              </div>
+              <div v-else>
+                <el-button type="primary">我的视频</el-button>
+              </div>
             </el-col>
           </el-row>
         </el-card>
         <el-card shadow="never" style="margin-top: 20px">
             <h4>TA的视频</h4>
-            <div v-for="(item,index) in items" :key="index">
+            <div v-for="(item,index) in createrWorks" :key="index" style="cursor: pointer" @click="toDetailPage(item.videoId)">
               <el-row :gutter="20" type="flex"  style="margin-bottom: 20px">
                 <el-col>
-                  <img :src="item.url"
+                  <img :src="item.coverUrl"
                   width="225" height="112.5">
                 </el-col>
                 <el-col>
                   <span style="font-size: 16px;position: absolute;top: 5px">{{item.title}}</span>
                   <br>
-                  <span style="font-size: 13px;position: absolute;bottom: 25px">{{item.time}}</span>
+                  <span style="font-size: 13px;position: absolute;bottom: 25px">{{item.createTime}}</span>
                   <br>
-                  <span style="font-size: 13px;position: absolute;bottom: 5px">播放量：{{item.watch}}</span>
+                  <span style="font-size: 13px;position: absolute;bottom: 5px">点赞量：{{item.likeCount}}</span>
                 </el-col>
               </el-row>
             </div>
@@ -73,6 +80,7 @@ import {getVideoById} from "@/api/video";
 import {mapState} from "vuex";
 
 import Comment from "@/views/home/components/comment";
+import {followListById, followUser, getUserInfo, unFollowUser} from "@/api/user";
 
 export default {
   name: "Detail",
@@ -100,21 +108,15 @@ export default {
       }],
       poster: ''
     }
-    const description = "个人简介介个人简介介人介"
     const commentInput = ''
-    const item = {
-      url:"http://s33fgajdq.hd-bkt.clouddn.com/%E4%BF%AE%E4%BB%99%E6%B8%B8%E6%88%8F%E5%93%AA%E5%AE%B6%E5%BC%BA%EF%BC%9F%E9%AB%98%E5%93%81%E8%B4%A8%E4%BF%AE%E4%BB%99%E6%B8%B8%E6%88%8F%E6%8E%A8%E8%8D%90%EF%BC%81.jpg",
-      title:'日本小姐姐教你怎么读介绍',
-      time:'2023-11-2',
-      watch:1432,
-    }
     return {
       playerOptions,
       videoInfo,
       loading,
-      description,
       commentInput,
-      items : Array(3).fill(item),
+      creater:'',
+      userFollows:[],
+      createrWorks : [],
       comments:[{
         username:'Champion',
         date:'2023年11月2日   13:58:58',
@@ -149,7 +151,16 @@ export default {
         this.videoInfo = res.data
         this.playerOptions.sources[0].src = res.data.videoUrl
         this.playerOptions.poster = res.data.coverUrl
+        this.createrWorks = res.data.createrWorks
         this.loading = false
+        getUserInfo(res.data.createrId).then((user_res)=>{
+          this.creater = user_res.data
+          followListById(this.user.id).then((res) => {
+            this.userFollows = res.data.followingIds
+          }).catch(err => {
+            console.log("followListById",err)
+          })
+        })
       })
     },
     updateComment(value){
@@ -171,9 +182,57 @@ export default {
       })
       this.commentInput = ''
     },
+    toDetailPage(videoId){
+      this.$router.push({
+        name:'Detail',
+        params:{
+          id:videoId
+        }
+      }).catch(err=>{
+        this.$message.warning({
+          message:"已经到当前页面了",
+          duration:800,
+        })
+      })
+    },
+    follow(){
+      followUser(this.creater.id).then((res)=>{
+        console.log(res)
+        if (res.code === 200) {
+          this.$message.success(`关注${this.creater.username}成功！`)
+        }
+        followListById(this.user.id).then((res) => {
+          console.log(res)
+          this.userFollows = res.data.followingIds
+        }).catch(err => {
+          console.log("showFollow",err)
+        })
+      }).catch(err=>{
+        console.log("follow",err)
+      })
+    },
+    unFollow(){
+      unFollowUser(this.creater.id).then((res)=>{
+        console.log(res)
+        if (res.code === 200) {
+          this.$message.success("取关成功！")
+        }
+        followListById(this.user.id).then((res) => {
+          console.log(res)
+          this.userFollows = res.data.followingIds
+        }).catch(err => {
+          console.log("showFollow",err)
+        })
+      }).catch(err=>{
+        console.log("follow",err)
+      })
+    },
   },
   computed:{
-    ...mapState(['user'])
+    ...mapState(['user']),
+    showFollow(){
+      return !this.userFollows.includes(this.creater.id)
+    }
   },
   mounted() {
     this.initData(this.$route.params.id)

@@ -3,7 +3,7 @@
     <el-page-header @back="goBack" :content="$route.meta.title">
     </el-page-header>
     <div style="margin: 20px">
-      <el-tabs v-model="activeIndex" type="card">
+      <el-tabs v-model="activeIndex" type="card" :key="activeIndex">
         <el-tab-pane label="我的喜欢" name="1">
           <div v-loading="this.loading.likeVideo"
                element-loading-text="拼命加载中"
@@ -126,9 +126,10 @@
 import myVideo from "@/views/home/components/video";
 import MyMessage from '@/views/home/components/message';
 import Im from "@/views/home/components/im";
-import {mapGetters, mapState} from "vuex";
+import {mapGetters, mapMutations, mapState} from "vuex";
 import {getUserInfo, getUserLike, updateUserInfo} from "@/api/user";
 import {getVideoById} from "@/api/video";
+import md5 from "js-md5";
 
 export default {
   name: "user",
@@ -139,7 +140,7 @@ export default {
     ...mapState(['user'])
   },
   data(){
-    const activeIndex = '1'
+    const activeIndex = "1"
     const isInput = false
     const form_2 = {
       avatarFile:'',
@@ -223,6 +224,7 @@ export default {
   },
   methods:{
     ...mapGetters({avatarPath:'getUserAvatarPath',username:'getUserUsername'}),
+    ...mapMutations({updateUser:"UPDATE_USER"}),
     goBack(){
       this.$router.back()
     },
@@ -233,6 +235,8 @@ export default {
         let count = 0
         res.data.videoIds.forEach((id,index,arr)=>{
           getVideoById(id).then((res)=>{
+            // 额外加入
+            res.data.isLike = true
             this.videoList.push(res.data)
           }).finally(()=>{
             count++
@@ -256,33 +260,50 @@ export default {
       } else if (window.webkitURL != undefined) {
         this.form_2.avatarPath = window.webkitURL.createObjectURL(file.raw);
       }
-      this.form_2.avatarFile = file
+      this.form_2.avatarFile = file.raw
     },
     update(){
       const data = new FormData()
+      let reloadUserInfo = false
       if(this.form_2.avatarFile){
-        data.set("file",this.form_2.avatarFile)
+        data.set("avatarFile",this.form_2.avatarFile)
+        console.log(this.form_2.avatarFile)
+        reloadUserInfo = true
       }
       if (this.form_2.username !== this.username()){
         data.set("username",this.form_2.username)
+        reloadUserInfo = true
       }
       if(this.form_2.password){
-        data.set("password",this.form_2.password)
+        data.set("password",md5(this.form_2.password))
       }
       for(let pair of data.entries()) {
         console.log(pair[0]+ ', '+ pair[1]);
       }
       updateUserInfo(data).then((res)=>{
-        console.log(res)
-        getUserInfo(this.user.id).then((res)=>{
-          console.log("user",res)
-        }).catch((error)=>{
-          console.log(error)
-          this.$message.error('获取用户信息失败！')
-        })
+        console.log("updateUserInfo",res)
+        if (reloadUserInfo) {
+          getUserInfo(this.user.id).then((res)=>{
+            console.log("getUserInfo",res)
+            this.updateUser(res.data)
+            this.$message.success('更新用户信息成功！')
+          }).catch((error)=>{
+            console.log(error)
+            this.$message.error('获取用户信息失败！')
+            this.resetForm('form_2');
+          })
+        }else{
+          if(res.code === 200) {
+            this.$message.success('修改成功！')
+            this.resetForm('form_2');
+          }
+        }
       }).catch((error)=>{
         console.log(error)
         this.$message.error('更新用户信息失败！')
+        this.resetForm('form_2');
+      }).finally(()=>{
+        this.isInput = false
       })
     },
     cancel(){
@@ -333,9 +354,17 @@ export default {
   },
   activated() {
     this.activeIndex = this.$route.params.index ? this.$route.params.index : "1"
+    console.log(this.activeIndex)
+    if (this.activeIndex === "1") {
+      this.getLikeVideoList()
+    }
   },
-  mounted() {
-    this.getLikeVideoList()
+  watch:{
+    activeIndex(newV,oldV){
+      if (newV === "1"){
+        this.getLikeVideoList()
+      }
+    }
   }
 }
 </script>

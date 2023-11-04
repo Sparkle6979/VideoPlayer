@@ -13,7 +13,7 @@
                 clearable
                 class="search-input"
             >
-              <el-button slot="append" icon="el-icon-search"></el-button>
+              <el-button slot="append" icon="el-icon-search" @click.native="toDiscoverPage"></el-button>
             </el-input>
           </el-col>
           <el-col :span="this.isLogin ? 4 : 2" :offset="isLogin ? 8 : 10">
@@ -28,8 +28,8 @@
               </el-tooltip>
               <el-dropdown>
                 <div>
-                  <el-avatar :src="this.user.avatarPath"  style="vertical-align: middle"></el-avatar>
-                  <span style="margin: 10px">{{ this.user.username }}</span>
+                  <el-avatar :src="user.avatarPath ? user.avatarPath : defaultUserAvatar"  style="vertical-align: middle"></el-avatar>
+                  <span style="margin: 10px">{{ user.username }}</span>
                 </div>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item @click.native="dialogVisible = true">关注&粉丝</el-dropdown-item>
@@ -50,7 +50,7 @@
       </el-header>
 
       <el-main>
-        <router-view></router-view>
+          <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
@@ -95,6 +95,16 @@ export default {
           index:id.toString()
         }
       }).catch(err => err)
+    },
+    toDiscoverPage(){
+      this.$router.replace({
+        path:'/home/discover',
+        query:{
+          kw:this.searchInput
+        },
+      }).catch(err=>{
+        console.log(err)
+      })
     }
   },
   mounted() {

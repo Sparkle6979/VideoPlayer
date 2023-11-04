@@ -44,3 +44,31 @@ export function getUserLike(){
         method:'GET',
     })
 }
+
+export function followListById(id){
+    return request({
+        url:`/user/follows/following/${id}`,
+        method:'GET'
+    })
+}
+
+export function fanListById(id){
+    return request({
+        url:`/user/follows/follower/${id}`,
+        method:'GET'
+    })
+}
+
+export function followUser(followingId){
+    return request({
+        url:`/user/follows/${followingId}`,
+        method:'POST'
+    })
+}
+
+export function unFollowUser(followingId){
+    return request({
+        url:`/user/follows/${followingId}`,
+        method:'DELETE'
+    })
+}

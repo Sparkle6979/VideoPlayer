@@ -33,3 +33,21 @@ export function dislikeVideo(videoId){
         method:'DELETE'
     })
 }
+
+export function getVideoBySearch(keyword){
+    return request({
+        url:'/video/search',
+        params:{
+            keyword:keyword
+        },
+        method:'GET',
+    })
+}
+
+export function uploadVideo(data){
+    return request({
+        url:'/video/upload',
+        data:data,
+        method:'POST'
+    })
+}

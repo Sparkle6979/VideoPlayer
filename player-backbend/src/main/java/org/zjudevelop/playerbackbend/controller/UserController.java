@@ -134,25 +134,28 @@ public class UserController {
         Long userId = BaseContext.getCurrentUserId();
 
         // save file in local path
-        MultipartFile file = userInfoUpdateDTO.getFile();
-        String filePath = tmpFilePath + "/" + file.getOriginalFilename();
-        File localFile = new File(filePath);
-        try {
-            file.transferTo(localFile);
-            log.info("文件保存成功，保存路径为： " + filePath);
-        } catch (IllegalStateException | IOException e) {
-            e.printStackTrace();
-            return RestResult.fail("文件上传失败");
-        }
+        MultipartFile file = userInfoUpdateDTO.getAvatarFile();
+        String fileUrl = null;
+        if (file != null) {
+            String filePath = tmpFilePath + "/" + file.getOriginalFilename();
+            File localFile = new File(filePath);
+            try {
+                file.transferTo(localFile);
+                log.info("文件保存成功，保存路径为： " + filePath);
+            } catch (IllegalStateException | IOException e) {
+                e.printStackTrace();
+                return RestResult.fail("文件上传失败");
+            }
 
-        // upload file to server
-        String fileUrl = uploadService.uploadfile(filePath, qnDataServer).getServerFileUrl();
-        log.info("文件上传成功, url为： " + fileUrl);
+            // upload file to server
+            fileUrl = uploadService.uploadfile(filePath, qnDataServer).getServerFileUrl();
+            log.info("文件上传成功, url为： " + fileUrl);
+        }
 
         User user = new User();
         BeanUtils.copyProperties(userInfoUpdateDTO, user);
         user.setId(userId);
-        user.setAvatarPath(fileUrl);
+        if (fileUrl != null) {user.setAvatarPath(fileUrl);}
         int returnValue = userService.update(user);
         if (returnValue <= 0) {
             return RestResult.fail("更新失败");

@@ -2,8 +2,10 @@ package org.zjudevelop.playerbackbend.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.zjudevelop.playerbackbend.domain.CategoryPO;
+import org.zjudevelop.playerbackbend.domain.User;
 import org.zjudevelop.playerbackbend.domain.VideoPO;
 import org.zjudevelop.playerbackbend.dto.CategoryInfoDTO;
+import org.zjudevelop.playerbackbend.dto.UserInfoDTO;
 import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
 import org.zjudevelop.playerbackbend.dto.VideoSearchInfoDTO;
 
@@ -64,5 +66,14 @@ public class DTOUtil {
                 .videoUrl(videoInfoDTO.getVideoUrl())
                 .build();
         return videoSearchInfoDTO;
+    }
+
+    public static UserInfoDTO makeUserInfoDTO(User user){
+        UserInfoDTO userInfoDTO = UserInfoDTO.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .avatarPath(user.getAvatarPath())
+                .build();
+        return userInfoDTO;
     }
 }

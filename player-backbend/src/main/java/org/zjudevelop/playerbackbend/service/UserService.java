@@ -1,5 +1,6 @@
 package org.zjudevelop.playerbackbend.service;
 
+import org.zjudevelop.playerbackbend.domain.Creates;
 import org.zjudevelop.playerbackbend.domain.Follows;
 import org.zjudevelop.playerbackbend.domain.Likes;
 import org.zjudevelop.playerbackbend.dto.UserLoginDTO;
@@ -25,6 +26,10 @@ public interface UserService {
     List<Likes> getLikes(Long userId);
 
     int follow(Follows follows);
+
+    int create(Creates creates);
+
+    List<Creates> getCreates(Long userId);
 
     int unfollow(Follows follows);
 

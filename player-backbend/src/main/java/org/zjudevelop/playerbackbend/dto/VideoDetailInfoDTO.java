@@ -29,6 +29,7 @@ public class VideoDetailInfoDTO {
     String videoUrl;
     String coverUrl;
     Long createrId;
+    Boolean isLike;
     List<VideoInfoDTO> createrWorks;
 
 }

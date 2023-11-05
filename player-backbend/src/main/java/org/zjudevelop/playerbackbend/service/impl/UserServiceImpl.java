@@ -52,7 +52,6 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new AccountNotFoundException();
         }
-        log.info("user: " + user);
         if (!password.equals(user.getPassword())){
             throw new PasswordErrorException();
         }

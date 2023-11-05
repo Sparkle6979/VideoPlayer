@@ -21,11 +21,19 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     public Boolean IfLikes(Long userId,Long videoId) {
+        Likes likes = getLikesByUserIdAndVideoId(userId, videoId);
+        return likes != null ? Boolean.TRUE : Boolean.FALSE;
+    }
+    @Override
+    public Likes getLikesByUserIdAndVideoId(Long userId,Long videoId){
         QueryWrapper wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId);
         wrapper.eq("video_id", videoId);
+        return likesMapper.selectOne(wrapper);
+    }
 
-        Likes likes = likesMapper.selectOne(wrapper);
-        return likes != null ? Boolean.TRUE : Boolean.FALSE;
+    @Override
+    public Likes getLikesById(Long likeId) {
+        return likesMapper.selectById(likeId);
     }
 }

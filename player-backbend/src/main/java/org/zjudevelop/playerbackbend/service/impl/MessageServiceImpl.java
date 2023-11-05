@@ -22,16 +22,31 @@ public class MessageServiceImpl implements MessageService {
     MessageMapper messageMapper;
 
     @Override
-    public List<MessagePO> getPublishMessageByUserId(Long userId) {
+    public List<MessagePO> getAllPublishMessageByUserId(Long userId) {
         QueryWrapper wrapper = new QueryWrapper<>();
         wrapper.eq("from_id", userId);
         return messageMapper.selectList(wrapper);
     }
 
     @Override
-    public List<MessagePO> getReceiveMessageByUserId(Long userId) {
+    public List<MessagePO> getAllReceiveMessageByUserId(Long userId) {
         QueryWrapper wrapper = new QueryWrapper<>();
         wrapper.eq("to_id", userId);
         return messageMapper.selectList(wrapper);
+    }
+
+    @Override
+    public List<MessagePO> getUnreadReceiveMessageByUserId(Long userId) {
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("to_id", userId);
+        wrapper.eq("status",0);
+
+        return messageMapper.selectList(wrapper);
+    }
+
+
+    @Override
+    public int insertMessage(MessagePO messagePO) {
+        return messageMapper.insert(messagePO);
     }
 }

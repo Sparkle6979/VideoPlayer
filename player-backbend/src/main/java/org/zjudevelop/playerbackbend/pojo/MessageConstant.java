@@ -9,4 +9,9 @@ public class MessageConstant {
 
     public static final String TOPIC_FOLLOW = "follow";
 
+
+    public static final String EVENT_VIDEO_LIKE = "video-like";
+
+    public static final String EVENT_USER_FOLLOW = "user-follow";
+
 }

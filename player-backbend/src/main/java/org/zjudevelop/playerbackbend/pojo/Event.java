@@ -20,15 +20,12 @@ import java.util.Map;
 public class Event {
     // topic名称
     private String topic;
-    // 发送Event的userid
-    private int userId;
+    // 发送事件的userid
+    private Long userId;
+    // 事件发送目标的userid
+    private Long entityUserId;
     // 事件的类型
     private String entityType;
     // 事件（点赞/关注）的Id
-    private int entityId;
-
-    // 事件发送目标用户id
-    private int entityUserId;
-
-    private Map<String,Object> data = new HashMap<>();
+    private Long entityId;
 }

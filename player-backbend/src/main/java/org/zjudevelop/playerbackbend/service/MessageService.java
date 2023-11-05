@@ -11,6 +11,10 @@ import java.util.List;
  */
 public interface MessageService {
 
-    List<MessagePO> getPublishMessageByUserId(Long userId);
-    List<MessagePO> getReceiveMessageByUserId(Long userId);
+    List<MessagePO> getAllPublishMessageByUserId(Long userId);
+    List<MessagePO> getAllReceiveMessageByUserId(Long userId);
+
+    List<MessagePO> getUnreadReceiveMessageByUserId(Long userId);
+
+    int insertMessage(MessagePO messagePO);
 }

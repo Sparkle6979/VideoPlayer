@@ -106,16 +106,17 @@ public class HomeController {
         Long currentUserId = getUserIdFromRequest(request, jwtProperties);
 
 
-        // 取前5个作为代表作
+        // 取前3个作为代表作
         List<VideoInfoDTO> ownVideosById = userService.getOwnVideosById(createrInfoById.getId())
                 .stream()
+                .filter(videoInfoDTO -> videoInfoDTO.getVideoId() != videoId)
                 .sorted(new Comparator<VideoInfoDTO>() {
                     @Override
                     public int compare(VideoInfoDTO o1, VideoInfoDTO o2) {
                         return (int)(o2.getLikeCount() - o1.getLikeCount());
                     }
                 })
-                .limit(5)
+                .limit(3)
                 .collect(Collectors.toList());
 
 

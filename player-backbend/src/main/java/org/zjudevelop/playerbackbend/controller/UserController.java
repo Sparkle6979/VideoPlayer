@@ -14,12 +14,10 @@ import org.zjudevelop.playerbackbend.domain.Creates;
 import org.zjudevelop.playerbackbend.domain.Follows;
 import org.zjudevelop.playerbackbend.domain.Likes;
 import org.zjudevelop.playerbackbend.dto.*;
-import org.zjudevelop.playerbackbend.pojo.CheckAuth;
-import org.zjudevelop.playerbackbend.pojo.JwtProperties;
+import org.zjudevelop.playerbackbend.event.EventProducer;
+import org.zjudevelop.playerbackbend.pojo.*;
 import org.zjudevelop.playerbackbend.domain.User;
-import org.zjudevelop.playerbackbend.pojo.QNDataServer;
-import org.zjudevelop.playerbackbend.service.UploadService;
-import org.zjudevelop.playerbackbend.service.UserService;
+import org.zjudevelop.playerbackbend.service.*;
 import org.zjudevelop.playerbackbend.utils.JwtUtil;
 import org.zjudevelop.playerbackbend.utils.RestResult;
 
@@ -34,13 +32,22 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/user")
 @Slf4j
 @Api(tags = "用户")
-public class UserController {
+public class UserController extends MessageConstant {
 
     @Autowired
     UserService userService;
 
     @Autowired
+    VideoService videoService;
+
+    @Autowired
     UploadService uploadService;
+
+    @Autowired
+    LikeService likeService;
+
+    @Autowired
+    FollowService followService;
 
     @Autowired
     QNDataServer qnDataServer;
@@ -50,6 +57,9 @@ public class UserController {
 
     @Value("${tmp_file_path}")
     String tmpFilePath;
+
+    @Autowired
+    EventProducer eventProducer;
 
     /**
      * 用户登录
@@ -170,11 +180,23 @@ public class UserController {
     @PostMapping("/follows/{followingId}")
     @ApiOperation("关注用户")
     public RestResult follow(@PathVariable Long followingId) {
+        Long currentUserId = BaseContext.getCurrentUserId();
         Follows follows = new Follows().builder()
-                .followerId(BaseContext.getCurrentUserId())
+                .followerId(currentUserId)
                 .followingId(followingId)
                 .build();
         userService.follow(follows);
+
+        Event build = Event.builder()
+                .topic(TOPIC_FOLLOW)
+                .userId(currentUserId)
+                .entityType(EVENT_USER_FOLLOW)
+                .entityId(followService.getFollowByFollowerIdAndFollowingId(currentUserId,followingId).getId())
+                .entityUserId(followingId)
+                .build();
+
+        eventProducer.fireEvent(build);
+
         return RestResult.success();
     }
 
@@ -236,11 +258,23 @@ public class UserController {
     @PostMapping("/likes/{videoId}")
     @ApiOperation("点赞视频")
     public RestResult like(@PathVariable Long videoId) {
+        Long currentUserId = BaseContext.getCurrentUserId();
         Likes likes = new Likes().builder()
-                .userId(BaseContext.getCurrentUserId())
+                .userId(currentUserId)
                 .videoId(videoId)
                 .build();
         userService.like(likes);
+
+        Event build = Event.builder()
+                .topic(TOPIC_LIKE)
+                .userId(currentUserId)
+                .entityType(EVENT_VIDEO_LIKE)
+                .entityId(likeService.getLikesByUserIdAndVideoId(currentUserId, videoId).getId())
+                .entityUserId(videoService.getCreaterInfoById(videoId).getId())
+                .build();
+
+        eventProducer.fireEvent(build);
+
         return RestResult.success();
     }
 

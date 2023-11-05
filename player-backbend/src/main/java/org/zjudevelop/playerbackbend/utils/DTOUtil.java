@@ -1,16 +1,13 @@
 package org.zjudevelop.playerbackbend.utils;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.zjudevelop.playerbackbend.domain.CategoryPO;
-import org.zjudevelop.playerbackbend.domain.User;
-import org.zjudevelop.playerbackbend.domain.VideoPO;
-import org.zjudevelop.playerbackbend.dto.CategoryInfoDTO;
-import org.zjudevelop.playerbackbend.dto.UserInfoDTO;
-import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
-import org.zjudevelop.playerbackbend.dto.VideoSearchInfoDTO;
+import org.zjudevelop.playerbackbend.domain.*;
+import org.zjudevelop.playerbackbend.dto.*;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 
 /**
  * @author sparkle6979l
@@ -75,5 +72,32 @@ public class DTOUtil {
                 .avatarPath(user.getAvatarPath())
                 .build();
         return userInfoDTO;
+    }
+
+    public static MessageInfoDTO makeMessageInfoDTO(MessagePO messagePO, Likes likes){
+
+        MessageInfoDTO noticeId = MessageInfoDTO.builder()
+                .MessageId(messagePO.getId())
+                .currentUserId(messagePO.getToId())
+                .conversationType(messagePO.getConversationType())
+                .EventUserId(messagePO.getFromId())
+                .EventEntityId(likes.getVideoId())
+//                .EventEntityId((long)((Integer)JSONObject.parseObject(messagePO.getContent(), Map.class).get("noticeId")).intValue())
+                .build();
+        return noticeId;
+    }
+
+
+    public static MessageInfoDTO makeMessageInfoDTO(MessagePO messagePO, Follows follows){
+
+        MessageInfoDTO noticeId = MessageInfoDTO.builder()
+                .MessageId(messagePO.getId())
+                .currentUserId(messagePO.getToId())
+                .conversationType(messagePO.getConversationType())
+                .EventUserId(messagePO.getFromId())
+                .EventEntityId(follows.getFollowingId())
+//                .EventEntityId((long)((Integer)JSONObject.parseObject(messagePO.getContent(), Map.class).get("noticeId")).intValue())
+                .build();
+        return noticeId;
     }
 }

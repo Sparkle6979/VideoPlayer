@@ -53,7 +53,7 @@ public class VideoController {
     private JwtProperties jwtProperties;
 
     @ApiOperation("视频上传")
-    @RequestMapping(value = "/upload",method = RequestMethod.POST)
+    @RequestMapping(value = "/upload",method = RequestMethod.PUT)
     public RestResult<VideoInfoDTO> uploadVideo(@ModelAttribute VideoUploadDTO videoUploadDTO){
 
         try {

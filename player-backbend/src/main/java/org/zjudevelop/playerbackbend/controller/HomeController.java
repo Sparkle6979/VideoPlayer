@@ -18,6 +18,7 @@ import org.zjudevelop.playerbackbend.dto.*;
 import org.zjudevelop.playerbackbend.pojo.CheckAuth;
 import org.zjudevelop.playerbackbend.pojo.JwtProperties;
 import org.zjudevelop.playerbackbend.service.CategoryService;
+import org.zjudevelop.playerbackbend.service.LikeService;
 import org.zjudevelop.playerbackbend.service.UserService;
 import org.zjudevelop.playerbackbend.service.VideoService;
 import org.zjudevelop.playerbackbend.utils.JwtUtil;
@@ -53,6 +54,9 @@ public class HomeController {
     private HttpServletRequest request;
 
     @Autowired
+    private LikeService likeService;
+
+    @Autowired
     private JwtProperties jwtProperties;
 
     @CheckAuth(check = false)
@@ -69,20 +73,7 @@ public class HomeController {
     public RestResult<List<VideoDisplayDTO>> getVideoInfoListByCategoryId(@RequestParam Long categoryId){
         List<VideoInfoDTO> videoInfoList = videoService.getVideoInfoListByCategoryId(categoryId);
 
-
-        String token  = request.getHeader(jwtProperties.getUserTokenName());
-
-        Long currentUserId = null;
-        if(StringUtils.isNotBlank(token)){
-            Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
-            currentUserId = Long.valueOf(claims.get("user").toString());
-        }
-
-        List<Long> likeVideoIds = userService.getLikes(currentUserId)
-                .stream()
-                .map(like -> like.getVideoId())
-                .collect(Collectors.toList());
-
+        Long currentUserId = getUserIdFromRequest(request, jwtProperties);
         List<VideoDisplayDTO> result = new ArrayList<>();
         for (VideoInfoDTO videoInfoDTO : videoInfoList) {
             VideoDisplayDTO build = VideoDisplayDTO.builder()
@@ -96,7 +87,7 @@ public class HomeController {
                     .videoUrl(videoInfoDTO.getVideoUrl())
                     .coverUrl(videoInfoDTO.getCoverUrl())
                     .build();
-            if(null != currentUserId && likeVideoIds.contains(videoInfoDTO.getVideoId())){
+            if(null != currentUserId && likeService.IfLikes(currentUserId,videoInfoDTO.getVideoId())){
                 build.setIsLike(Boolean.TRUE);
             }else {
                 build.setIsLike(Boolean.FALSE);
@@ -111,6 +102,9 @@ public class HomeController {
     public RestResult<VideoDetailInfoDTO> getVideoInfoByVideoId(@RequestParam Long videoId){
         VideoInfoDTO videoInfo = videoService.getVideoInfoById(videoId);
         UserInfoDTO createrInfoById = videoService.getCreaterInfoById(videoId);
+
+        Long currentUserId = getUserIdFromRequest(request, jwtProperties);
+
 
         // 取前5个作为代表作
         List<VideoInfoDTO> ownVideosById = userService.getOwnVideosById(createrInfoById.getId())
@@ -137,6 +131,7 @@ public class HomeController {
                 .coverUrl(videoInfo.getCoverUrl())
                 .createrId(createrInfoById.getId())
                 .createrWorks(ownVideosById)
+                .isLike(Boolean.TRUE ? likeService.IfLikes(currentUserId,videoId) : Boolean.FALSE)
                 .build();
 
         return RestResult.success(build);
@@ -147,5 +142,17 @@ public class HomeController {
     public RestResult<CategoryInfoDTO> getCategoryInfoByCategoryId(@RequestParam Long categoryId){
         CategoryInfoDTO categoryInfo = categoryService.getCategoryInfoById(categoryId);
         return RestResult.success(categoryInfo);
+    }
+
+
+    public static Long getUserIdFromRequest(HttpServletRequest request, JwtProperties jwtProperties){
+        String token  = request.getHeader(jwtProperties.getUserTokenName());
+
+        Long currentUserId = null;
+        if(StringUtils.isNotBlank(token)){
+            Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
+            currentUserId = Long.valueOf(claims.get("user").toString());
+        }
+        return currentUserId;
     }
 }

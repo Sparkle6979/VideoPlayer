@@ -52,7 +52,6 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new AccountNotFoundException();
         }
-        log.info("user: " + user);
         if (!password.equals(user.getPassword())){
             throw new PasswordErrorException();
         }
@@ -132,6 +131,19 @@ public class UserServiceImpl implements UserService {
         wrapper.eq("user_id", userId);
         List<Likes> likesList = likesMapper.selectList(wrapper);
         return likesList;
+    }
+
+    @Override
+    public int create(Creates creates) {
+        return createsMapper.insert(creates);
+    }
+
+    @Override
+    public List<Creates> getCreates(Long userId) {
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
+        List<Creates> createsList = createsMapper.selectList(wrapper);
+        return createsList;
     }
 
     @Override

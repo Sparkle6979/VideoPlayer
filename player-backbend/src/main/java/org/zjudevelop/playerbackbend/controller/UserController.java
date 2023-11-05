@@ -17,6 +17,7 @@ import org.zjudevelop.playerbackbend.dto.*;
 import org.zjudevelop.playerbackbend.pojo.CheckAuth;
 import org.zjudevelop.playerbackbend.pojo.JwtProperties;
 import org.zjudevelop.playerbackbend.domain.User;
+import org.zjudevelop.playerbackbend.utils.PageResult;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 import org.zjudevelop.playerbackbend.service.UploadService;
 import org.zjudevelop.playerbackbend.service.UserService;
@@ -201,33 +202,23 @@ public class UserController {
     /**
      * 查询粉丝列表
      * */
-    @GetMapping("/follows/follower/{id}")
-    @ApiOperation("查询粉丝列表")
+    @GetMapping("/follows/follower")
+    @ApiOperation("分页查询给定id的粉丝列表")
     @CheckAuth(check = false)
-    public RestResult<FollowersDTO> getFollowers(@ApiParam("查询用户id") @PathVariable Long id) {
-        List<Follows> followsList = userService.getFollowers(id);
-        List<Long> follwersList = followsList.stream().map(Follows::getFollowerId).collect(Collectors.toList());
-        FollowersDTO followersDTO = new FollowersDTO().builder()
-                .id(id)
-                .followerIds(follwersList)
-                .build();
-        return RestResult.success(followersDTO);
+    public RestResult<PageResult> getFollowers(FollowersPageQueryDTO followersPageQueryDTO) {
+        PageResult followersList = userService.getFollowers(followersPageQueryDTO);
+        return RestResult.success(followersList);
     }
 
     /**
      * 查询关注列表
      * */
-    @GetMapping("/follows/following/{id}")
-    @ApiOperation("查询关注列表")
+    @GetMapping("/follows/following")
+    @ApiOperation("分页查询给定id的关注列表")
     @CheckAuth(check = false)
-    public RestResult<FollowingsDTO> getFollowings(@ApiParam("查询用户id") @PathVariable Long id) {
-        List<Follows> followsList = userService.getFollowings(id);
-        List<Long> follwingsList = followsList.stream().map(Follows::getFollowingId).collect(Collectors.toList());
-        FollowingsDTO followingsDTO = new FollowingsDTO().builder()
-                .id(id)
-                .followingIds(follwingsList)
-                .build();
-        return RestResult.success(followingsDTO);
+    public RestResult<PageResult> getFollowings(FollowingsPageQueryDTO followingsPageQueryDTO) {
+        PageResult followingsPageList = userService.getFollowings(followingsPageQueryDTO);
+        return RestResult.success(followingsPageList);
     }
 
     /**
@@ -268,16 +259,11 @@ public class UserController {
      * 查询点赞视频
      * */
     @GetMapping("/likes")
-    @ApiOperation("查询点赞视频")
-    public RestResult<LikeVideosDTO> getLikeVideos() {
+    @ApiOperation("分页查询点赞视频")
+    public RestResult<PageResult> getLikeVideos(LikesPageQueryDTO likesPageQueryDTO) {
         Long userId = BaseContext.getCurrentUserId();
-        List<Likes> likes = userService.getLikes(userId);
-        List<Long> videoIds = likes.stream().map(Likes::getVideoId).collect(Collectors.toList());
-        LikeVideosDTO likeVideosDTO = new LikeVideosDTO().builder()
-                .userId(userId)
-                .videoIds(videoIds)
-                .build();
-        return RestResult.success(likeVideosDTO);
+        PageResult likesList = userService.getLikes(userId, likesPageQueryDTO);
+        return RestResult.success(likesList);
     }
 
     @GetMapping("/creates")

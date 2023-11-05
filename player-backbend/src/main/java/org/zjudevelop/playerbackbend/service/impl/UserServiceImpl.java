@@ -1,6 +1,7 @@
 package org.zjudevelop.playerbackbend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,9 +9,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.zjudevelop.playerbackbend.dao.*;
 import org.zjudevelop.playerbackbend.domain.*;
-import org.zjudevelop.playerbackbend.dto.UserLoginDTO;
-import org.zjudevelop.playerbackbend.dto.UserRegisterDTO;
-import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
+import org.zjudevelop.playerbackbend.dto.*;
+import org.zjudevelop.playerbackbend.utils.PageResult;
 import org.zjudevelop.playerbackbend.pojo.exception.AccountNotFoundException;
 import org.zjudevelop.playerbackbend.pojo.exception.BaseException;
 import org.zjudevelop.playerbackbend.pojo.exception.PasswordErrorException;
@@ -20,6 +20,7 @@ import org.zjudevelop.playerbackbend.utils.DTOUtil;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -52,6 +53,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new AccountNotFoundException();
         }
+        log.info("user: " + user);
         if (!password.equals(user.getPassword())){
             throw new PasswordErrorException();
         }
@@ -134,6 +136,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public PageResult getLikes(Long userId, LikesPageQueryDTO likesPageQueryDTO) {
+        Page<Likes> page = new Page<>(likesPageQueryDTO.getPage(), likesPageQueryDTO.getPageSize());
+        QueryWrapper queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        Page<Likes> pageResult = likesMapper.selectPage(page, queryWrapper);
+        List<Long>  likesList = pageResult.getRecords().stream().map(Likes::getVideoId).collect(Collectors.toList());
+        return new PageResult(pageResult.getTotal(), likesList);
+    }
+
+    @Override
     public int create(Creates creates) {
         return createsMapper.insert(creates);
     }
@@ -163,19 +175,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Follows> getFollowings(Long userId) {
-        QueryWrapper wrapper = new QueryWrapper<>();
-        wrapper.eq("follower_id", userId);
-        List<Follows> followsList = followsMapper.selectList(wrapper);
-        return followsList;
+    public PageResult getFollowings(FollowingsPageQueryDTO followingsPageQueryDTO) {
+        Page<Follows> page = new Page<>(followingsPageQueryDTO.getPage(), followingsPageQueryDTO.getPageSize());
+        QueryWrapper queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("follower_id", followingsPageQueryDTO.getId());
+        Page<Follows> pageResult = followsMapper.selectPage(page, queryWrapper);
+        List<Long> followingsList = pageResult.getRecords().stream().map(Follows::getFollowingId).collect(Collectors.toList());
+        return new PageResult(pageResult.getTotal(), followingsList);
     }
 
     @Override
-    public List<Follows> getFollowers(Long userId) {
-        QueryWrapper wrapper = new QueryWrapper<>();
-        wrapper.eq("following_id", userId);
-        List<Follows> followsList = followsMapper.selectList(wrapper);
-        return followsList;
+    public PageResult getFollowers(FollowersPageQueryDTO followersPageQueryDTO) {
+        Page<Follows> page = new Page<>(followersPageQueryDTO.getPage(), followersPageQueryDTO.getPageSize());
+        QueryWrapper queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("following_id", followersPageQueryDTO.getId());
+        Page<Follows> pageResult = followsMapper.selectPage(page, queryWrapper);
+        List<Follows> records = pageResult.getRecords();
+        List<Long> followersList = records.stream().map(Follows::getFollowerId).collect(Collectors.toList());
+        return new PageResult(pageResult.getTotal(), followersList);
     }
 
     @Override

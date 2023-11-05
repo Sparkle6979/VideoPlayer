@@ -18,6 +18,7 @@ import org.zjudevelop.playerbackbend.service.UploadService;
 import org.zjudevelop.playerbackbend.service.UserService;
 import org.zjudevelop.playerbackbend.service.VideoService;
 import org.zjudevelop.playerbackbend.utils.JwtUtil;
+import org.zjudevelop.playerbackbend.utils.PageResult;
 import org.zjudevelop.playerbackbend.utils.RestResult;
 import org.zjudevelop.playerbackbend.utils.FileProcessUtil;
 import org.zjudevelop.playerbackbend.utils.VideoProcessUtil;
@@ -133,5 +134,18 @@ public class VideoController {
         return currentUserId;
     }
 
+    /**
+     * 分页获取视频
+     * @param videosPageQueryDTO
+     * @return org.zjudevelop.playerbackbend.utils.RestResult<org.zjudevelop.playerbackbend.utils.PageResult>
+     * */
+    @GetMapping
+    @ApiOperation("分页获取视频")
+    @CheckAuth(check = false)
+    public RestResult<PageResult> getVideos(VideosPageQueryDTO videosPageQueryDTO) {
+        // TODO: 打乱后，再分页取
+        PageResult videoList = videoService.getVideos(videosPageQueryDTO);
+        return RestResult.success(videoList);
+    }
 
 }

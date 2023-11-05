@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.zjudevelop.playerbackbend.dao.*;
 import org.zjudevelop.playerbackbend.domain.*;
 import org.zjudevelop.playerbackbend.dto.UserLoginDTO;
@@ -85,13 +87,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public int like(Likes likes) {
-        // TODO: 当用户对同一个视频进行多次点暂时，不重复添加
+        Long userId = likes.getUserId();
+        Long videoId = likes.getVideoId();
+
+        // check if already liked
+        if (this.isAlreadyLiked(userId, videoId)) {
+            return 0;
+        }
+
+        // update likeCount
+        VideoPO videoPO = videoMapper.selectByIdWithLock(videoId);
+        videoPO.setLikeCount(videoPO.getLikeCount() + 1);
+        videoMapper.updateById(videoPO);
+
         return likesMapper.insert(likes);
     }
 
     @Override
     public int unlike(Likes likes) {
+        Long userId = likes.getUserId();
+        Long videoId = likes.getVideoId();
+
+        // check if already liked
+        if (!this.isAlreadyLiked(userId, videoId)) {
+            return 0;
+        }
+
+        // update likeCount
+        VideoPO videoPO = videoMapper.selectByIdWithLock(videoId);
+        videoPO.setLikeCount(videoPO.getLikeCount() - 1);
+        videoMapper.updateById(videoPO);
+
         QueryWrapper wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", likes.getUserId());
         wrapper.eq("video_id", likes.getVideoId());
@@ -108,6 +136,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int follow(Follows follows) {
+        if (this.isAlreadyFollowed(follows.getFollowerId(), follows.getFollowingId())) {
+            return 0;
+        }
         return followsMapper.insert(follows);
     }
 
@@ -156,5 +187,25 @@ public class UserServiceImpl implements UserService {
             result.add(videoInfoDTO);
         }
         return result;
+    }
+
+    @Override
+    public boolean isAlreadyLiked(Long userId, Long videoId) {
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
+        wrapper.eq("video_id", videoId);
+
+        Long count = likesMapper.selectCount(wrapper);
+        return count > 0;
+    }
+
+    @Override
+    public boolean isAlreadyFollowed(Long followerId, Long followingId) {
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("follower_id", followerId);
+        wrapper.eq("following_id", followingId);
+
+        Long count = followsMapper.selectCount(wrapper);
+        return count > 0;
     }
 }

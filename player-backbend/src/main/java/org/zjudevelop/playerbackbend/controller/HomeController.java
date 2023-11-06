@@ -10,10 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.zjudevelop.playerbackbend.common.context.BaseContext;
-import org.zjudevelop.playerbackbend.domain.Likes;
-import org.zjudevelop.playerbackbend.domain.User;
-import org.zjudevelop.playerbackbend.domain.VideoPO;
 import org.zjudevelop.playerbackbend.dto.*;
 import org.zjudevelop.playerbackbend.pojo.CheckAuth;
 import org.zjudevelop.playerbackbend.pojo.JwtProperties;
@@ -106,16 +102,17 @@ public class HomeController {
         Long currentUserId = getUserIdFromRequest(request, jwtProperties);
 
 
-        // 取前5个作为代表作
+        // 取前3个作为代表作
         List<VideoInfoDTO> ownVideosById = userService.getOwnVideosById(createrInfoById.getId())
                 .stream()
+                .filter(videoInfoDTO -> videoInfoDTO.getVideoId() != videoId)
                 .sorted(new Comparator<VideoInfoDTO>() {
                     @Override
                     public int compare(VideoInfoDTO o1, VideoInfoDTO o2) {
                         return (int)(o2.getLikeCount() - o1.getLikeCount());
                     }
                 })
-                .limit(5)
+                .limit(3)
                 .collect(Collectors.toList());
 
 

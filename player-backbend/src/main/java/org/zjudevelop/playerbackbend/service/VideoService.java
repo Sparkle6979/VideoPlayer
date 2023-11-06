@@ -21,4 +21,8 @@ public interface VideoService {
     UserInfoDTO getCreaterInfoById(Long videoId);
 
     PageResult getVideos(VideosPageQueryDTO videosPageQueryDTO);
+
+    List<VideoCommentDTO> getCommentByVideoId(Long videoId);
+
+    PageResult getCommentByVideoId(VideoCommentsPageQueryDTO videoCommentsPageQueryDTO);
 }

@@ -44,6 +44,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private CategoryMapper categoryMapper;
 
+    @Autowired
+    private CommentMapper commentMapper;
+
     @Override
     public User login(UserLoginDTO userLoginDTO){
         String username = userLoginDTO.getUsername();
@@ -53,7 +56,6 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new AccountNotFoundException();
         }
-        log.info("user: " + user);
         if (!password.equals(user.getPassword())){
             throw new PasswordErrorException();
         }
@@ -175,6 +177,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Long comment(CommentPO commentPO) {
+         commentMapper.insert(commentPO);
+         return commentPO.getId();
+    }
+
+    @Override
+    public List<Follows> getFollowings(Long userId) {
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("follower_id", userId);
+        List<Follows> followsList = followsMapper.selectList(wrapper);
+        return followsList;
+    }
+
+    @Override
     public PageResult getFollowings(FollowingsPageQueryDTO followingsPageQueryDTO) {
         Page<Follows> page = new Page<>(followingsPageQueryDTO.getPage(), followingsPageQueryDTO.getPageSize());
         QueryWrapper queryWrapper = new QueryWrapper<>();
@@ -182,6 +198,14 @@ public class UserServiceImpl implements UserService {
         Page<Follows> pageResult = followsMapper.selectPage(page, queryWrapper);
         List<Long> followingsList = pageResult.getRecords().stream().map(Follows::getFollowingId).collect(Collectors.toList());
         return new PageResult(pageResult.getTotal(), followingsList);
+    }
+
+    @Override
+    public List<Follows> getFollowers(Long userId) {
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("following_id", userId);
+        List<Follows> followsList = followsMapper.selectList(wrapper);
+        return followsList;
     }
 
     @Override

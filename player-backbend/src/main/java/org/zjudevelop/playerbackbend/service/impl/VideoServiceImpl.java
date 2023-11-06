@@ -5,12 +5,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zjudevelop.playerbackbend.dao.CategoryMapper;
-import org.zjudevelop.playerbackbend.dao.CreatesMapper;
-import org.zjudevelop.playerbackbend.dao.UserMapper;
-import org.zjudevelop.playerbackbend.dao.VideoMapper;
+import org.zjudevelop.playerbackbend.dao.*;
 import org.zjudevelop.playerbackbend.domain.*;
 import org.zjudevelop.playerbackbend.dto.*;
+import org.zjudevelop.playerbackbend.pojo.MessageConstant;
 import org.zjudevelop.playerbackbend.service.VideoService;
 import org.zjudevelop.playerbackbend.utils.DTOUtil;
 import org.zjudevelop.playerbackbend.utils.PageResult;
@@ -18,6 +16,7 @@ import org.zjudevelop.playerbackbend.utils.PageResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author sparkle6979l
@@ -26,7 +25,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class VideoServiceImpl implements VideoService {
+public class VideoServiceImpl extends MessageConstant implements VideoService {
 
     @Autowired
     private VideoMapper videoMapper;
@@ -40,6 +39,8 @@ public class VideoServiceImpl implements VideoService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private CommentMapper commentMapper;
     @Override
     public VideoInfoDTO getVideoInfoById(Long videoId) {
         VideoPO videoPO = videoMapper.selectById(videoId);
@@ -119,5 +120,68 @@ public class VideoServiceImpl implements VideoService {
         Page<VideoPO> page = new Page<>(videosPageQueryDTO.getPage(), videosPageQueryDTO.getPageSize());
         Page<VideoPO> pageResult = videoMapper.selectPage(page, null);
         return new PageResult(pageResult.getTotal(), pageResult.getRecords());
+    }
+
+    @Override
+    public List<VideoCommentDTO> getCommentByVideoId(Long videoId) {
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("entity_type", COMMENT_TYPE_VIDEO);
+        wrapper.eq("entity_id", videoId);
+        List<CommentPO> comments = commentMapper.selectList(wrapper);
+        List<VideoCommentDTO> result = makeVideoCommentDTO(comments);
+
+        return  result;
+    }
+
+    @Override
+    public PageResult getCommentByVideoId(VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
+        log.info("进入service");
+        Page<CommentPO> page = new Page<>(videoCommentsPageQueryDTO.getPage(), videoCommentsPageQueryDTO.getPageSize());
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("entity_type", COMMENT_TYPE_VIDEO);
+        wrapper.eq("entity_id", videoCommentsPageQueryDTO.getVideoId());
+        Page<CommentPO> pageResult = commentMapper.selectPage(page, wrapper);
+
+        List<VideoCommentDTO> result = makeVideoCommentDTO(pageResult.getRecords());
+        return new PageResult(result.size(),result);
+    }
+
+
+    public List<VideoCommentDTO> makeVideoCommentDTO(List<CommentPO> comments){
+        List<VideoCommentDTO> result = new ArrayList<>();
+        for (CommentPO comment : comments) {
+            VideoCommentDTO build = VideoCommentDTO.builder()
+                    .commentId(comment.getId())
+                    .commentUserId(comment.getUserId())
+                    .commentUserName(userMapper.selectById(comment.getUserId()).getUsername())
+                    .content(comment.getContent())
+                    .createTime(comment.getCreateTime().toString())
+                    .build();
+
+            Long commentId = comment.getId();
+            QueryWrapper commentwrapper = new QueryWrapper<>();
+            commentwrapper.eq("entity_type", COMMENT_TYPE_COMMENT);
+            commentwrapper.eq("entity_id", commentId);
+            List<CommentPO> commentPOS = commentMapper.selectList(commentwrapper);
+
+            List<VideoCommentDTO> commentReply = new ArrayList<>();
+            for (CommentPO commentPO : commentPOS) {
+                VideoCommentDTO commentbuild = VideoCommentDTO.builder()
+                        .commentId(comment.getId())
+                        .commentUserId(commentPO.getUserId())
+                        .commentUserName(userMapper.selectById(commentPO.getUserId()).getUsername())
+                        .content(commentPO.getContent())
+                        .createTime(commentPO.getCreateTime().toString())
+                        .targetUserId(commentPO.getTargetId())
+                        .targetUserName(userMapper.selectById(commentPO.getTargetId()).getUsername())
+                        .build();
+
+                commentReply.add(commentbuild);
+            }
+            build.setCommentReply(commentReply);
+
+            result.add(build);
+        }
+        return result;
     }
 }

@@ -1,5 +1,6 @@
 package org.zjudevelop.playerbackbend.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,19 +14,27 @@ import java.util.List;
 @Data
 @Builder
 public class VideoCommentDTO {
+    @ApiModelProperty(value = "评论id")
     Long commentId;
 
+    @ApiModelProperty(value = "评论者的userId")
     Long commentUserId;
 
+    @ApiModelProperty(value = "评论者的userName")
     String commentUserName;
 
+    @ApiModelProperty(value = "评论内容")
     String content;
 
+    @ApiModelProperty(value = "被评论者的userId")
     Long targetUserId;
 
+    @ApiModelProperty(value = "被评论者的userName")
     String targetUserName;
 
+    @ApiModelProperty(value = "评论时间")
     String createTime;
 
+    @ApiModelProperty(value = "追评")
     List<VideoCommentDTO> commentReply;
 }

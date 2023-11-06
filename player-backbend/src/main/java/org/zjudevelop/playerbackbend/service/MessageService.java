@@ -23,4 +23,6 @@ public interface MessageService {
     List<MessagePO> getUnreadReceiveCommentMessageByUserId(Long userId);
 
     int insertMessage(MessagePO messagePO);
+
+    MessagePO readMessage(Long MessageId);
 }

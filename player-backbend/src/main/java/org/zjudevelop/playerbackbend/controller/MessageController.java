@@ -5,15 +5,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.zjudevelop.playerbackbend.common.context.BaseContext;
-import org.zjudevelop.playerbackbend.domain.CommentPO;
-import org.zjudevelop.playerbackbend.domain.Follows;
-import org.zjudevelop.playerbackbend.domain.Likes;
 import org.zjudevelop.playerbackbend.domain.MessagePO;
 import org.zjudevelop.playerbackbend.dto.MessageInfoDTO;
 import org.zjudevelop.playerbackbend.pojo.MessageConstant;
@@ -24,7 +17,6 @@ import org.zjudevelop.playerbackbend.utils.RestResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author sparkle6979l
@@ -33,9 +25,9 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping(value = "/event")
+@RequestMapping(value = "/message")
 @Api(tags = "消息通知")
-public class EventController extends MessageConstant {
+public class MessageController extends MessageConstant {
     @Autowired
     private UserService userService;
 
@@ -117,5 +109,12 @@ public class EventController extends MessageConstant {
         }
 
         return RestResult.success(result);
+    }
+
+    @GetMapping("/read")
+    @ApiOperation("读取消息通知")
+    public RestResult readMessage(@RequestParam Long messageId) {
+        messageService.readMessage(messageId);
+        return RestResult.success();
     }
 }

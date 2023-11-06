@@ -82,4 +82,12 @@ public class MessageServiceImpl extends MessageConstant implements MessageServic
     public int insertMessage(MessagePO messagePO) {
         return messageMapper.insert(messagePO);
     }
+
+    @Override
+    public MessagePO readMessage(Long messageId) {
+        MessagePO messagePO = messageMapper.selectById(messageId);
+        messagePO.setStatus((long) 1);
+        messageMapper.updateById(messagePO);
+        return messagePO;
+    }
 }

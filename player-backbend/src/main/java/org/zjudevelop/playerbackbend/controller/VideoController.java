@@ -17,10 +17,7 @@ import org.zjudevelop.playerbackbend.service.LikeService;
 import org.zjudevelop.playerbackbend.service.UploadService;
 import org.zjudevelop.playerbackbend.service.UserService;
 import org.zjudevelop.playerbackbend.service.VideoService;
-import org.zjudevelop.playerbackbend.utils.JwtUtil;
-import org.zjudevelop.playerbackbend.utils.RestResult;
-import org.zjudevelop.playerbackbend.utils.FileProcessUtil;
-import org.zjudevelop.playerbackbend.utils.VideoProcessUtil;
+import org.zjudevelop.playerbackbend.utils.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -122,11 +119,19 @@ public class VideoController {
         return RestResult.success(videoInfoByKeyword);
     }
 
-    @ApiOperation("查看视频评论")
+//    @ApiOperation("查看视频评论")
+//    @CheckAuth(check = false)
+//    @RequestMapping(value = "/comment",method = RequestMethod.GET)
+//    public RestResult<List<VideoCommentDTO>> getVideoSearchInfoByKeyword(@RequestParam Long videoId) {
+//        return RestResult.success(videoService.getCommentByVideoId(videoId));
+//    }
+
+    @ApiOperation("分页查看视频评论")
     @CheckAuth(check = false)
-    @RequestMapping(value = "/comment",method = RequestMethod.GET)
-    public RestResult<List<VideoCommentDTO>> getVideoSearchInfoByKeyword(@RequestParam Long videoId) {
-        return RestResult.success(videoService.getCommentByVideoId(videoId));
+    @RequestMapping(value = "/comment",method = RequestMethod.POST)
+    public RestResult<PageResult> getVideoCommentsInfoByKeyword(@RequestBody VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
+        log.info("进入controller");
+        return RestResult.success(videoService.getCommentByVideoId(videoCommentsPageQueryDTO));
     }
 
     public static Long getUserIdFromRequest(HttpServletRequest request, JwtProperties jwtProperties){

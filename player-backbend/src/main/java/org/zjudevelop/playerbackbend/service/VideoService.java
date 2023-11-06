@@ -2,6 +2,7 @@ package org.zjudevelop.playerbackbend.service;
 
 import org.zjudevelop.playerbackbend.domain.User;
 import org.zjudevelop.playerbackbend.dto.*;
+import org.zjudevelop.playerbackbend.utils.PageResult;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface VideoService {
     UserInfoDTO getCreaterInfoById(Long videoId);
 
     List<VideoCommentDTO> getCommentByVideoId(Long videoId);
+
+    PageResult getCommentByVideoId(VideoCommentsPageQueryDTO videoCommentsPageQueryDTO);
 }

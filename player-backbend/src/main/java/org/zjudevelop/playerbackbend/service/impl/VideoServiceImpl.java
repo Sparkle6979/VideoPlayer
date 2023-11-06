@@ -1,6 +1,7 @@
 package org.zjudevelop.playerbackbend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,10 +11,12 @@ import org.zjudevelop.playerbackbend.dto.*;
 import org.zjudevelop.playerbackbend.pojo.MessageConstant;
 import org.zjudevelop.playerbackbend.service.VideoService;
 import org.zjudevelop.playerbackbend.utils.DTOUtil;
+import org.zjudevelop.playerbackbend.utils.PageResult;
 
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author sparkle6979l
@@ -118,8 +121,27 @@ public class VideoServiceImpl extends MessageConstant implements VideoService {
         wrapper.eq("entity_type", COMMENT_TYPE_VIDEO);
         wrapper.eq("entity_id", videoId);
         List<CommentPO> comments = commentMapper.selectList(wrapper);
-        List<VideoCommentDTO> result = new ArrayList<>();
+        List<VideoCommentDTO> result = makeVideoCommentDTO(comments);
 
+        return  result;
+    }
+
+    @Override
+    public PageResult getCommentByVideoId(VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
+        log.info("进入service");
+        Page<CommentPO> page = new Page<>(videoCommentsPageQueryDTO.getPage(), videoCommentsPageQueryDTO.getPageSize());
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("entity_type", COMMENT_TYPE_VIDEO);
+        wrapper.eq("entity_id", videoCommentsPageQueryDTO.getVideoId());
+        Page<CommentPO> pageResult = commentMapper.selectPage(page, wrapper);
+
+        List<VideoCommentDTO> result = makeVideoCommentDTO(pageResult.getRecords());
+        return new PageResult(result.size(),result);
+    }
+
+
+    public List<VideoCommentDTO> makeVideoCommentDTO(List<CommentPO> comments){
+        List<VideoCommentDTO> result = new ArrayList<>();
         for (CommentPO comment : comments) {
             VideoCommentDTO build = VideoCommentDTO.builder()
                     .commentId(comment.getId())
@@ -153,7 +175,6 @@ public class VideoServiceImpl extends MessageConstant implements VideoService {
 
             result.add(build);
         }
-
-        return  result;
+        return result;
     }
 }

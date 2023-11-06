@@ -10,24 +10,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.zjudevelop.playerbackbend.common.context.BaseContext;
-import org.zjudevelop.playerbackbend.domain.Creates;
-import org.zjudevelop.playerbackbend.domain.Follows;
-import org.zjudevelop.playerbackbend.domain.Likes;
+import org.zjudevelop.playerbackbend.domain.*;
 import org.zjudevelop.playerbackbend.dto.*;
-import org.zjudevelop.playerbackbend.pojo.CheckAuth;
-import org.zjudevelop.playerbackbend.pojo.JwtProperties;
-import org.zjudevelop.playerbackbend.domain.User;
+import org.zjudevelop.playerbackbend.pojo.*;
+import org.zjudevelop.playerbackbend.service.*;
 import org.zjudevelop.playerbackbend.utils.PageResult;
-import org.zjudevelop.playerbackbend.pojo.QNDataServer;
-import org.zjudevelop.playerbackbend.service.UploadService;
-import org.zjudevelop.playerbackbend.service.UserService;
 import org.zjudevelop.playerbackbend.event.EventProducer;
 import org.zjudevelop.playerbackbend.utils.JwtUtil;
 import org.zjudevelop.playerbackbend.utils.RestResult;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +30,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/user")
 @Slf4j
 @Api(tags = "用户")
-public class UserController {
+public class UserController extends MessageConstant {
 
     @Autowired
     UserService userService;

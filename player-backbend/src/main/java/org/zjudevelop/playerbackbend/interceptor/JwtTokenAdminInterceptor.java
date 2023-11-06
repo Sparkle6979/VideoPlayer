@@ -48,7 +48,6 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
         try {
             Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
             Long userId = Long.valueOf(claims.get("user").toString());
-            log.info("当前用户id：" + userId);
             BaseContext.setCurrentUserId(userId);
             return true;
         } catch (Exception ex) {

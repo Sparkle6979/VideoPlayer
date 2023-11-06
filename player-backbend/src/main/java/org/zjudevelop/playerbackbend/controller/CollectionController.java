@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.zjudevelop.playerbackbend.common.context.BaseContext;
 import org.zjudevelop.playerbackbend.dto.CollectionInfoDTO;
 import org.zjudevelop.playerbackbend.dto.PageQueryDTO;
-import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
 import org.zjudevelop.playerbackbend.service.CollectionService;
 import org.zjudevelop.playerbackbend.utils.PageResult;
 import org.zjudevelop.playerbackbend.utils.RestResult;

@@ -60,11 +60,10 @@ public class CollectionImpl implements CollectionService {
 
     @Override
     public int cancelCollect(Long collectionId, Long videoId) {
-        CollectionVideo collectionVideo = CollectionVideo.builder()
-                .collectionId(collectionId)
-                .videoId(videoId)
-                .build();
-        return collectionVideoMapper.deleteById(collectionVideo);
+        QueryWrapper queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("collection_id", collectionId);
+        queryWrapper.eq("video_id", videoId);
+        return collectionVideoMapper.delete(queryWrapper);
     }
 
     @Override

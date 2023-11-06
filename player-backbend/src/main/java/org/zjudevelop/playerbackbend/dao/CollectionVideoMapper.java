@@ -14,7 +14,7 @@ import java.util.List;
 
 @Mapper
 public interface CollectionVideoMapper extends BaseMapper<CollectionVideo> {
-    String innerSelectSql = "select v.* from collection_video cv " +
+    String innerSelectSql = "select * from collection_video cv " +
             "inner join video v " +
             "on v.id = cv.video_id " +
             "where cv.collection_id = ${collectionId}";

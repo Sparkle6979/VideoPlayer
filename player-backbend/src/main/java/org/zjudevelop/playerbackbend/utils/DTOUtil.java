@@ -74,28 +74,41 @@ public class DTOUtil {
         return userInfoDTO;
     }
 
-    public static MessageInfoDTO makeMessageInfoDTO(MessagePO messagePO, Likes likes){
+//    public static MessageInfoDTO makeMessageInfoDTO(MessagePO messagePO, Likes likes){
+//
+//        MessageInfoDTO noticeId = MessageInfoDTO.builder()
+//                .MessageId(messagePO.getId())
+//                .currentUserId(messagePO.getToId())
+//                .conversationType(messagePO.getConversationType())
+//                .EventUserId(messagePO.getFromId())
+//                .EventEntityId(likes.getVideoId())
+////                .EventEntityId((long)((Integer)JSONObject.parseObject(messagePO.getContent(), Map.class).get("noticeId")).intValue())
+//                .build();
+//        return noticeId;
+//    }
+//
+//
+//    public static MessageInfoDTO makeMessageInfoDTO(MessagePO messagePO, Follows follows){
+//
+//        MessageInfoDTO noticeId = MessageInfoDTO.builder()
+//                .MessageId(messagePO.getId())
+//                .currentUserId(messagePO.getToId())
+//                .conversationType(messagePO.getConversationType())
+//                .EventUserId(messagePO.getFromId())
+//                .EventEntityId(follows.getFollowingId())
+////                .EventEntityId((long)((Integer)JSONObject.parseObject(messagePO.getContent(), Map.class).get("noticeId")).intValue())
+//                .build();
+//        return noticeId;
+//    }
+
+    public static MessageInfoDTO makePartialMessageInfoDTO(MessagePO messagePO, Long entityId){
 
         MessageInfoDTO noticeId = MessageInfoDTO.builder()
-                .MessageId(messagePO.getId())
+                .messageId(messagePO.getId())
                 .currentUserId(messagePO.getToId())
                 .conversationType(messagePO.getConversationType())
-                .EventUserId(messagePO.getFromId())
-                .EventEntityId(likes.getVideoId())
-//                .EventEntityId((long)((Integer)JSONObject.parseObject(messagePO.getContent(), Map.class).get("noticeId")).intValue())
-                .build();
-        return noticeId;
-    }
-
-
-    public static MessageInfoDTO makeMessageInfoDTO(MessagePO messagePO, Follows follows){
-
-        MessageInfoDTO noticeId = MessageInfoDTO.builder()
-                .MessageId(messagePO.getId())
-                .currentUserId(messagePO.getToId())
-                .conversationType(messagePO.getConversationType())
-                .EventUserId(messagePO.getFromId())
-                .EventEntityId(follows.getFollowingId())
+                .eventUserId(messagePO.getFromId())
+                .eventEntityId(entityId)
 //                .EventEntityId((long)((Integer)JSONObject.parseObject(messagePO.getContent(), Map.class).get("noticeId")).intValue())
                 .build();
         return noticeId;

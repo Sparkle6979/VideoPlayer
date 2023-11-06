@@ -16,15 +16,19 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MessageInfoDTO {
 
-    Long MessageId;
+    Long messageId;
 
     Long currentUserId;
 
+    String currentUserName;
+
     String conversationType;
 
-    Long EventUserId;
+    Long eventUserId;
 
-    Long EventEntityId;
+    String eventUserName;
+
+    Long eventEntityId;
 
 
 }

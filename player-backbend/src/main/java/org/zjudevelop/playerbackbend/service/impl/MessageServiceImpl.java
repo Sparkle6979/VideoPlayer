@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zjudevelop.playerbackbend.dao.MessageMapper;
 import org.zjudevelop.playerbackbend.domain.MessagePO;
+import org.zjudevelop.playerbackbend.pojo.MessageConstant;
 import org.zjudevelop.playerbackbend.service.MessageService;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class MessageServiceImpl implements MessageService {
+public class MessageServiceImpl extends MessageConstant implements MessageService {
     @Autowired
     MessageMapper messageMapper;
 
@@ -44,6 +45,38 @@ public class MessageServiceImpl implements MessageService {
         return messageMapper.selectList(wrapper);
     }
 
+    @Override
+    public List<MessagePO> getUnreadReceiveLikeMessageByUserId(Long userId) {
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("to_id", userId);
+        wrapper.eq("status",0);
+        wrapper.eq("conversation_type",EVENT_VIDEO_LIKE);
+
+        return messageMapper.selectList(wrapper);
+    }
+
+    @Override
+    public List<MessagePO> getUnreadReceiveFollowMessageByUserId(Long userId) {
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("to_id", userId);
+        wrapper.eq("status",0);
+        wrapper.eq("conversation_type",EVENT_USER_FOLLOW);
+
+        return messageMapper.selectList(wrapper);
+    }
+
+    @Override
+    public List<MessagePO> getUnreadReceiveCommentMessageByUserId(Long userId) {
+        QueryWrapper<MessagePO> wrapper = new QueryWrapper<>();
+        wrapper.eq("to_id", userId);
+        wrapper.eq("status",0);
+        wrapper.and( wq -> {
+           wq.eq("conversation_type",EVENT_USER_COMMENT)
+                   .or()
+                   .eq("conversation_type",EVENT_VIDEO_COMMENT);
+        });
+        return messageMapper.selectList(wrapper);
+    }
 
     @Override
     public int insertMessage(MessagePO messagePO) {

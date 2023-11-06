@@ -122,6 +122,13 @@ public class VideoController {
         return RestResult.success(videoInfoByKeyword);
     }
 
+    @ApiOperation("查看视频评论")
+    @CheckAuth(check = false)
+    @RequestMapping(value = "/comment",method = RequestMethod.GET)
+    public RestResult<List<VideoCommentDTO>> getVideoSearchInfoByKeyword(@RequestParam Long videoId) {
+        return RestResult.success(videoService.getCommentByVideoId(videoId));
+    }
+
     public static Long getUserIdFromRequest(HttpServletRequest request, JwtProperties jwtProperties){
         String token  = request.getHeader(jwtProperties.getUserTokenName());
 

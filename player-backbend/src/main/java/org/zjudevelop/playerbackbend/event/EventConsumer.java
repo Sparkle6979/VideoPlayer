@@ -26,10 +26,8 @@ public class EventConsumer extends MessageConstant {
     @Autowired
     private MessageService messageService;
 
-    @KafkaListener(topics = {TOPIC_FOLLOW,TOPIC_LIKE})
+    @KafkaListener(topics = {TOPIC_FOLLOW, TOPIC_LIKE, TOPIC_COMMENT})
     public void handleCommentMessage(ConsumerRecord record) {
-
-        log.info("kafka监听到消息");
 
         if (record == null || record.value() == null) {
             log.error("消息的内容为空!");

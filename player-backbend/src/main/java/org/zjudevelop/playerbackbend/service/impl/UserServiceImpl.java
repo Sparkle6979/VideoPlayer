@@ -43,6 +43,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private CategoryMapper categoryMapper;
 
+    @Autowired
+    private CommentMapper commentMapper;
+
     @Override
     public User login(UserLoginDTO userLoginDTO){
         String username = userLoginDTO.getUsername();
@@ -160,6 +163,12 @@ public class UserServiceImpl implements UserService {
         wrapper.eq("follower_id", follows.getFollowerId());
         wrapper.eq("following_id", follows.getFollowingId());
         return followsMapper.delete(wrapper);
+    }
+
+    @Override
+    public Long comment(CommentPO commentPO) {
+         commentMapper.insert(commentPO);
+         return commentPO.getId();
     }
 
     @Override

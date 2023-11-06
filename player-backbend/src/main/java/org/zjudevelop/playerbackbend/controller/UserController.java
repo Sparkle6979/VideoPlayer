@@ -10,19 +10,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.zjudevelop.playerbackbend.common.context.BaseContext;
-import org.zjudevelop.playerbackbend.domain.Creates;
-import org.zjudevelop.playerbackbend.domain.Follows;
-import org.zjudevelop.playerbackbend.domain.Likes;
+import org.zjudevelop.playerbackbend.domain.*;
 import org.zjudevelop.playerbackbend.dto.*;
 import org.zjudevelop.playerbackbend.event.EventProducer;
 import org.zjudevelop.playerbackbend.pojo.*;
-import org.zjudevelop.playerbackbend.domain.User;
 import org.zjudevelop.playerbackbend.service.*;
 import org.zjudevelop.playerbackbend.utils.JwtUtil;
 import org.zjudevelop.playerbackbend.utils.RestResult;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +46,9 @@ public class UserController extends MessageConstant {
 
     @Autowired
     FollowService followService;
+
+    @Autowired
+    CommentService commentService;
 
     @Autowired
     QNDataServer qnDataServer;
@@ -171,6 +172,43 @@ public class UserController extends MessageConstant {
         if (returnValue <= 0) {
             return RestResult.fail("更新失败");
         }
+        return RestResult.success();
+    }
+    @RequestMapping(value = "/comment",method = RequestMethod.POST)
+    @ApiOperation("发表评论")
+    public RestResult comment(@RequestBody UserCommentDTO userCommentDTO){
+
+        Long currentUserId = BaseContext.getCurrentUserId();
+
+        CommentPO build = CommentPO.builder()
+                .userId(currentUserId)
+                .entityType(userCommentDTO.getEntityType())
+                .entityId(userCommentDTO.getEntityId())
+                .targetId(userCommentDTO.getTargetId())
+                .content(userCommentDTO.getContent())
+                .build();
+
+        Long commentId = userService.comment(build);
+
+
+        Event event = Event.builder()
+                .topic(TOPIC_COMMENT)
+                .userId(currentUserId)
+                .entityId(commentId)
+                .build();
+
+        // 如果对视频进行评论，entityUserId为视频作者Id，否则为targetId
+        if(COMMENT_TYPE_VIDEO.equals(userCommentDTO.getEntityType())){
+            event.setEntityType(EVENT_VIDEO_COMMENT);
+            event.setEntityUserId(videoService.getCreaterInfoById(userCommentDTO.getEntityId()).getId());
+        }else if(COMMENT_TYPE_COMMENT.equals(userCommentDTO.getEntityType())){
+            event.setEntityType(EVENT_USER_COMMENT);
+            event.setEntityUserId(userCommentDTO.getTargetId());
+        }
+
+        eventProducer.fireEvent(event);
+
+
         return RestResult.success();
     }
 

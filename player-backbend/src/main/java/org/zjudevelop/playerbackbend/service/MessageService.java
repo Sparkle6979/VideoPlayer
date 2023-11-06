@@ -16,5 +16,11 @@ public interface MessageService {
 
     List<MessagePO> getUnreadReceiveMessageByUserId(Long userId);
 
+    List<MessagePO> getUnreadReceiveLikeMessageByUserId(Long userId);
+
+    List<MessagePO> getUnreadReceiveFollowMessageByUserId(Long userId);
+
+    List<MessagePO> getUnreadReceiveCommentMessageByUserId(Long userId);
+
     int insertMessage(MessagePO messagePO);
 }

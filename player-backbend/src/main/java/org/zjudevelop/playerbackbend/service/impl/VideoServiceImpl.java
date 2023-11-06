@@ -4,18 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zjudevelop.playerbackbend.dao.CategoryMapper;
-import org.zjudevelop.playerbackbend.dao.CreatesMapper;
-import org.zjudevelop.playerbackbend.dao.UserMapper;
-import org.zjudevelop.playerbackbend.dao.VideoMapper;
-import org.zjudevelop.playerbackbend.domain.CategoryPO;
-import org.zjudevelop.playerbackbend.domain.Creates;
-import org.zjudevelop.playerbackbend.domain.User;
-import org.zjudevelop.playerbackbend.domain.VideoPO;
-import org.zjudevelop.playerbackbend.dto.UserInfoDTO;
-import org.zjudevelop.playerbackbend.dto.VideoInsertDTO;
-import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
-import org.zjudevelop.playerbackbend.dto.VideoSearchInfoDTO;
+import org.zjudevelop.playerbackbend.dao.*;
+import org.zjudevelop.playerbackbend.domain.*;
+import org.zjudevelop.playerbackbend.dto.*;
+import org.zjudevelop.playerbackbend.pojo.MessageConstant;
 import org.zjudevelop.playerbackbend.service.VideoService;
 import org.zjudevelop.playerbackbend.utils.DTOUtil;
 
@@ -30,7 +22,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class VideoServiceImpl implements VideoService {
+public class VideoServiceImpl extends MessageConstant implements VideoService {
 
     @Autowired
     private VideoMapper videoMapper;
@@ -44,6 +36,8 @@ public class VideoServiceImpl implements VideoService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private CommentMapper commentMapper;
     @Override
     public VideoInfoDTO getVideoInfoById(Long videoId) {
         VideoPO videoPO = videoMapper.selectById(videoId);
@@ -116,5 +110,50 @@ public class VideoServiceImpl implements VideoService {
         User user = userMapper.selectById(creates.getUserId());
 
         return DTOUtil.makeUserInfoDTO(user);
+    }
+
+    @Override
+    public List<VideoCommentDTO> getCommentByVideoId(Long videoId) {
+        QueryWrapper wrapper = new QueryWrapper<>();
+        wrapper.eq("entity_type", COMMENT_TYPE_VIDEO);
+        wrapper.eq("entity_id", videoId);
+        List<CommentPO> comments = commentMapper.selectList(wrapper);
+        List<VideoCommentDTO> result = new ArrayList<>();
+
+        for (CommentPO comment : comments) {
+            VideoCommentDTO build = VideoCommentDTO.builder()
+                    .commentId(comment.getId())
+                    .commentUserId(comment.getUserId())
+                    .commentUserName(userMapper.selectById(comment.getUserId()).getUsername())
+                    .content(comment.getContent())
+                    .createTime(comment.getCreateTime().toString())
+                    .build();
+
+            Long commentId = comment.getId();
+            QueryWrapper commentwrapper = new QueryWrapper<>();
+            commentwrapper.eq("entity_type", COMMENT_TYPE_COMMENT);
+            commentwrapper.eq("entity_id", commentId);
+            List<CommentPO> commentPOS = commentMapper.selectList(commentwrapper);
+
+            List<VideoCommentDTO> commentReply = new ArrayList<>();
+            for (CommentPO commentPO : commentPOS) {
+                VideoCommentDTO commentbuild = VideoCommentDTO.builder()
+                        .commentId(comment.getId())
+                        .commentUserId(commentPO.getUserId())
+                        .commentUserName(userMapper.selectById(commentPO.getUserId()).getUsername())
+                        .content(commentPO.getContent())
+                        .createTime(commentPO.getCreateTime().toString())
+                        .targetUserId(commentPO.getTargetId())
+                        .targetUserName(userMapper.selectById(commentPO.getTargetId()).getUsername())
+                        .build();
+
+                commentReply.add(commentbuild);
+            }
+            build.setCommentReply(commentReply);
+
+            result.add(build);
+        }
+
+        return  result;
     }
 }

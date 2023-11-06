@@ -75,4 +75,9 @@ public class CollectionImpl implements CollectionService {
         Page<VideoInfoDTO> pageResult = collectionVideoMapper.selectVideosByCollectionId(page, collectionId);
         return new PageResult(pageResult.getTotal(), pageResult.getRecords());
     }
+
+    @Override
+    public int removeCollection(Long collectionId) {
+        return collectionMapper.deleteById(collectionId);
+    }
 }

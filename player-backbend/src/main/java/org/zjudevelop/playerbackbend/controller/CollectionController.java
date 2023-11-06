@@ -48,7 +48,7 @@ public class CollectionController {
      * @param pageQueryDTO
      * @return org.zjudevelop.playerbackbend.utils.RestResult<org.zjudevelop.playerbackbend.dto.CollectionInfoDTO>
      * */
-    @GetMapping("/abc")
+    @GetMapping
     @ApiOperation("获取收藏夹列表")
     public RestResult<PageResult> getCollection(PageQueryDTO pageQueryDTO) {
         PageResult pageResult = collectionService.getCollectionsByUserID(BaseContext.getCurrentUserId(), pageQueryDTO);
@@ -61,6 +61,13 @@ public class CollectionController {
         }
         pageResult.setRecords(collectionInfoDTOList);
         return RestResult.success(pageResult);
+    }
+
+    @DeleteMapping("")
+    @ApiOperation("删除收藏夹")
+    public RestResult removeCollection(@RequestParam Long id) {
+        collectionService.removeCollection(id);
+        return RestResult.success();
     }
 
     /**

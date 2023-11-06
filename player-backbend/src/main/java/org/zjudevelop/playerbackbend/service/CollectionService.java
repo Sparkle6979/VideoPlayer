@@ -10,6 +10,8 @@ import java.util.List;
 public interface CollectionService {
     int createCollection(Long userId, String collectionName);
 
+    int removeCollection(Long collectionId);
+
     PageResult getCollectionsByUserID(Long userId, PageQueryDTO pageQueryDTO);
 
     int collect(Long collectionId, Long videoId);

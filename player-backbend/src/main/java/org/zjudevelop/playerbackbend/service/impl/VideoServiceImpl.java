@@ -1,6 +1,7 @@
 package org.zjudevelop.playerbackbend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,16 +9,11 @@ import org.zjudevelop.playerbackbend.dao.CategoryMapper;
 import org.zjudevelop.playerbackbend.dao.CreatesMapper;
 import org.zjudevelop.playerbackbend.dao.UserMapper;
 import org.zjudevelop.playerbackbend.dao.VideoMapper;
-import org.zjudevelop.playerbackbend.domain.CategoryPO;
-import org.zjudevelop.playerbackbend.domain.Creates;
-import org.zjudevelop.playerbackbend.domain.User;
-import org.zjudevelop.playerbackbend.domain.VideoPO;
-import org.zjudevelop.playerbackbend.dto.UserInfoDTO;
-import org.zjudevelop.playerbackbend.dto.VideoInsertDTO;
-import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
-import org.zjudevelop.playerbackbend.dto.VideoSearchInfoDTO;
+import org.zjudevelop.playerbackbend.domain.*;
+import org.zjudevelop.playerbackbend.dto.*;
 import org.zjudevelop.playerbackbend.service.VideoService;
 import org.zjudevelop.playerbackbend.utils.DTOUtil;
+import org.zjudevelop.playerbackbend.utils.PageResult;
 
 
 import java.util.ArrayList;
@@ -116,5 +112,12 @@ public class VideoServiceImpl implements VideoService {
         User user = userMapper.selectById(creates.getUserId());
 
         return DTOUtil.makeUserInfoDTO(user);
+    }
+
+    @Override
+    public PageResult getVideos(VideosPageQueryDTO videosPageQueryDTO) {
+        Page<VideoPO> page = new Page<>(videosPageQueryDTO.getPage(), videosPageQueryDTO.getPageSize());
+        Page<VideoPO> pageResult = videoMapper.selectPage(page, null);
+        return new PageResult(pageResult.getTotal(), pageResult.getRecords());
     }
 }

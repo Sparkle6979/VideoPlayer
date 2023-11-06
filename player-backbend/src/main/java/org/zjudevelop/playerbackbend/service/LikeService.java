@@ -9,4 +9,8 @@ import org.zjudevelop.playerbackbend.domain.Likes;
  */
 public interface LikeService {
     Boolean IfLikes(Long userId,Long videoId);
+
+    Likes getLikesByUserIdAndVideoId(Long userId,Long videoId);
+
+    Likes getLikesById(Long likeId);
 }

@@ -21,11 +21,13 @@ import org.zjudevelop.playerbackbend.utils.PageResult;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 import org.zjudevelop.playerbackbend.service.UploadService;
 import org.zjudevelop.playerbackbend.service.UserService;
+import org.zjudevelop.playerbackbend.event.EventProducer;
 import org.zjudevelop.playerbackbend.utils.JwtUtil;
 import org.zjudevelop.playerbackbend.utils.RestResult;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +43,19 @@ public class UserController {
     UserService userService;
 
     @Autowired
+    VideoService videoService;
+
+    @Autowired
     UploadService uploadService;
+
+    @Autowired
+    LikeService likeService;
+
+    @Autowired
+    FollowService followService;
+
+    @Autowired
+    CommentService commentService;
 
     @Autowired
     QNDataServer qnDataServer;
@@ -51,6 +65,9 @@ public class UserController {
 
     @Value("${tmp_file_path}")
     String tmpFilePath;
+
+    @Autowired
+    EventProducer eventProducer;
 
     /**
      * 用户登录
@@ -164,6 +181,43 @@ public class UserController {
         }
         return RestResult.success();
     }
+    @RequestMapping(value = "/comment",method = RequestMethod.POST)
+    @ApiOperation("发表评论")
+    public RestResult comment(@RequestBody UserCommentDTO userCommentDTO){
+
+        Long currentUserId = BaseContext.getCurrentUserId();
+
+        CommentPO build = CommentPO.builder()
+                .userId(currentUserId)
+                .entityType(userCommentDTO.getEntityType())
+                .entityId(userCommentDTO.getEntityId())
+                .targetId(userCommentDTO.getTargetId())
+                .content(userCommentDTO.getContent())
+                .build();
+
+        Long commentId = userService.comment(build);
+
+
+        Event event = Event.builder()
+                .topic(TOPIC_COMMENT)
+                .userId(currentUserId)
+                .entityId(commentId)
+                .build();
+
+        // 如果对视频进行评论，entityUserId为视频作者Id，否则为targetId
+        if(COMMENT_TYPE_VIDEO.equals(userCommentDTO.getEntityType())){
+            event.setEntityType(EVENT_VIDEO_COMMENT);
+            event.setEntityUserId(videoService.getCreaterInfoById(userCommentDTO.getEntityId()).getId());
+        }else if(COMMENT_TYPE_COMMENT.equals(userCommentDTO.getEntityType())){
+            event.setEntityType(EVENT_USER_COMMENT);
+            event.setEntityUserId(userCommentDTO.getTargetId());
+        }
+
+        eventProducer.fireEvent(event);
+
+
+        return RestResult.success();
+    }
 
     /**
      * 关注
@@ -171,11 +225,23 @@ public class UserController {
     @PostMapping("/follows/{followingId}")
     @ApiOperation("关注用户")
     public RestResult follow(@PathVariable Long followingId) {
+        Long currentUserId = BaseContext.getCurrentUserId();
         Follows follows = new Follows().builder()
-                .followerId(BaseContext.getCurrentUserId())
+                .followerId(currentUserId)
                 .followingId(followingId)
                 .build();
         userService.follow(follows);
+
+        Event build = Event.builder()
+                .topic(TOPIC_FOLLOW)
+                .userId(currentUserId)
+                .entityType(EVENT_USER_FOLLOW)
+                .entityId(followService.getFollowByFollowerIdAndFollowingId(currentUserId,followingId).getId())
+                .entityUserId(followingId)
+                .build();
+
+        eventProducer.fireEvent(build);
+
         return RestResult.success();
     }
 
@@ -227,11 +293,23 @@ public class UserController {
     @PostMapping("/likes/{videoId}")
     @ApiOperation("点赞视频")
     public RestResult like(@PathVariable Long videoId) {
+        Long currentUserId = BaseContext.getCurrentUserId();
         Likes likes = new Likes().builder()
-                .userId(BaseContext.getCurrentUserId())
+                .userId(currentUserId)
                 .videoId(videoId)
                 .build();
         userService.like(likes);
+
+        Event build = Event.builder()
+                .topic(TOPIC_LIKE)
+                .userId(currentUserId)
+                .entityType(EVENT_VIDEO_LIKE)
+                .entityId(likeService.getLikesByUserIdAndVideoId(currentUserId, videoId).getId())
+                .entityUserId(videoService.getCreaterInfoById(videoId).getId())
+                .build();
+
+        eventProducer.fireEvent(build);
+
         return RestResult.success();
     }
 
@@ -278,6 +356,4 @@ public class UserController {
                 .build();
         return RestResult.success(createVideosDTO);
     }
-
-
 }

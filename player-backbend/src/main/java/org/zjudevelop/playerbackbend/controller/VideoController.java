@@ -123,16 +123,6 @@ public class VideoController {
         return RestResult.success(videoInfoByKeyword);
     }
 
-    public static Long getUserIdFromRequest(HttpServletRequest request, JwtProperties jwtProperties){
-        String token  = request.getHeader(jwtProperties.getUserTokenName());
-
-        Long currentUserId = null;
-        if(StringUtils.isNotBlank(token)){
-            Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
-            currentUserId = Long.valueOf(claims.get("user").toString());
-        }
-        return currentUserId;
-    }
 
     /**
      * 分页获取视频
@@ -147,5 +137,31 @@ public class VideoController {
         PageResult videoList = videoService.getVideos(videosPageQueryDTO);
         return RestResult.success(videoList);
     }
+//    @ApiOperation("查看视频评论")
+//    @CheckAuth(check = false)
+//    @RequestMapping(value = "/comment",method = RequestMethod.GET)
+//    public RestResult<List<VideoCommentDTO>> getVideoSearchInfoByKeyword(@RequestParam Long videoId) {
+//        return RestResult.success(videoService.getCommentByVideoId(videoId));
+//    }
+
+    @ApiOperation("分页查看视频评论")
+    @CheckAuth(check = false)
+    @RequestMapping(value = "/comment",method = RequestMethod.POST)
+    public RestResult<PageResult> getVideoCommentsInfoByKeyword(@RequestBody VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
+        log.info("进入controller");
+        return RestResult.success(videoService.getCommentByVideoId(videoCommentsPageQueryDTO));
+    }
+
+    public static Long getUserIdFromRequest(HttpServletRequest request, JwtProperties jwtProperties){
+        String token  = request.getHeader(jwtProperties.getUserTokenName());
+
+        Long currentUserId = null;
+        if(StringUtils.isNotBlank(token)){
+            Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
+            currentUserId = Long.valueOf(claims.get("user").toString());
+        }
+        return currentUserId;
+    }
+
 
 }

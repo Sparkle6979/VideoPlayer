@@ -38,9 +38,13 @@ export function updateUserInfo(data){
     })
 }
 
-export function getUserLike(){
+export function getUserLike(page,pageSize){
     return request({
         url:'/user/likes',
+        params:{
+          page:page,
+          pageSize:pageSize
+        },
         method:'GET',
     })
 }
@@ -52,16 +56,26 @@ export function getUserVideo(){
     })
 }
 
-export function followListById(id){
+export function followListById(id,page,pageSize){
     return request({
-        url:`/user/follows/following/${id}`,
+        url:`/user/follows/following`,
+        params:{
+            id:id,
+            page:page,
+            pageSize:pageSize,
+        },
         method:'GET'
     })
 }
 
-export function fanListById(id){
+export function fanListById(id,page,pageSize){
     return request({
-        url:`/user/follows/follower/${id}`,
+        url:`/user/follows/follower`,
+        params:{
+            id:id,
+            page:page,
+            pageSize:pageSize,
+        },
         method:'GET'
     })
 }

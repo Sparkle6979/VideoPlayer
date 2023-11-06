@@ -33,6 +33,7 @@
                 </div>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item @click.native="dialogVisible = true">关注&粉丝</el-dropdown-item>
+                  <el-dropdown-item @click.native="toUserPage(5)">我的收藏</el-dropdown-item>
                   <el-dropdown-item @click.native="toUserPage(4)">我的视频</el-dropdown-item>
                   <el-dropdown-item @click.native="toUserPage(1)">我的喜欢</el-dropdown-item>
                   <el-dropdown-item @click.native="toUserPage(2)">账号设置</el-dropdown-item>

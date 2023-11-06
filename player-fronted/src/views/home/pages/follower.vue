@@ -65,15 +65,20 @@ import {mapState} from "vuex";
 export default {
   name: "follower",
   data() {
+    const GlobalPageSize = 5
     const follower = {
       finished:false,
       loading:false,
       list:[],
+      curPage:1,
+      pageSize:GlobalPageSize
     }
     const fan = {
       finished:false,
       loading:false,
       list:[],
+      curPage:1,
+      pageSize:GlobalPageSize
     }
     return {
       activeName: 'follower',
@@ -92,41 +97,56 @@ export default {
   },
   methods:{
     loadFollower () {
-      console.log("loadFollower",this.follower.list.length,this.fan.list.length)
+      console.log("loadFollower",this.follower.list.length,this.follower.curPage,this.follower.pageSize)
       this.follower.loading = true
-      followListById(this.user.id).then((res)=>{
+      followListById(this.user.id,this.follower.curPage,this.follower.pageSize).then((res)=>{
         console.log(res)
-        if (res.data.followingIds.length === 0){
+        if(res.code === 401) {
+          this.$router.push("/login")
+        }
+        if (res.data.records.length === 0){
           this.follower.finished = true
           return
         }
-        res.data.followingIds.forEach((id)=>{
+        res.data.records.forEach((id)=>{
           getUserInfo(id).then((res)=>{
             this.follower.list.push(res.data)
           })
         })
-        this.follower.finished = true
+        if (res.data.records.length < this.follower.pageSize) {
+          this.follower.finished = true
+        }else{
+          this.follower.curPage++
+        }
       }).catch(err=>{
         console.log("followListById",err)
       }).finally(()=>{
         this.follower.loading = false
+        console.log(this.follower)
       })
     },
     loadFans(){
-      console.log("loadFans",this.follower.list.length,this.fan.list.length)
+      console.log("loadFans",this.fan.list.length,this.fan.curPage,this.fan.pageSize)
       this.fan.loading = true
-      fanListById(this.user.id).then((res)=>{
+      fanListById(this.user.id,this.fan.curPage,this.fan.pageSize).then((res)=>{
         console.log(res)
-        if (res.data.followerIds.length === 0){
+        if(res.code === 401) {
+          this.$router.push("/login")
+        }
+        if (res.data.records.length === 0){
           this.fan.finished = true
           return
         }
-        res.data.followerIds.forEach((id)=>{
+        res.data.records.forEach((id)=>{
           getUserInfo(id).then((res)=>{
             this.fan.list.push(res.data)
           })
         })
-        this.fan.finished = true
+        if (res.data.records.length < this.fan.pageSize) {
+          this.fan.finished = true
+        }else{
+          this.fan.curPage++
+        }
       }).catch(err=>{
         console.log("followListById",err)
       }).finally(()=>{

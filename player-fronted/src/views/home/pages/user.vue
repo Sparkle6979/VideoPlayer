@@ -13,6 +13,12 @@
                 <myVideo :info="video"></myVideo>
               </el-col>
             </el-row>
+            <el-row justify="space-around" :gutter="20">
+              <el-col>
+                <el-button type="primary" @click="getLikeVideoList" v-if="!allLikeLoaded">更多视频</el-button>
+                <p v-else>没有数据了</p>
+              </el-col>
+            </el-row>
           </div>
         </el-tab-pane>
         <el-tab-pane label="账号设置" name="2">
@@ -107,6 +113,13 @@
             </el-empty>
           </div>
         </el-tab-pane>
+        <el-tab-pane label="我的收藏" name="5">
+          <div v-loading="this.loading.myFavorite"
+               element-loading-text="拼命加载中"
+               element-loading-spinner="el-icon-loading" style="width: 100%">
+            <el-tree :data="favoriteData" :props="defaultProps" :render-content="renderContent"></el-tree>
+          </div>
+        </el-tab-pane>
       </el-tabs>
     </div>
 
@@ -163,7 +176,8 @@ export default {
     }
     const loading = {
       likeVideo:false,
-      myVideo:false
+      myVideo:false,
+      myFavorite:false,
     }
     const msgVisible = false
     let msg = {
@@ -171,7 +185,10 @@ export default {
       content : '',
     }
     const myVideoList = []
-    const videoList = []
+    const videoList = [] // 点赞视频列表
+    const curLikePage = 1
+    const pageSize = 6
+    const allLikeLoaded = false
     let textarea = '' // 评论输入框
     let commentContent = ''
     const zanList = [
@@ -192,11 +209,52 @@ export default {
         videoCover: "https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg"
       }
     ]
+    const favoriteData = [
+        {
+      label: '一级 1',
+      children: [{
+        label: '二级 1-1',
+        children: [{
+          label: '三级 1-1-1'
+        }]
+      }]
+    }, {
+      label: '一级 2',
+      children: [{
+        label: '二级 2-1',
+        children: [{
+          label: '三级 2-1-1'
+        }]
+      }, {
+        label: '二级 2-2',
+        children: [{
+          label: '三级 2-2-1'
+        }]
+      }]
+    }, {
+      label: '一级 3',
+      children: [{
+        label: '二级 3-1',
+        children: [{
+          label: '三级 3-1-1'
+        }]
+      }, {
+        label: '二级 3-2',
+        children: [{
+          label: '三级 3-2-1'
+        }]
+      }]
+    }]
+    const defaultProps =  {
+      children: 'children',
+      label: 'label'
+    }
     return {
       activeIndex,
       isInput,
       form_2,
-      tableData: [{
+      tableData: [
+          {
         id:1,
         date: '2016-05-02',
       }, {
@@ -231,11 +289,16 @@ export default {
       msgVisible,
       msg,
       videoList,
+      curLikePage,
+      pageSize,
+      allLikeLoaded,
       textarea,
       commentContent,
       zanList,
       loading,
-      myVideoList
+      myVideoList,
+      favoriteData,
+      defaultProps
     }
   },
   methods:{
@@ -246,20 +309,30 @@ export default {
     },
     getLikeVideoList(){
       this.loading.likeVideo = true
-      getUserLike().then((res)=>{
-        this.videoList = []
-        let count = 0
-        res.data.videoIds.forEach((id,index,arr)=>{
+      getUserLike(this.curLikePage++,this.pageSize).then((res)=>{
+        if (res.code === 401) {
+          this.$router.push('/login')
+          return
+        }
+        if (res.data.records.length === 0 ){
+          this.loading.likeVideo = false
+          return
+        }
+        res.data.records.forEach((id,index,arr)=>{
+          let count = 0
           getVideoById(id).then((res)=>{
-            // console.log(res)
             this.videoList.push(res.data)
           }).finally(()=>{
             count++
-            if (count === arr.length) {
+            if(count === arr.length){
               this.loading.likeVideo = false
             }
           })
         })
+        console.log(res)
+        if (this.videoList.length === res.data.total) {
+          this.allLikeLoaded = true
+        }
       })
     },
     getMyVideoList(){
@@ -390,7 +463,27 @@ export default {
           "</div>";
       this.commentContent += html
       this.textarea = ''
-    }
+    },
+    renderContent(h, { node, data, store }){
+      console.log(node)
+      if (node.data.children) {
+        return (
+            <span className="custom-tree-node">
+              <span>{node.label}</span>
+            </span>
+        )
+      }else{
+        return (
+            <span className="custom-tree-node">
+              <span>{node.label}</span>
+              <span>
+                <el-button size="mini" type="text">Append</el-button>
+                <el-button size="mini" type="text">Delete</el-button>
+              </span>
+            </span>
+        );
+      }
+    } 
   },
   watch:{
     "$route.params.index":{
@@ -437,5 +530,14 @@ export default {
 ul {
   list-style-type: none; /* 移除默认的圆点样式 */
   padding: 0; /* 移除默认的内边距 */
+}
+
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
 }
 </style>

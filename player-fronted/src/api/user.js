@@ -14,7 +14,7 @@ export function userLogin(form){
 
 export function userRegister(form){
     return request({
-        url:'/user/register',
+        url:'/user',
         data:{
             username : form.username,
             password : md5(form.password)
@@ -42,6 +42,13 @@ export function getUserLike(){
     return request({
         url:'/user/likes',
         method:'GET',
+    })
+}
+
+export function getUserVideo(){
+    return request({
+        url:'/user/creates',
+        method:'GET'
     })
 }
 

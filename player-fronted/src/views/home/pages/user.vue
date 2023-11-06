@@ -7,7 +7,7 @@
         <el-tab-pane label="我的喜欢" name="1">
           <div v-loading="this.loading.likeVideo"
                element-loading-text="拼命加载中"
-               element-loading-spinner="el-icon-loading">
+               element-loading-spinner="el-icon-loading" style="width: 100%">
             <el-row justify="space-around" :gutter="20">
               <el-col :span="6" v-for="(video,index) in videoList" :key="index" :offset="1">
                 <myVideo :info="video"></myVideo>
@@ -25,7 +25,6 @@
                     action=""
                     :auto-upload="false"
                     accept=".jpg,.png"
-                    :limit="1"
                     :on-change="picturePreview">
                   <el-avatar :src="form_2.avatarPath ? form_2.avatarPath : defaultUserAvatar" :size="150" :fit="'cover'" ></el-avatar>
                 </el-upload>
@@ -94,6 +93,20 @@
             </el-tabs>
           </div>
         </el-tab-pane>
+        <el-tab-pane label="我的视频" name="4">
+          <div v-loading="this.loading.myVideo"
+               element-loading-text="拼命加载中"
+               element-loading-spinner="el-icon-loading" style="width: 100%">
+            <el-row justify="space-around" :gutter="20" v-if="myVideoList.length">
+              <el-col :span="6" v-for="(video,index) in myVideoList" :key="index" :offset="1">
+                <myVideo :info="video"></myVideo>
+              </el-col>
+            </el-row>
+            <el-empty v-else description="没有符合条件的数据">
+              <el-button type="primary" @click="$router.push('/home/upload')">上传视频</el-button>
+            </el-empty>
+          </div>
+        </el-tab-pane>
       </el-tabs>
     </div>
 
@@ -127,7 +140,7 @@ import myVideo from "@/views/home/components/video";
 import MyMessage from '@/views/home/components/message';
 import Im from "@/views/home/components/im";
 import {mapGetters, mapMutations, mapState} from "vuex";
-import {getUserInfo, getUserLike, updateUserInfo} from "@/api/user";
+import {getUserInfo, getUserLike, getUserVideo, updateUserInfo} from "@/api/user";
 import {getVideoById} from "@/api/video";
 import md5 from "js-md5";
 
@@ -149,13 +162,15 @@ export default {
       password:""
     }
     const loading = {
-      likeVideo:false
+      likeVideo:false,
+      myVideo:false
     }
     const msgVisible = false
     let msg = {
       sender : '',
       content : '',
     }
+    const myVideoList = []
     const videoList = []
     let textarea = '' // 评论输入框
     let commentContent = ''
@@ -219,7 +234,8 @@ export default {
       textarea,
       commentContent,
       zanList,
-      loading
+      loading,
+      myVideoList
     }
   },
   methods:{
@@ -235,13 +251,34 @@ export default {
         let count = 0
         res.data.videoIds.forEach((id,index,arr)=>{
           getVideoById(id).then((res)=>{
-            // 额外加入
-            res.data.isLike = true
+            // console.log(res)
             this.videoList.push(res.data)
           }).finally(()=>{
             count++
             if (count === arr.length) {
               this.loading.likeVideo = false
+            }
+          })
+        })
+      })
+    },
+    getMyVideoList(){
+      this.myVideoList = []
+      this.loading.myVideo = true
+      getUserVideo().then((res)=>{
+        let count = 0
+        if (res.data.videoIds.length == 0){
+          this.loading.myVideo = false
+          return
+        }
+        res.data.videoIds.forEach((id,index,arr)=>{
+          getVideoById(id).then((res)=>{
+            console.log(res)
+            this.myVideoList.push(res.data)
+          }).finally(()=>{
+            count++
+            if (count === arr.length) {
+              this.loading.myVideo = false
             }
           })
         })
@@ -261,6 +298,9 @@ export default {
         this.form_2.avatarPath = window.webkitURL.createObjectURL(file.raw);
       }
       this.form_2.avatarFile = file.raw
+      if (fileList.length > 1){
+        fileList.splice(0,1)
+      }
     },
     update(){
       const data = new FormData()
@@ -352,20 +392,27 @@ export default {
       this.textarea = ''
     }
   },
-  activated() {
-    this.activeIndex = this.$route.params.index ? this.$route.params.index : "1"
-    console.log(this.activeIndex)
-    if (this.activeIndex === "1") {
-      this.getLikeVideoList()
-    }
-  },
   watch:{
-    activeIndex(newV,oldV){
-      if (newV === "1"){
-        this.getLikeVideoList()
+    "$route.params.index":{
+      immediate:true,
+      handler(newV){
+        this.activeIndex = newV
+      }
+    },
+    "activeIndex":{
+      immediate:true,
+      handler(newV){
+        if (newV === "1"){
+          this.videoList = []
+          this.getLikeVideoList()
+        }
+        if (newV === "4"){
+          this.myVideoList = []
+          this.getMyVideoList()
+        }
       }
     }
-  }
+  },
 }
 </script>
 

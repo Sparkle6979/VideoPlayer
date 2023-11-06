@@ -90,12 +90,8 @@ export default {
       })
     },
     handleMountedFunc(){
-      setTimeout(()=>{
-        this.$refs.videoPlayer.$el.addEventListener("mouseenter",this.mouseEnter)
-      },50)
-      setTimeout(()=>{
-        this.$refs.videoPlayer.$el.addEventListener("mouseleave",this.mouseLeave)
-      },50)
+      this.$refs.videoPlayer.$el.addEventListener("mouseenter",this.mouseEnter)
+      this.$refs.videoPlayer.$el.addEventListener("mouseleave",this.mouseLeave)
     },
     changeLike(){
       if (!this.info.isLike) {

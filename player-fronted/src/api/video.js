@@ -47,7 +47,7 @@ export function getVideoBySearch(keyword){
 export function uploadVideo(data){
     return request({
         url:'/video/upload',
-        data:data,
-        method:'POST'
+        data: data,
+        method:'PUT',
     })
 }

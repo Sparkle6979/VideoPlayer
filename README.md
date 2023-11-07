@@ -2,9 +2,9 @@
 
 该项目为[七牛头2023年1024创作节](https://www.qiniu.com/activity/detail/651297ed0d50912d3d53307b?from=0010)参赛作品
 
-Demo讲解视频链接：
+Demo讲解及演示视频链接：
 
-七牛云外链：[点击这里](http://s33fgajdq.hd-bkt.clouddn.com/demo.mp4)
+七牛云外链：[点击这里](http://s33fgajdq.hd-bkt.clouddn.com/demo.mp4) （可能需要缓冲一段时间）
 
 哔哩哔哩：
 

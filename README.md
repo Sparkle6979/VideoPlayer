@@ -103,7 +103,7 @@ VideoInfoDTO getVideoInfoById(Long videoId);
 - 基本功能：根据用户名和密码进行登录
 - 核心接口定义:
 
-```Java
+```java
 // 根据用户名及密码进行登录
 User login(UserLoginDTO userLoginDTO);
 ```
@@ -116,7 +116,7 @@ User login(UserLoginDTO userLoginDTO);
 - 基本功能：使用用户名以及密码进行注册
 - 核心接口定义：
 
-```Java
+```java
 // 使用用户名及加密后的密码进行注册
 User registry(UserRegisterDTO userRegisterDTO);
 ```
@@ -130,7 +130,7 @@ User registry(UserRegisterDTO userRegisterDTO);
 - 基本功能：更新用户信息，如姓名，密码，头像等
 - 核心接口定义：
 
-```Java
+```java
 // 更新用户信息
 int update(User user);
 ```
@@ -143,7 +143,7 @@ int update(User user);
 - 基本功能：获取用户基本信息，如用户名，头像等
 - 核心接口定义：
 
-```Java
+```java
 // 根据用户id获取用户基本信息
 User getUserById(Long id);
 ```
@@ -153,7 +153,7 @@ User getUserById(Long id);
 - 基本功能：点赞、取消点赞、查看点赞视频
 - 核心接口定义：
 
-```Java
+```java
 // 点赞
 int like(Likes likes);
 // 取消点赞
@@ -171,7 +171,7 @@ boolean isAlreadyLiked(Long userId, Long videoId);
 - 基本功能：关注用户、取消关注用户、查看关注列表、查看粉丝列表
 - 核心接口定义：
 
-```Java
+```java
 // 关注
 int follow(Follows follows);
 // 取消关注
@@ -189,7 +189,7 @@ boolean isAlreadyFollowed(Long followerId, Long followingId);
 - 基本功能：创建收藏夹，删除收藏夹，收藏视频，取消收藏视频，查看收藏的视频
 - 核心接口定义：
 
-```Java
+```java
 // 创建收藏夹
 int createCollection(Long userId, String collectionName);
 // 删除收藏夹
@@ -209,7 +209,7 @@ PageResult getCollectionVideoByCollectionId(Long collectionId, PageQueryDTO page
 - 基本功能：实现用户对视频进行评论，同时支持用户对他人评论进行评论
 - 核心接口定义（选一些有代表性的）：
 
-```
+```java
 // 用户对实体（视频/评论）进行评论
 Long comment(CommentPO commentPO);
 // 获得某一视频下的所有评论信息
@@ -273,7 +273,7 @@ public class EventConsumer extends MessageConstant {
 - 基本功能：根据token进行鉴权
 - 核心接口定义：
 
-```Java
+```java
 public static Claims parseJWT(String secretKey, String token);
 ```
 

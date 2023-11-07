@@ -70,37 +70,13 @@
                 </div>
               </el-tab-pane>
               <el-tab-pane label="评论" name="32">
+                <el-button type="primary" @click="allRead(32)">一键已读</el-button>
                 <div v-loading="this.loading.commentMessage"
                      element-loading-text="拼命加载中"
                      element-loading-spinner="el-icon-loading">
                   <MyMessage v-if="commentMessageList.length" :messageList="commentMessageList" :type="3"></MyMessage>
                   <el-empty description="没有数据" v-else></el-empty>
                 </div>
-<!--                <div>-->
-<!--                  <el-table :data="tableData" style="margin-bottom: 20px;"-->
-<!--                            row-key="id" :cell-style="msgTableRowClass" :show-header="true"-->
-<!--                            :tree-props="{children: 'children', hasChildren: 'hasChildren'}">-->
-<!--                    <el-table-column prop="date" label="时间" align="center" width="200" sortable>-->
-<!--                    </el-table-column>-->
-<!--                    <el-table-column prop="name" label="用户名" width="180"></el-table-column>-->
-<!--                    <el-table-column prop="createdAt" label="消息时间" align="center" ></el-table-column>-->
-<!--                    <el-table-column prop="message" label="消息"></el-table-column>-->
-<!--                    <el-table-column label="状态">-->
-<!--                      <template slot-scope="scope">-->
-<!--                        <el-tag v-if="scope.row.status == 0" type="danger">未读</el-tag>-->
-<!--                        <el-tag v-if="scope.row.status == 1" type="success">已读</el-tag>-->
-<!--                        <el-tag v-if="scope.row.status == 2">已回复</el-tag>-->
-<!--                      </template>-->
-<!--                    </el-table-column>-->
-<!--                    <el-table-column label="操作" width="100px" fixed="right">-->
-<!--                      <template slot-scope="scope">-->
-<!--                        <el-button v-if="scope.row.message && scope.row.status != 2" type="text" size="small"-->
-<!--                                   @click="reviewMsg(scope.row.name,scope.row.message)">回复</el-button>-->
-<!--                        &lt;!&ndash;                  <el-button v-if="scope.row.message && scope.row.status == 2" type="text" size="small">查看</el-button>&ndash;&gt;-->
-<!--                      </template>-->
-<!--                    </el-table-column>-->
-<!--                  </el-table>-->
-<!--                </div>-->
               </el-tab-pane>
               <el-tab-pane label="关注" name="33">
                 <el-button type="primary" @click="allRead(33)">一键已读</el-button>
@@ -132,51 +108,73 @@
           <div v-loading="this.loading.myFavorite"
                element-loading-text="拼命加载中"
                element-loading-spinner="el-icon-loading" style="width: 100%">
-            <el-tree :data="favoriteData" :props="defaultProps" :render-content="renderContent"></el-tree>
+            <div v-if="collectionData.length">
+              <el-button type="primary" @click="dialogVisible = true">创建收藏夹</el-button>
+              <div>
+                <el-row justify="space-around" :gutter="20" class="card-row">
+                  <el-card class="box-card" v-for="(collection,index) in collectionData" :key="index" style="width: auto;margin: 20px">
+                    <div slot="header" class="clearfix">
+                      <span>{{ collection.collectionName }}</span>
+                      <el-button style="float: right; padding: 3px 0" type="text" @click="removeCollection(collection.id)">删除</el-button>
+                    </div>
+                    <div v-if="collection.videos.length">
+                      <div v-for="(v,index) in collection.videos" :key="index" class="text item">
+                        <el-button type="text" @click="toDetailPage(v.videoId)">{{v.title}}</el-button>
+                      </div>
+                    </div>
+                    <el-empty v-else description="暂无数据"></el-empty>
+                  </el-card>
+                </el-row>
+              </div>
+            </div>
+            <el-empty description="暂无收藏" v-else>
+              <el-button type="primary" @click="dialogVisible = true">创建收藏夹</el-button>
+            </el-empty>
           </div>
+
+          <el-dialog
+              title="创建收藏夹"
+              :visible.sync="dialogVisible"
+              width="30%">
+            <el-form :model="form_5" ref="form_5" :rules="rules">
+              <el-form-item label="收藏夹名字" prop="collectionName">
+                <el-input
+                    v-model.trim="form_5.collectionName"
+                ></el-input>
+              </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="resetForm('form_5');dialogVisible = false">取 消</el-button>
+              <el-button type="primary" @click="createCollectionDir('form_5')">确 定</el-button>
+            </span>
+          </el-dialog>
         </el-tab-pane>
       </el-tabs>
     </div>
-
-    <!--dialog-->
-    <el-dialog
-        :title="msg.sender"
-        :visible.sync="msgVisible"
-        width="40%"
-        :show-close="false"
-        center>
-      <!--  回复框  -->
-      <div v-html="commentContent">
-      </div>
-      <el-input
-          type="textarea"
-          style="padding: 5px 0"
-          :rows="2"
-          placeholder="请输入内容"
-          v-model="textarea">
-      </el-input>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="msgVisible = false;commentContent=''">返 回</el-button>
-        <el-button type="primary" @click="replayComment">发 送</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import myVideo from "@/views/home/components/video";
 import MyMessage from '@/views/home/components/message';
-import Im from "@/views/home/components/im";
 import {mapGetters, mapMutations, mapState} from "vuex";
-import {getUserInfo, getUserLike, getUserVideo, updateUserInfo} from "@/api/user";
+import {
+  createCollection,
+  deleteCollection,
+  getCollection,
+  getUserInfo,
+  getUserLike,
+  getUserVideo, getVideoByCollectionId,
+  updateUserInfo
+} from "@/api/user";
 import {getVideoById} from "@/api/video";
 import md5 from "js-md5";
-import {getComment, getFollow, getLike, getMessageInfoById, readMessage} from "@/api/notice";
+import {getComment, getFollow, getLike, readMessage} from "@/api/notice";
 
 export default {
   name: "user",
   components:{
-    myVideo,MyMessage,Im
+    myVideo,MyMessage
   },
   computed:{
     ...mapState(['user'])
@@ -191,6 +189,9 @@ export default {
       username:this.username(),
       password:""
     }
+    const form_5 = {
+      collectionName :''
+    }
     const loading = {
       likeVideo:false,
       myVideo:false,
@@ -199,114 +200,41 @@ export default {
       likeMessage:false,
       followMessage:false,
     }
-    const msgVisible = false
-    let msg = {
-      sender : '',
-      content : '',
-    }
     const myVideoList = []
     const videoList = [] // 点赞视频列表
     const curLikePage = 1
     const pageSize = 6
     const allLikeLoaded = false
-    let textarea = '' // 评论输入框
-    let commentContent = ''
     const likeMessageList = []
     const commentMessageList = []
     const followMessageList = []
-    const favoriteData = [
-        {
-      label: '一级 1',
-      children: [{
-        label: '二级 1-1',
-        children: [{
-          label: '三级 1-1-1'
-        }]
-      }]
-    }, {
-      label: '一级 2',
-      children: [{
-        label: '二级 2-1',
-        children: [{
-          label: '三级 2-1-1'
-        }]
-      }, {
-        label: '二级 2-2',
-        children: [{
-          label: '三级 2-2-1'
-        }]
-      }]
-    }, {
-      label: '一级 3',
-      children: [{
-        label: '二级 3-1',
-        children: [{
-          label: '三级 3-1-1'
-        }]
-      }, {
-        label: '二级 3-2',
-        children: [{
-          label: '三级 3-2-1'
-        }]
-      }]
-    }]
+    const collectionData = []
     const defaultProps =  {
       children: 'children',
       label: 'label'
+    }
+    const rules = {
+      collectionName:[{required:true,message:"请输入收藏夹名字",trigger:'blur'}],
     }
     return {
       activeIndex,
       subActiveIndex,
       isInput,
       form_2,
-      tableData: [
-          {
-        id:1,
-        date: '2016-05-02',
-      }, {
-        id:2,
-        date: '2016-05-03',
-      }, {
-        id:3,
-        date: '2016-05-04',
-        children: [{
-          id: 31,
-          createdAt: '2016-05-04 08:00:00',
-          name: '王小虎',
-          message: '上海市普陀区金沙江路 1519 弄',
-          status: 0
-        }, {
-          id: 32,
-          createdAt: '2016-05-04 08:00:01',
-          name: '王小虎',
-          message: '上海市普陀区金沙江路 1519 弄',
-          status: 1
-        },{
-          id: 33,
-          createdAt: '2016-05-04 08:00:01',
-          name: '王小虎',
-          message: '上海市普陀区金沙江路 1519 弄',
-          status: 2
-        }]
-      }, {
-        id: 4,
-        date: '2016-05-05',
-      }],
-      msgVisible,
-      msg,
+      form_5,
       videoList,
       curLikePage,
       pageSize,
       allLikeLoaded,
-      textarea,
-      commentContent,
       likeMessageList,
       followMessageList,
       commentMessageList,
       loading,
       myVideoList,
-      favoriteData,
-      defaultProps
+      collectionData,
+      defaultProps,
+      dialogVisible:false,
+      rules,
     }
   },
   methods:{
@@ -352,7 +280,7 @@ export default {
         }
         res.data.videoIds.forEach((id,index,arr)=>{
           getVideoById(id).then((res)=>{
-            console.log(res)
+            // console.log(res)
             this.myVideoList.push(res.data)
           }).finally(()=>{
             count++
@@ -461,14 +389,26 @@ export default {
         this.loading.likeMessage = false
       })
     },
+    async processCommentMessageItems(data){
+      for (const item of data) {
+        try {
+          const userInfo = await getUserInfo(item.eventUserId);
+          item.eventUserAvatarPath = userInfo.data.avatarPath;
+        } catch (error) {
+          console.error(`Error getting user info for user ID ${item.eventUserId}:`, error);
+        }
+
+        this.commentMessageList.push(item);
+      }
+      this.loading.commentMessage = false
+    },
     getCommentMessageList(){
       this.loading.commentMessage = true
       this.commentMessageList = []
       getComment().then((res)=>{
-        console.log(res)
+        this.processCommentMessageItems(res.data)
       }).catch(err=>{
         console.log("getCommentMessageList",err)
-      }).finally(()=>{
         this.loading.commentMessage = false
       })
     },
@@ -505,30 +445,15 @@ export default {
           await readMessage(item.messageId)
         }
         await this.getFollowMessageList()
-      }
-    },
-    msgTableRowClass({row, rowIndex}){
-      if(row.children) { //如果此行children存在，也就是一级菜单
-        return { "height":"4vh !important ","color":"blue"}
-      }else{
-        return { "height":"8vh !important" }
+      }else if (type === 32) {
+        for (const item of this.commentMessageList) {
+          await readMessage(item.messageId)
+        }
+        await this.getCommentMessageList()
       }
     },
     reviewMsg(sender,content){
-      this.msg.sender = sender
-      this.msg.content = content
-      this.msgVisible = true
-      let html = "<div class=\"el-row\" style=\"padding: 5px 0\">\n" +
-          "  <div class=\"el-col el-col-2\" style=\"text-align: right\">\n" +
-          "  <span class=\"el-avatar el-avatar--circle\" style=\"height: 40px; width: 40px; line-height: 40px;\">\n" +
-          "    <img src=\"https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png\" style=\"object-fit: cover;\">\n" +
-          "  </span>\n" +
-          "  </div>\n" +
-          "  <div class=\"el-col el-col-22\" style=\"text-align: left; padding-left: 10px\">\n" +
-          "    <div class=\"tip right\">" + content + "</div>\n" +
-          "  </div>\n" +
-          "</div>";
-      this.commentContent += html
+
     },
     replayComment(){
       let html;
@@ -564,7 +489,59 @@ export default {
             </span>
         );
       }
-    } 
+    } ,
+    getCollectionDir(){
+      this.collectionData = []
+      getCollection(1,100).then((res)=>{
+        res.data.records.forEach((item)=>{
+          getVideoByCollectionId(item.id,1,100).then((res)=>{
+            console.log(item.collectionName,res)
+            item.videos = res.data.records
+            this.collectionData.push(item)
+          })
+        })
+      })
+    },
+    createCollectionDir(formName){
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          const data = new FormData()
+          data.set("collectionName",this.form_5.collectionName)
+          createCollection(data).then((res)=>{
+            if (res.code === 200) {
+              this.$message.success({
+                message:"创建成功",
+                duration:500
+              })
+            }
+            this.getCollectionDir()
+          }).finally(()=>{
+            this.dialogVisible = false
+          })
+        } else {
+          return false;
+        }
+      });
+    },
+    removeCollection(id){
+      deleteCollection(id).then((res)=>{
+        if (res.code === 200) {
+          this.$message.success({
+            message:"删除成功",
+            duration:500
+          })
+        }
+        this.getCollectionDir()
+      })
+    },
+    toDetailPage(videoId){
+      this.$router.push({
+        name:'Detail',
+        params:{
+          id:videoId
+        }
+      })
+    }
   },
   watch:{
     "$route.params.index":{
@@ -586,6 +563,9 @@ export default {
         }
         if (newV === "3"){
           this.subActiveIndex = "31"
+        }
+        if (newV === "5"){
+          this.getCollectionDir()
         }
       }
     },
@@ -639,5 +619,17 @@ ul {
   justify-content: space-between;
   font-size: 14px;
   padding-right: 8px;
+}
+
+.card-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -10px; /* 负 margin 以消除 gutter 的影响 */
+}
+
+.box-card {
+  flex: 0 0 calc(20% - 20px); /* 设置卡片的宽度，20% 表示每个卡片的宽度占父元素的 20% */
+  margin: 10px; /* gutter 的一半，使得卡片之间有间隔 */
+  box-sizing: border-box; /* 让 margin 不会撑大卡片的宽度 */
 }
 </style>

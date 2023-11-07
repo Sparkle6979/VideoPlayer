@@ -15,9 +15,33 @@
       </div>
       <div class="item-right">
         <img :src="item.video.coverUrl" alt="封面" class="video-cover" v-if="type === 1" @click="toDetailPage(item.messageId,item.video.videoId)"/>
-        <el-button type="text" @click="readFollowMessage(item.messageId)" v-if="type === 2">已读</el-button>
+        <el-button type="text" @click="readFollowMessage(item.messageId)" v-if="type === 2 || type === 3">已读</el-button>
+<!--        <el-button type="text" @click="reviewMsg(item.eventEntityId)" v-if="type === 3">回复</el-button>-->
       </div>
     </div>
+
+    <!--dialog-->
+    <el-dialog
+        :title="msg.sender"
+        :visible.sync="msgVisible"
+        width="40%"
+        :show-close="false"
+        center>
+      <!--  回复框  -->
+      <div v-html="commentContent">
+      </div>
+      <el-input
+          type="textarea"
+          style="padding: 5px 0"
+          :rows="2"
+          placeholder="请输入内容"
+          v-model="textarea">
+      </el-input>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="msgVisible = false;commentContent=''">返 回</el-button>
+        <el-button type="primary">发 送</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -29,11 +53,22 @@ export default {
   name:'MyMessage',
   props:['messageList','type'],
   data() {
+    let msg = {
+      sender : '',
+      content : '',
+    }
+    const msgVisible = false
+    let textarea = '' // 评论输入框
+    let commentContent = ''
     return {
       page: 1,
       pageSize: 10,
       noMore: false,
       loading: false,
+      msg,
+      msgVisible,
+      textarea,
+      commentContent
     };
   },
   methods: {
@@ -52,6 +87,22 @@ export default {
           id:videoId
         }
       })
+    },
+    async reviewMsg(id){
+      this.msg.sender = sender
+      this.msg.content = content
+      this.msgVisible = true
+      let html = "<div class=\"el-row\" style=\"padding: 5px 0\">\n" +
+          "  <div class=\"el-col el-col-2\" style=\"text-align: right\">\n" +
+          "  <span class=\"el-avatar el-avatar--circle\" style=\"height: 40px; width: 40px; line-height: 40px;\">\n" +
+          "    <img src=\"https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png\" style=\"object-fit: cover;\">\n" +
+          "  </span>\n" +
+          "  </div>\n" +
+          "  <div class=\"el-col el-col-22\" style=\"text-align: left; padding-left: 10px\">\n" +
+          "    <div class=\"tip right\">" + content + "</div>\n" +
+          "  </div>\n" +
+          "</div>";
+      this.commentContent += html
     }
   },
 };

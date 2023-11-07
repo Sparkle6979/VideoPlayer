@@ -1,5 +1,7 @@
 <template>
-  <div ref="myDiv" tabindex="0" @keydown="handleKeyDown" @keydown.prevent="handleKeyDown2" v-loading="loading">
+  <div ref="myDiv" tabindex="0" @keydown="handleKeyDown" @keydown.prevent="handleKeyDown2" v-loading="loading"
+       element-loading-text="拼命加载中"
+       element-loading-spinner="el-icon-loading">
     <Swiper
         v-if="playerVideoList.length"
         ref="mySwiper"
@@ -9,14 +11,12 @@
           v-for="(video,index) in playerVideoList"
           :key="index"
       >
-        <div>
+        <div @click="$refs.myDiv.focus()">
           <el-row :gutter="20">
             <el-col :span="17">
               <videoPlayer
-                  class="video-player vjs-custom-skin"
                   :ref="`videoPlayer_${index}`"
                   :options="video.playerOptions"
-                  :playsinline="true"
               ></videoPlayer>
             </el-col>
             <el-col :span="7">
@@ -57,7 +57,7 @@
 
 <script>
 import 'vue-video-player/src/custom-theme.css';
-import 'video.js/dist/video-js.css'
+import 'video.js/dist/video-js.css';
 import { videoPlayer } from 'vue-video-player'
 
 import { Swiper, SwiperSlide } from "vue-awesome-swiper";
@@ -75,7 +75,7 @@ export default {
   },
   data(){
     let curPage = 1;
-    const pageSize = 10;
+    const pageSize = 5;
     const playerVideoList = []
     const curIndex = 0
 
@@ -97,8 +97,11 @@ export default {
       },
       direction: 'vertical'
     }
+
+    const testItem = {"id":3,"title":"踩水教学","categoryId":5,"likeCount":4,"description":"3分钟教会你如何踩水","createTime":1698387660000,"videoUrl":"http://s33fgajdq.hd-bkt.clouddn.com/%E8%B8%A9%E6%B0%B4%E6%95%99%E5%AD%A6.mp4","coverUrl":"http://s33fgajdq.hd-bkt.clouddn.com/%E8%B8%A9%E6%B0%B4%E6%95%99%E5%AD%A6.jpg","playerOptions":{"controls":true,"muted":true,"autoplay":true,"language":"zh-CN","preload":"auto","playbackRates":[0.5,1,1.5,2],"aspectRatio":"16:9","fluid":true,"notSupportedMessage":"此视频暂无法播放，请稍后再试","sources":[{"type":"video/mp4","src":"http://s33fgajdq.hd-bkt.clouddn.com/%E8%B8%A9%E6%B0%B4%E6%95%99%E5%AD%A6.mp4"}],"height":"100%"},"creater":{"id":1,"username":"admin","avatarPath":"http://s33fgajdq.hd-bkt.clouddn.com/头像.jpg"},"userFollows":[2,1,43]}
     const currentSwiperSlide = 0
     return {
+      testItem,
       curPage,
       pageSize,
       playerVideoList,
@@ -109,7 +112,7 @@ export default {
     }
   },
   computed:{
-    ...mapState(['user']),
+    ...mapState(['user','isLogin']),
   },
   methods:{
     getPlayerVideoList(){
@@ -141,8 +144,12 @@ export default {
           item.creater = userData.data;
 
           try {
-            const followListRes = await followListById(this.user.id, 1, 100);
-            item.userFollows = followListRes.data.records;
+            if (this.isLogin) {
+              const followListRes = await followListById(this.user.id, 1, 100);
+              item.userFollows = followListRes.data.records;
+            }else{
+              item.userFollows = []
+            }
           } catch (err) {
             console.log("followListById",err);
           }
@@ -210,12 +217,18 @@ export default {
       }
     },
     handleSlideChange(){
+      // console.log(this.$refs.mySwiper)
       const activeIndex = this.$refs.mySwiper.swiperInstance.activeIndex;
       console.log(`当前活动 slide 的索引是: ${activeIndex}`);
       // const length = this.playerVideoList.length
-      // if(activeIndex/length > 0.6) {
+      // if(activeIndex === length - 2) {
+      //   const prevActiveIndex = activeIndex;
       //   console.log("加载视频")
       //   this.getPlayerVideoList()
+      //   this.$nextTick(() => {
+      //     this.$refs.mySwiper.swiperInstance.update()
+      //     this.$refs.mySwiper.swiperInstance.slideTo(prevActiveIndex);
+      //   });
       // }
     },
     follow(video){

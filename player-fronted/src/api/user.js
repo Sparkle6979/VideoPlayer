@@ -120,3 +120,63 @@ export function commentToComment(entityId,entityType,content,targetId){
         method:'POST'
     })
 }
+
+export function getCollection(page,pageSize){
+    return request({
+        url:'/collection',
+        params:{
+            page:page,
+            pageSize:pageSize,
+        },
+        method:'GET'
+    })
+}
+
+export function createCollection(data){
+    return request({
+        url:'/collection',
+        data:data,
+        method:'POST'
+    })
+}
+
+export function deleteCollection(id){
+    return request({
+        url:'/collection',
+        params:{
+            id:id
+        },
+        method:'DELETE'
+    })
+}
+
+export function getVideoByCollectionId(id,page,pageSize){
+    return request({
+        url:`/collection/${id}`,
+        params:{
+            page:page,
+            pageSize:pageSize
+        },
+        method:'GET'
+    })
+}
+
+export function doCollection(id,videoId){
+    return request({
+        url:`/collection/${id}`,
+        params:{
+            videoId:videoId,
+        },
+        method:'POST'
+    })
+}
+
+export function undoCollection(id,videoId){
+    return request({
+        url:`/collection/${id}`,
+        params:{
+            videoId:videoId,
+        },
+        method:'DELETE'
+    })
+}

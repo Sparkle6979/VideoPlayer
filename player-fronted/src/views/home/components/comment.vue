@@ -12,12 +12,12 @@
             <span class="first-time">{{ item.createTime }}</span>
             <p class="first-comment">{{ item.content }}</p>
             <div class="first-right">
-              <span class="comments" @click="comment_input(item)">评论</span>
+              <span class="comments" @click="comment_input(item)" >评论</span>
             </div>
             <!-- 回复一级评论 -->
-            <div class="reply-comment" v-if="item.display">
+            <div class="reply-comment" v-if="item.isdisplay">
               <input type="text" placeholder="请输入评论 . . ." v-model="childComments"
-                     @keyup.enter="reply_submit(item)"/>
+                     @keyup.enter="reply_submit(item)" @blur="lose(item)"/>
               <button @click="reply_submit(item)">发表评论</button>
             </div>
             <!-- 次级评论 -->
@@ -27,19 +27,18 @@
                   <div class="top">
                     <!-- 次级评论头像,该用户没有头像则显示默认头像 -->
                     <a href="JavaScript:;" class="second-img">
-                      <img v-if="sons.picture" :src="sons.picture" />
-                      <img v-else :src="defaultUserAvatar" />
+                      <img :src="sons.commentUserAvatarPath ? sons.commentUserAvatarPath : defaultUserAvatar" />
                     </a>
                     <div class="second-content">
                       <!-- 次级评论用户昵称 -->
-                      <h3 class="second-username">{{ sons.username }}</h3>
+                      <h3 class="second-username">{{ sons.commentUserName }}</h3>
                       <!-- 次级评论评论时间 -->
-                      <span class="second-time">{{ sons.date }}</span>
+                      <span class="second-time">{{ sons.createTime }}</span>
                       <!-- 次级评论内容 xxx回复xxx：评论内容-->
                       <p class="second-comment">
 	                      <span class="second-reply">
-	                        <span class="to_reply">{{ sons.username }}</span>回复
-                          <span class="to_reply">{{ sons.to_username }}</span>：
+	                        <span class="to_reply">{{ sons.commentUserName }}</span>回复
+                          <span class="to_reply">{{ sons.targetUserName }}</span>：
 	                      </span>
                         {{ sons.content }}
                       </p>
@@ -50,10 +49,10 @@
                     </div>
                   </div>
                   <!-- 回复次级评论 -->
-                  <div class="reply-comment reply_li" v-if="sons.display">
+                  <div class="reply-comment reply_li" v-if="sons.isdisplay" @blur="lose(sons)">
                     <input type="text" placeholder="请输入评论 . . ." v-model="childComments"
-                           @keyup.enter="reply_submit(sons)"/>
-                    <button @click="reply_submit(sons)">发表评论</button>
+                           @keyup.enter="reply_submit_son(sons)" />
+                    <button @click="reply_submit_son(sons)">发表评论</button>
                   </div>
                 </li>
               </ul>
@@ -87,18 +86,25 @@ export default{
   methods:{
     // 评价框失焦
     lose(m){
-      m.display = false
+      m.isdisplay = false
     },
     // 评价展示
     comment_input(m){
-      m.display = true
+      console.log(m)
+      m.isdisplay = true
     },
     reply_submit(m){
-      console.log(m)
+      // console.log(m)
       this.$emit('update',this.childComments,m.commentId,m.commentUserId)
       this.childComments = ''
       m.display = false
-    }
+    },
+    reply_submit_son(m){
+      // console.log(m)
+      this.$emit('update',this.childComments,m.commentId,m.commentUserId)
+      this.childComments = ''
+      m.display = false
+    },
   },
   watch:{
     comments(newValue,oldValue){

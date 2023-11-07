@@ -66,6 +66,24 @@
     </el-row>
     <!--  视频详细信息   -->
     <h2>{{ videoInfo.title }}</h2>
+    <el-button type="danger" @click="changeLike(videoInfo)">{{ videoInfo.isLike ? "取消点赞" : "点赞" }}</el-button>
+    <el-button type="warning" @click="isCollected ? unCollected() : dialogVisible = true;">{{ isCollected ? "取消收藏" : "收藏" }}</el-button>
+
+    <el-dialog
+        title="选择收藏夹"
+        :visible.sync="dialogVisible"
+        width="30%">
+      <el-checkbox-group
+          v-model="checkedDirs">
+        <el-checkbox v-for="dir in collectionData" :key="dir.id" :label="dir.id">{{dir.collectionName}}</el-checkbox>>
+      </el-checkbox-group>
+
+      <span slot="footer" class="dialog-footer">
+              <el-button @click="dialogVisible = false">取 消</el-button>
+              <el-button type="primary" @click="collection(videoInfo);dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+
     <el-row>
       <Comment :comments="commentList" @update="updateComment"></Comment>
     </el-row>
@@ -76,17 +94,16 @@
 import 'vue-video-player/src/custom-theme.css';
 import 'video.js/dist/video-js.css'
 import { videoPlayer } from 'vue-video-player'
-import {getVideoById, getVideoComment} from "@/api/video";
+import {dislikeVideo, getVideoById, getVideoComment, likeVideo} from "@/api/video";
 import {mapState} from "vuex";
 
 import Comment from "@/views/home/components/comment";
 import {
-  comment,
   commentToComment,
-  commentToVideo,
+  commentToVideo, doCollection,
   followListById,
-  followUser,
-  getUserInfo,
+  followUser, getCollection,
+  getUserInfo, getVideoByCollectionId, undoCollection,
   unFollowUser
 } from "@/api/user";
 
@@ -103,7 +120,7 @@ export default {
       // videojs options
       controls:true,
       muted: false,
-      autoplay: false,
+      autoplay: true,
       language: 'zh-CN',
       preload: 'auto',
       playbackRates: [0.5, 1.0, 1.5, 2.0],
@@ -118,6 +135,8 @@ export default {
     }
     const commentInput = ''
     return {
+      checkedDirs:[],
+      dialogVisible:false,
       playerOptions,
       videoInfo,
       loading,
@@ -147,6 +166,7 @@ export default {
         }]
       }],
       commentList:[],
+      collectionData:[],
     }
 
   },
@@ -172,13 +192,14 @@ export default {
         })
       })
       getVideoComment(id,0,100).then((res)=>{
-        console.log(res)
+        // console.log(res)
         this.commentList = res.data.records
       })
+      this.getCollectionDir()
     },
     updateComment(content,entityId,targetId){
       commentToComment(entityId,"comment",content,targetId).then((res)=>{
-        console.log(res)
+        // console.log(res)
         if(res.code === 200){
           this.$message.success("评论成功！")
         }
@@ -192,17 +213,8 @@ export default {
       commentToVideo(this.videoInfo.videoId,"video",this.commentInput).then((res)=>{
         if (res.code === 200) {
           this.$message.success(`评论成功！`)
-          this.getVideoComment(this.videoInfo.videoId,0,100).then((res)=>{
-            const itemPromises = res.data.records.map(async (item) => {
-              const userInfo = await getUserInfo(item.commentUserId)
-              item.commentUserAvatarPath = userInfo.data.avatarPath
-              item.display = false
-              return item
-            })
-            Promise.all(itemPromises).then((items)=>{
-              console.log(items)
-              this.commentList = items
-            }).catch(err=>err)
+          getVideoComment(this.videoInfo.videoId,0,100).then((res)=>{
+            this.commentList = res.data.records
           })
         }
       })
@@ -253,12 +265,92 @@ export default {
         console.log("follow",err)
       })
     },
+    changeLike(videoInfo){
+      if (!videoInfo.isLike) {
+        likeVideo(videoInfo.videoId).then((res)=>{
+          if(res.code === 200) {
+            this.$message.success({
+              message:'点赞成功',
+              duration:400
+            })
+            videoInfo.isLike = !videoInfo.isLike
+          }
+        })
+      }else{
+        dislikeVideo(videoInfo.videoId).then((res)=>{
+          if(res.code === 200) {
+            this.$message.warning({
+              message:'取消点赞',
+              duration:400
+            })
+            videoInfo.isLike = !videoInfo.isLike
+          }
+        })
+      }
+      this.info.isLike = !this.info.isLike
+    },
+    collection(videoInfo){
+      console.log(this.checkedDirs)
+      this.checkedDirs.forEach((id)=>{
+        doCollection(id,videoInfo.videoId).then((res)=>{
+          if(res.code === 200) {
+            this.$message.success({
+              message:"收藏成功",
+              duration:500
+            })
+          }
+        })
+      })
+    },
+    getCollectionDir(){
+      this.collectionData = []
+      getCollection(1,100).then((res)=>{
+        res.data.records.forEach((item)=>{
+          getVideoByCollectionId(item.id,1,100).then((res)=>{
+            item.videos = res.data.records
+            this.collectionData.push(item)
+          })
+        })
+      })
+    },
+    unCollected(){
+      let foundId;
+      this.collectionData.forEach((dir)=>{
+        dir.videos.forEach((video)=>{
+          console.log(video.videoId,this.videoInfo.videoId)
+          if (video.videoId === this.videoInfo.videoId) {
+            foundId = dir.id
+          }
+        })
+      })
+      undoCollection(foundId,this.videoInfo.videoId).then((res)=>{
+        if(res.code === 200) {
+          this.$message.success({
+            message:"取消收藏成功",
+            duration:500
+          })
+        }
+        this.getCollectionDir()
+      })
+    }
   },
   computed:{
     ...mapState(['user']),
     showFollow(){
       return !this.userFollows.includes(this.creater.id)
-    }
+    },
+    isCollected(){
+      let found = false
+      this.collectionData.forEach((dir)=>{
+        dir.videos.forEach((video)=>{
+          console.log(video.videoId,this.videoInfo.videoId)
+          if (video.videoId === this.videoInfo.videoId) {
+            found = true
+          }
+        })
+      })
+      return found
+    },
   },
   mounted() {
     this.initData(this.$route.params.id)

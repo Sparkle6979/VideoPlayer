@@ -1,6 +1,6 @@
 ## VideoPlayer - ZJU5oftwar3
 
-该项目为[七牛头2023年1024创作节](https://www.qiniu.com/activity/detail/651297ed0d50912d3d53307b?from=0010)参赛作品
+该项目为[七牛云2023年1024创作节](https://www.qiniu.com/activity/detail/651297ed0d50912d3d53307b?from=0010)参赛作品
 
 Demo讲解及演示视频链接：
 

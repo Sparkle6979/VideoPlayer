@@ -1,10 +1,12 @@
 <template>
-  <div ref="myDiv" tabindex="0" @keydown="handleKeyDown" @keydown.prevent="handleKeyDown2">
+  <div ref="myDiv" tabindex="0" @keydown="handleKeyDown" @keydown.prevent="handleKeyDown2" v-loading="loading">
     <Swiper
+        v-if="playerVideoList.length"
         ref="mySwiper"
-        :options="swiperOption">
+        :options="swiperOption"
+        @slideChange="handleSlideChange">
       <SwiperSlide
-          v-for="(video,index) in videos()"
+          v-for="(video,index) in playerVideoList"
           :key="index"
       >
         <div>
@@ -18,21 +20,21 @@
               ></videoPlayer>
             </el-col>
             <el-col :span="7">
-              <h4>{{video.titile}} 当前：{{ index }}</h4>
+              <h4>{{video.title}}</h4>
               <span>{{video.description}}</span>
               <el-card style="background-color: #eeeeee;margin-top: 20px">
                 <el-row :gutter="20" type="flex" align="middle">
                   <el-col :span="6">
-                    <el-avatar :src="defaultUserAvatar" :size="70"></el-avatar>
+                    <el-avatar :src="video.creater.avatarPath ? video.creater.avatarPath : defaultUserAvatar" :size="70"></el-avatar>
                   </el-col>
                   <el-col :span="12">
-                    <h4 class="author">作者</h4>
+                    <h4 class="author">{{ video.creater.username }}</h4>
                   </el-col>
                   <el-col :span="6">
-                    <div v-if="true">
-                      <el-button type="danger" v-if="true" >关注</el-button>
+                    <div v-if="video.creater.username != user.username">
+                      <el-button type="danger" v-if="!video.userFollows.includes(video.creater.id)" @click.native="follow(video)">关注</el-button>
                       <div v-else>
-                        <el-popconfirm title="确认取消关注吗?" >
+                        <el-popconfirm title="确认取消关注吗?" @confirm="unFollow(video)">
                           <el-button type="info" slot="reference">已关注</el-button>
                         </el-popconfirm>
                       </div>
@@ -49,6 +51,7 @@
       </SwiperSlide>
       <div class="swiper-pagination" slot="pagination"></div>
     </Swiper>
+    <el-empty description="没有可以播放的视频" v-else></el-empty>
   </div>
 </template>
 
@@ -59,6 +62,9 @@ import { videoPlayer } from 'vue-video-player'
 
 import { Swiper, SwiperSlide } from "vue-awesome-swiper";
 import 'swiper/css/swiper.min.css';
+import {getPlayerVideo, getVideoById} from "@/api/video";
+import {followListById, followUser, getUserInfo, unFollowUser} from "@/api/user";
+import {mapState} from "vuex";
 
 export default {
   name: "all",
@@ -68,40 +74,9 @@ export default {
     SwiperSlide,
   },
   data(){
-    const playerOptions = {
-      // videojs options
-      controls:true,
-      muted: true,
-      autoplay: true,
-      language: 'zh-CN',
-      preload: 'auto',
-      playbackRates: [0.5, 1.0, 1.5, 2.0],
-      aspectRatio: "16:9",
-      fluid:true,
-      notSupportedMessage: '此视频暂无法播放，请稍后再试',
-      sources: [{
-        type: "video/mp4",
-        src: ''
-      }],
-      height: '100%'
-    }
-
-    const item = {
-      "videoId": 5,
-      "titile": "修仙游戏哪家强？高品质修仙游戏推荐！",
-      "description": "看一看有哪些值得玩的修仙游戏",
-      "likeCount": 0,
-      "categoryId": 2,
-      "categoryName": "游戏",
-      "createTime": "2023-10-27",
-      'playerOptions':'',
-      "url": "http://s33fgajdq.hd-bkt.clouddn.com/%E4%BF%AE%E4%BB%99%E6%B8%B8%E6%88%8F%E5%93%AA%E5%AE%B6%E5%BC%BA%EF%BC%9F%E9%AB%98%E5%93%81%E8%B4%A8%E4%BF%AE%E4%BB%99%E6%B8%B8%E6%88%8F%E6%8E%A8%E8%8D%90%EF%BC%81.mp4"
-    }
-    const videos = ()=>{
-      playerOptions.sources[0].src = item.url
-      item.playerOptions = playerOptions
-      return Array(5).fill(item)
-    }
+    let curPage = 1;
+    const pageSize = 10;
+    const playerVideoList = []
     const curIndex = 0
 
     const swiperOption = {
@@ -124,17 +99,70 @@ export default {
     }
     const currentSwiperSlide = 0
     return {
-      videos,
+      curPage,
+      pageSize,
+      playerVideoList,
       curIndex,
-      playerOptions,
       swiperOption,
-      currentSwiperSlide
+      currentSwiperSlide,
+      loading:false,
     }
   },
+  computed:{
+    ...mapState(['user']),
+  },
   methods:{
+    getPlayerVideoList(){
+      this.loading = true
+      getPlayerVideo(this.curPage++,this.pageSize).then((res)=>{
+        const itemPromises = res.data.records.map(async (item) => {
+          const playerOptions = {
+            // videojs options
+            controls:true,
+            muted: true,
+            autoplay: true,
+            language: 'zh-CN',
+            preload: 'auto',
+            playbackRates: [0.5, 1.0, 1.5, 2.0],
+            aspectRatio: "16:9",
+            fluid:true,
+            notSupportedMessage: '此视频暂无法播放，请稍后再试',
+            sources: [{
+              type: "video/mp4",
+              src: ''
+            }],
+            height: '100%'
+          }
+          playerOptions.sources[0].src = item.videoUrl
+          item.playerOptions = playerOptions
+
+          const videoData = await getVideoById(item.id);
+          const userData = await getUserInfo(videoData.data.createrId);
+          item.creater = userData.data;
+
+          try {
+            const followListRes = await followListById(this.user.id, 1, 100);
+            item.userFollows = followListRes.data.records;
+          } catch (err) {
+            console.log("followListById",err);
+          }
+
+          return item;
+        });
+
+        Promise.all(itemPromises)
+            .then((items) => {
+              this.playerVideoList.push(...items);
+              this.loading = false
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+      })
+    },
     handleKeyDown(event){
       if(event.key === "ArrowDown"){
-        if (this.curIndex === this.videos().length-1){
+        if (this.curIndex === this.playerVideoList.length-1){
           this.$message.warning({
             message:"没有更多的视频了",
             duration:1000
@@ -180,29 +208,52 @@ export default {
         videoPlayer.player.muted(false); // 取消静音
         videoPlayer.player.play()
       }
-    }
+    },
+    handleSlideChange(){
+      const activeIndex = this.$refs.mySwiper.swiperInstance.activeIndex;
+      console.log(`当前活动 slide 的索引是: ${activeIndex}`);
+      // const length = this.playerVideoList.length
+      // if(activeIndex/length > 0.6) {
+      //   console.log("加载视频")
+      //   this.getPlayerVideoList()
+      // }
+    },
+    follow(video){
+      followUser(video.creater.id).then((res)=>{
+        // console.log(res)
+        if (res.code === 200) {
+          this.$message.success(`关注${video.creater.username}成功！`)
+        }
+        followListById(this.user.id).then((res) => {
+          console.log(res)
+          video.userFollows = res.data.followingIds
+        }).catch(err => {
+          console.log("showFollow",err)
+        })
+      }).catch(err=>{
+        console.log("follow",err)
+      })
+    },
+    unFollow(video){
+      unFollowUser(video.creater.id).then((res)=>{
+        console.log(res)
+        if (res.code === 200) {
+          this.$message.success("取关成功！")
+        }
+        followListById(this.user.id).then((res) => {
+          console.log(res)
+          video.userFollows = res.data.followingIds
+        }).catch(err => {
+          console.log("showFollow",err)
+        })
+      }).catch(err=>{
+        console.log("follow",err)
+      })
+    },
   },
   mounted() {
-    // this.$nextTick(() => {
-    //   setTimeout(()=>{
-    //     if (this.$refs.myDiv !== document.activeElement) {
-    //       document.addEventListener('keydown',(event)=>{
-    //         if(event.key === "ArrowDown" || event.key === "ArrowUp"){
-    //           this.$refs.myDiv.focus()
-    //         }
-    //       })
-    //     }
-    //   },100)
-    // })
-    let _this = this
+    this.getPlayerVideoList()
     this.$refs.myDiv.focus()
-    // document.addEventListener('keydown', function(event) {
-    //   if (event.key === "ArrowDown") {
-    //     _this.$refs.myDiv.focus()
-    //     event.preventDefault();
-    //   }
-    // });
-
     this.$notify({
       title: '提示',
       message: '首次播放需要取消视频静音',

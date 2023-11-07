@@ -93,3 +93,30 @@ export function unFollowUser(followingId){
         method:'DELETE'
     })
 }
+
+export function commentToVideo(entityId,entityType,content){
+
+    return request({
+        url:'/user/comment',
+        data:{
+            content:content,
+            entityId:entityId,
+            entityType:entityType,
+        },
+        method:'POST'
+    })
+}
+
+export function commentToComment(entityId,entityType,content,targetId){
+    // targetID 指向对最上层评论用户的ID
+    return request({
+        url:'/user/comment',
+        data:{
+            content:content,
+            entityId:entityId,
+            entityType:entityType,
+            targetId:targetId,
+        },
+        method:'POST'
+    })
+}

@@ -5,33 +5,25 @@
       <div v-if="show">
         <div  class="first" v-for="(item, index) in comments" :key="index" >
           <a href="javascript:;" class="first-img">
-            <img v-if="item.picture" :src="`http://` + item.picture" alt="" />
-            <img v-else :src="defaultUserAvatar" alt="" />
+            <img :src="item.commentUserAvatarPath ? item.commentUserAvatarPath : defaultUserAvatar" alt="" />
           </a>
           <div class="first-content">
-            <h3 class="first-username">{{ item.username }}</h3>
-            <span class="first-time">{{ item.date }}</span>
+            <h3 class="first-username">{{ item.commentUserName }}</h3>
+            <span class="first-time">{{ item.createTime }}</span>
             <p class="first-comment">{{ item.content }}</p>
-            <!-- 一级评论评论点赞 -->
             <div class="first-right">
-              <span class="delete" v-if="item.delete" @click="comment_delete(item, '父级', index)">删除</span>
               <span class="comments" @click="comment_input(item)">评论</span>
-              <!-- 一级评论点赞数 -->
-              <span class="praise">
-                <svg-icon name="like-on"></svg-icon>
-                <span v-if="item.numbers" style="margin-left: 3px">{{item.numbers }}</span>
-              </span>
             </div>
             <!-- 回复一级评论 -->
             <div class="reply-comment" v-if="item.display">
               <input type="text" placeholder="请输入评论 . . ." v-model="childComments"
-                     @keyup.enter="reply_submit(item, '父级', index)"/>
-              <button @click="reply_submit(item, '父级', index)">发表评论</button>
+                     @keyup.enter="reply_submit(item)"/>
+              <button @click="reply_submit(item)">发表评论</button>
             </div>
             <!-- 次级评论 -->
             <div class="second">
               <ul>
-                <li v-for="(sons, sons_index) in item.sons" :key="sons_index" >
+                <li v-for="(sons, sons_index) in item.commentReply" :key="sons_index" >
                   <div class="top">
                     <!-- 次级评论头像,该用户没有头像则显示默认头像 -->
                     <a href="JavaScript:;" class="second-img">
@@ -53,23 +45,15 @@
                       </p>
                       <!-- 次级评论评论点赞 -->
                       <div class="second-right">
-                        <span class="delete" v-if="sons.delete"
-                              @click="comment_delete(sons, '子级',index,sons_index)">删除</span>
                         <span class="comments" @click="comment_input(sons)">评论</span>
-                          <!-- 次级评论点赞数 -->
-                        <span class="praise">
-                          <svg-icon name="like-on"></svg-icon>
-                          <span v-if="sons.numbers" style="margin-left: 3px">{{sons.numbers }}</span>
-                        </span>
-
                       </div>
                     </div>
                   </div>
                   <!-- 回复次级评论 -->
                   <div class="reply-comment reply_li" v-if="sons.display">
                     <input type="text" placeholder="请输入评论 . . ." v-model="childComments"
-                           @keyup.enter="reply_submit(sons,'子级',index,sons_index)"/>
-                    <button @click="reply_submit(sons,'子级',index,sons_index)">发表评论</button>
+                           @keyup.enter="reply_submit(sons)"/>
+                    <button @click="reply_submit(sons)">发表评论</button>
                   </div>
                 </li>
               </ul>
@@ -109,35 +93,11 @@ export default{
     comment_input(m){
       m.display = true
     },
-    comment_delete(m,n,w,t){
-      if(n == '子级'){
-        this.comments[w].sons.splice(t,1);
-      }else if(n == '父级'){
-        this.comments.splice(w,1)
-      }
-      this.$emit('update',this.comments)
-    },
-    reply_submit(m,n,w,t){
-      console.log(m,n,w,t)
-      let index;
-      if(n == '父级'){
-        index = t
-      }else if( n == '子级'){
-        index = t+ 1;
-      }
-      this.comments[w].sons.splice(index, 0, {
-        username:this.user.username,
-        date:this.current.getFullYear() + '年' + (this.current.getMonth() + 1) + '月' + this.current.getDate() + '日' + this.current.getHours() + ':' + this.current.getMinutes() + ':' + this.current.getSeconds(),
-        content:this.childComments,
-        delete:true,
-        flag:false,
-        like:'',
-        display:false,	//显示评论区
-        to_username:m.username,
-      })
+    reply_submit(m){
+      console.log(m)
+      this.$emit('update',this.childComments,m.commentId,m.commentUserId)
       this.childComments = ''
       m.display = false
-      this.$emit('update',this.comments)
     }
   },
   watch:{

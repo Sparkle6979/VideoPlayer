@@ -2,6 +2,7 @@ import axios from "axios";
 // 全局进度条，可以用来做复杂请求的标识
 // import nprogress from 'nprogress';
 // import "nprogress/nprogress.css"
+import router from "@/router";
 
 const tokenType = 'Bearer'
 
@@ -32,6 +33,7 @@ request.interceptors.response.use(
             switch (status) {
                 case 401:
                     alert("用户没有权限")
+                    router.push('/login')
                     break;
             }
         }else{

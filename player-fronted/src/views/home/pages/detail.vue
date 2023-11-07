@@ -67,7 +67,7 @@
     <!--  视频详细信息   -->
     <h2>{{ videoInfo.title }}</h2>
     <el-row>
-      <Comment :comments="comments" @update="updateComment"></Comment>
+      <Comment :comments="commentList" @update="updateComment"></Comment>
     </el-row>
   </div>
 </template>
@@ -76,11 +76,19 @@
 import 'vue-video-player/src/custom-theme.css';
 import 'video.js/dist/video-js.css'
 import { videoPlayer } from 'vue-video-player'
-import {getVideoById} from "@/api/video";
+import {getVideoById, getVideoComment} from "@/api/video";
 import {mapState} from "vuex";
 
 import Comment from "@/views/home/components/comment";
-import {followListById, followUser, getUserInfo, unFollowUser} from "@/api/user";
+import {
+  comment,
+  commentToComment,
+  commentToVideo,
+  followListById,
+  followUser,
+  getUserInfo,
+  unFollowUser
+} from "@/api/user";
 
 export default {
   name: "Detail",
@@ -138,6 +146,7 @@ export default {
           numbers:1,		//点赞数
         }]
       }],
+      commentList:[],
     }
 
   },
@@ -155,30 +164,47 @@ export default {
         this.loading = false
         getUserInfo(res.data.createrId).then((user_res)=>{
           this.creater = user_res.data
-          followListById(this.user.id).then((res) => {
-            this.userFollows = res.data.followingIds
+          followListById(this.user.id,1,100).then((res) => {
+            this.userFollows = res.data.records
           }).catch(err => {
             console.log("followListById",err)
           })
         })
       })
+      getVideoComment(id,0,100).then((res)=>{
+        console.log(res)
+        this.commentList = res.data.records
+      })
     },
-    updateComment(value){
-      console.log(value)
-      this.comments = value
+    updateComment(content,entityId,targetId){
+      commentToComment(entityId,"comment",content,targetId).then((res)=>{
+        console.log(res)
+        if(res.code === 200){
+          this.$message.success("评论成功！")
+        }
+        getVideoComment(this.videoInfo.videoId,0,100).then((res)=>{
+          this.commentList = res.data.records
+        })
+      })
     },
     // 发表评论
     submitComment(){
-      this.current = new Date();
-      this.comments.push({
-        username:this.user.username,
-        date:this.current.getFullYear() + '年' + (this.current.getMonth() + 1) + '月' + this.current.getDate() + '日' + this.current.getHours() + ':' + this.current.getMinutes() + ':' + this.current.getSeconds(),
-        content:this.commentInput,
-        delete:true,
-        flag:false,
-        like:'',
-        display:false,	//显示评论区
-        sons:[]
+      commentToVideo(this.videoInfo.videoId,"video",this.commentInput).then((res)=>{
+        if (res.code === 200) {
+          this.$message.success(`评论成功！`)
+          this.getVideoComment(this.videoInfo.videoId,0,100).then((res)=>{
+            const itemPromises = res.data.records.map(async (item) => {
+              const userInfo = await getUserInfo(item.commentUserId)
+              item.commentUserAvatarPath = userInfo.data.avatarPath
+              item.display = false
+              return item
+            })
+            Promise.all(itemPromises).then((items)=>{
+              console.log(items)
+              this.commentList = items
+            }).catch(err=>err)
+          })
+        }
       })
       this.commentInput = ''
     },

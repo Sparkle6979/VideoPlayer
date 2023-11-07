@@ -101,9 +101,6 @@ export default {
       this.follower.loading = true
       followListById(this.user.id,this.follower.curPage,this.follower.pageSize).then((res)=>{
         console.log(res)
-        if(res.code === 401) {
-          this.$router.push("/login")
-        }
         if (res.data.records.length === 0){
           this.follower.finished = true
           return
@@ -130,9 +127,6 @@ export default {
       this.fan.loading = true
       fanListById(this.user.id,this.fan.curPage,this.fan.pageSize).then((res)=>{
         console.log(res)
-        if(res.code === 401) {
-          this.$router.push("/login")
-        }
         if (res.data.records.length === 0){
           this.fan.finished = true
           return

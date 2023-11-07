@@ -59,42 +59,57 @@
         </el-tab-pane>
         <el-tab-pane label="消息中心" name="3">
           <div>
-            <el-tabs tab-position="left" type="border-card" style="height: 650px;overflow-y: auto;">
-              <el-tab-pane label="赞">
-                <MyMessage :messageList="zanList" :type="1"></MyMessage>
-              </el-tab-pane>
-              <el-tab-pane label="回复">
-                <div>
-                  <el-table :data="tableData" style="margin-bottom: 20px;"
-                            row-key="id" :cell-style="msgTableRowClass" :show-header="true"
-                            :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
-                    <el-table-column prop="date" label="时间" align="center" width="200" sortable>
-                    </el-table-column>
-                    <el-table-column prop="name" label="用户名" width="180"></el-table-column>
-                    <el-table-column prop="createdAt" label="消息时间" align="center" ></el-table-column>
-                    <el-table-column prop="message" label="消息"></el-table-column>
-                    <el-table-column label="状态">
-                      <template slot-scope="scope">
-                        <el-tag v-if="scope.row.status == 0" type="danger">未读</el-tag>
-                        <el-tag v-if="scope.row.status == 1" type="success">已读</el-tag>
-                        <el-tag v-if="scope.row.status == 2">已回复</el-tag>
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="操作" width="100px" fixed="right">
-                      <template slot-scope="scope">
-                        <el-button v-if="scope.row.message && scope.row.status != 2" type="text" size="small"
-                                   @click="reviewMsg(scope.row.name,scope.row.message)">回复</el-button>
-                        <!--                  <el-button v-if="scope.row.message && scope.row.status == 2" type="text" size="small">查看</el-button>-->
-                      </template>
-                    </el-table-column>
-                  </el-table>
+            <el-tabs v-model="subActiveIndex" tab-position="left" type="border-card" style="height: 650px;overflow-y: auto;">
+              <el-tab-pane label="赞" name="31">
+                <el-button type="primary" @click="allRead(31)">一键已读</el-button>
+                <div v-loading="this.loading.likeMessage"
+                     element-loading-text="拼命加载中"
+                     element-loading-spinner="el-icon-loading"  >
+                  <MyMessage v-if="likeMessageList.length" :messageList="likeMessageList" :type="1"></MyMessage>
+                  <el-empty description="没有数据" v-else></el-empty>
                 </div>
               </el-tab-pane>
-              <el-tab-pane label="@我的">
-                <MyMessage :messageList="zanList" :type="2"></MyMessage>
+              <el-tab-pane label="评论" name="32">
+                <div v-loading="this.loading.commentMessage"
+                     element-loading-text="拼命加载中"
+                     element-loading-spinner="el-icon-loading">
+                  <MyMessage v-if="commentMessageList.length" :messageList="commentMessageList" :type="3"></MyMessage>
+                  <el-empty description="没有数据" v-else></el-empty>
+                </div>
+<!--                <div>-->
+<!--                  <el-table :data="tableData" style="margin-bottom: 20px;"-->
+<!--                            row-key="id" :cell-style="msgTableRowClass" :show-header="true"-->
+<!--                            :tree-props="{children: 'children', hasChildren: 'hasChildren'}">-->
+<!--                    <el-table-column prop="date" label="时间" align="center" width="200" sortable>-->
+<!--                    </el-table-column>-->
+<!--                    <el-table-column prop="name" label="用户名" width="180"></el-table-column>-->
+<!--                    <el-table-column prop="createdAt" label="消息时间" align="center" ></el-table-column>-->
+<!--                    <el-table-column prop="message" label="消息"></el-table-column>-->
+<!--                    <el-table-column label="状态">-->
+<!--                      <template slot-scope="scope">-->
+<!--                        <el-tag v-if="scope.row.status == 0" type="danger">未读</el-tag>-->
+<!--                        <el-tag v-if="scope.row.status == 1" type="success">已读</el-tag>-->
+<!--                        <el-tag v-if="scope.row.status == 2">已回复</el-tag>-->
+<!--                      </template>-->
+<!--                    </el-table-column>-->
+<!--                    <el-table-column label="操作" width="100px" fixed="right">-->
+<!--                      <template slot-scope="scope">-->
+<!--                        <el-button v-if="scope.row.message && scope.row.status != 2" type="text" size="small"-->
+<!--                                   @click="reviewMsg(scope.row.name,scope.row.message)">回复</el-button>-->
+<!--                        &lt;!&ndash;                  <el-button v-if="scope.row.message && scope.row.status == 2" type="text" size="small">查看</el-button>&ndash;&gt;-->
+<!--                      </template>-->
+<!--                    </el-table-column>-->
+<!--                  </el-table>-->
+<!--                </div>-->
               </el-tab-pane>
-              <el-tab-pane label="私信">
-                <Im></Im>
+              <el-tab-pane label="关注" name="33">
+                <el-button type="primary" @click="allRead(33)">一键已读</el-button>
+                <div v-loading="this.loading.followMessage"
+                     element-loading-text="拼命加载中"
+                     element-loading-spinner="el-icon-loading">
+                  <MyMessage v-if="followMessageList.length" :messageList="followMessageList" :type="2"></MyMessage>
+                  <el-empty description="没有数据" v-else></el-empty>
+                </div>
               </el-tab-pane>
             </el-tabs>
           </div>
@@ -156,6 +171,7 @@ import {mapGetters, mapMutations, mapState} from "vuex";
 import {getUserInfo, getUserLike, getUserVideo, updateUserInfo} from "@/api/user";
 import {getVideoById} from "@/api/video";
 import md5 from "js-md5";
+import {getComment, getFollow, getLike, getMessageInfoById, readMessage} from "@/api/notice";
 
 export default {
   name: "user",
@@ -167,6 +183,7 @@ export default {
   },
   data(){
     const activeIndex = "1"
+    const subActiveIndex = "1"
     const isInput = false
     const form_2 = {
       avatarFile:'',
@@ -178,6 +195,9 @@ export default {
       likeVideo:false,
       myVideo:false,
       myFavorite:false,
+      commentMessage:false,
+      likeMessage:false,
+      followMessage:false,
     }
     const msgVisible = false
     let msg = {
@@ -191,24 +211,9 @@ export default {
     const allLikeLoaded = false
     let textarea = '' // 评论输入框
     let commentContent = ''
-    const zanList = [
-      {
-        id:1,
-        name:"王二虎",
-        avatar:"https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-        created_at:"2023-11-3 16:38:00",
-        videoId: 1,
-        videoCover: "https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg"
-      },
-      {
-        id:2,
-        name:"王二虎",
-        avatar:"https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-        created_at:"2023-11-3 16:38:00",
-        videoId: 1,
-        videoCover: "https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg"
-      }
-    ]
+    const likeMessageList = []
+    const commentMessageList = []
+    const followMessageList = []
     const favoriteData = [
         {
       label: '一级 1',
@@ -251,6 +256,7 @@ export default {
     }
     return {
       activeIndex,
+      subActiveIndex,
       isInput,
       form_2,
       tableData: [
@@ -294,7 +300,9 @@ export default {
       allLikeLoaded,
       textarea,
       commentContent,
-      zanList,
+      likeMessageList,
+      followMessageList,
+      commentMessageList,
       loading,
       myVideoList,
       favoriteData,
@@ -307,32 +315,30 @@ export default {
     goBack(){
       this.$router.back()
     },
-    getLikeVideoList(){
+    getLikeVideoList() {
       this.loading.likeVideo = true
-      getUserLike(this.curLikePage++,this.pageSize).then((res)=>{
-        if (res.code === 401) {
-          this.$router.push('/login')
-          return
-        }
-        if (res.data.records.length === 0 ){
+      getUserLike(this.curLikePage++, this.pageSize).then((res) => {
+        if (res.data.records.length === 0) {
           this.loading.likeVideo = false
           return
         }
-        res.data.records.forEach((id,index,arr)=>{
-          let count = 0
-          getVideoById(id).then((res)=>{
-            this.videoList.push(res.data)
-          }).finally(()=>{
-            count++
-            if(count === arr.length){
-              this.loading.likeVideo = false
-            }
-          })
-        })
-        console.log(res)
-        if (this.videoList.length === res.data.total) {
-          this.allLikeLoaded = true
-        }
+        const videoPromises = res.data.records.map((id) => {
+          return getVideoById(id).then((res) => {
+            this.videoList.push(res.data);
+          });
+        });
+        Promise.all(videoPromises)
+            .then(() => {
+              this.loading.likeVideo = false;
+              if (this.videoList.length === res.data.total) {
+                this.allLikeLoaded = true;
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+      }).catch((err) => {
+        console.log(err)
       })
     },
     getMyVideoList(){
@@ -340,7 +346,7 @@ export default {
       this.loading.myVideo = true
       getUserVideo().then((res)=>{
         let count = 0
-        if (res.data.videoIds.length == 0){
+        if (res.data.videoIds.length === 0){
           this.loading.myVideo = false
           return
         }
@@ -426,6 +432,81 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
+    async processLikeMessageItems(data) {
+      for (const item of data) {
+        try {
+          const userInfo = await getUserInfo(item.eventUserId);
+          item.eventUserAvatarPath = userInfo.data.avatarPath;
+        } catch (error) {
+          console.error(`Error getting user info for user ID ${item.eventUserId}:`, error);
+        }
+
+        try {
+          const videoInfo = await getVideoById(item.eventEntityId);
+          item.video = videoInfo.data;
+        } catch (error) {
+          console.error(`Error getting video info for video ID ${item.eventEntityId}:`, error);
+        }
+        this.likeMessageList.push(item);
+      }
+      this.loading.likeMessage = false
+    },
+    getLikeMessageList(){
+      this.loading.likeMessage = true
+      this.likeMessageList = []
+      getLike().then((res)=>{
+        this.processLikeMessageItems(res.data)
+      }).catch(err=>{
+        console.log("getLikeMessageList",err)
+        this.loading.likeMessage = false
+      })
+    },
+    getCommentMessageList(){
+      this.loading.commentMessage = true
+      this.commentMessageList = []
+      getComment().then((res)=>{
+        console.log(res)
+      }).catch(err=>{
+        console.log("getCommentMessageList",err)
+      }).finally(()=>{
+        this.loading.commentMessage = false
+      })
+    },
+    async processFollowMessageItems(data) {
+      for (const item of data) {
+        try {
+          const userInfo = await getUserInfo(item.eventUserId);
+          item.eventUserAvatarPath = userInfo.data.avatarPath;
+        } catch (error) {
+          console.error(`Error getting user info for user ID ${item.eventUserId}:`, error);
+        }
+        this.followMessageList.push(item);
+      }
+      this.loading.followMessage = false
+    },
+    getFollowMessageList(){
+      this.loading.followMessage = true
+      this.followMessageList = []
+      getFollow().then((res)=>{
+        this.processFollowMessageItems(res.data)
+      }).catch(err=>{
+        console.log("getFollowMessageList",err)
+        this.loading.followMessage = false
+      })
+    },
+    async allRead(type){
+      if (type === 31){
+        for (const item of this.likeMessageList) {
+          await readMessage(item.messageId);
+        }
+        await this.getLikeMessageList();
+      }else if (type === 33){
+        for (const item of this.likeMessageList) {
+          await readMessage(item.messageId)
+        }
+        await this.getFollowMessageList()
+      }
+    },
     msgTableRowClass({row, rowIndex}){
       if(row.children) { //如果此行children存在，也就是一级菜单
         return { "height":"4vh !important ","color":"blue"}
@@ -465,7 +546,7 @@ export default {
       this.textarea = ''
     },
     renderContent(h, { node, data, store }){
-      console.log(node)
+      // console.log(node)
       if (node.data.children) {
         return (
             <span className="custom-tree-node">
@@ -502,6 +583,25 @@ export default {
         if (newV === "4"){
           this.myVideoList = []
           this.getMyVideoList()
+        }
+        if (newV === "3"){
+          this.subActiveIndex = "31"
+        }
+      }
+    },
+    "subActiveIndex":{
+      handler(newV){
+        if(newV === "31"){
+          this.likeMessageList = []
+          this.getLikeMessageList()
+        }
+        if(newV === "32"){
+          this.commentMessageList = []
+          this.getCommentMessageList()
+        }
+        if(newV === "33"){
+          this.followMessageList = []
+          this.getFollowMessageList()
         }
       }
     }

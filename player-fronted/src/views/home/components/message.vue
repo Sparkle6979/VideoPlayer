@@ -2,24 +2,28 @@
   <div class="msg-container">
     <div class="msg-item" v-for="(item, index) in messageList" :key="index">
       <div class="item-left">
-        <img :src="item.avatar" alt="Avatar" class="avatar" />
+        <img :src="item.eventUserAvatarPath ? item.eventUserAvatarPath : defaultUserAvatar" alt="Avatar" class="avatar" />
       </div>
       <div class="item-center">
         <p class="title">
-          <span class="user-name">{{ item.name }}</span>
+          <span class="user-name">{{ item.eventUserName }}</span>
           <span v-if="type === 1">赞了我的视频</span>
-          <span v-if="type === 2">在评论中提到了你</span>
+          <span v-if="type === 2">关注了</span>
+          <span v-if="type === 3">评论了我</span>
         </p>
-        <div class="msg-time">{{ new Date(item.created_at) }}</div>
+<!--        <div class="msg-time">{{ new Date(item.created_at) }}</div>-->
       </div>
       <div class="item-right">
-        <img :src="item.videoCover" alt="封面" class="video-cover" />
+        <img :src="item.video.coverUrl" alt="封面" class="video-cover" v-if="type === 1" @click="toDetailPage(item.messageId,item.video.videoId)"/>
+        <el-button type="text" @click="readFollowMessage(item.messageId)" v-if="type === 2">已读</el-button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+
+import {readMessage} from "@/api/notice";
 
 export default {
   name:'MyMessage',
@@ -33,7 +37,22 @@ export default {
     };
   },
   methods: {
-
+    readFollowMessage(messageId){
+      readMessage(messageId)
+      this.$message.success({
+        message:'消息已读',
+        duration:500
+      })
+    },
+    toDetailPage(messageId,videoId){
+      readMessage(messageId)
+      this.$router.push({
+        name:'Detail',
+        params:{
+          id:videoId
+        }
+      })
+    }
   },
 };
 </script>

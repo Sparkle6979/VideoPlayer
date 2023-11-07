@@ -51,3 +51,26 @@ export function uploadVideo(data){
         method:'PUT',
     })
 }
+
+export function getPlayerVideo(page,pageSize){
+    return request({
+        url:'/video',
+        params:{
+            page:page,
+            pageSize:pageSize
+        },
+        method:'GET'
+    })
+}
+
+export function getVideoComment(videoId,page,pageSize){
+    return request({
+        url:'/video/comment',
+        data:{
+            videoId:videoId,
+            page:page,
+            pageSize:pageSize
+        },
+        method:'POST'
+    })
+}

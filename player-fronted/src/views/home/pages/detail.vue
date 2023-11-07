@@ -184,18 +184,24 @@ export default {
         this.loading = false
         getUserInfo(res.data.createrId).then((user_res)=>{
           this.creater = user_res.data
-          followListById(this.user.id,1,100).then((res) => {
-            this.userFollows = res.data.records
-          }).catch(err => {
-            console.log("followListById",err)
-          })
+          if (this.isLogin) {
+            followListById(this.user.id,1,100).then((res) => {
+              this.userFollows = res.data.records
+            }).catch(err => {
+              console.log("followListById",err)
+            })
+          }else{
+            this.userFollows = []
+          }
         })
       })
       getVideoComment(id,0,100).then((res)=>{
         // console.log(res)
         this.commentList = res.data.records
       })
-      this.getCollectionDir()
+      if (this.isLogin) {
+        this.getCollectionDir()
+      }
     },
     updateComment(content,entityId,targetId){
       commentToComment(entityId,"comment",content,targetId).then((res)=>{
@@ -203,9 +209,15 @@ export default {
         if(res.code === 200){
           this.$message.success("评论成功！")
         }
+        if(res.code === 401){
+          this.$router.push('/login')
+          return
+        }
         getVideoComment(this.videoInfo.videoId,0,100).then((res)=>{
           this.commentList = res.data.records
         })
+      }).catch(err=> {
+        console.log(err)
       })
     },
     // 发表评论
@@ -217,7 +229,7 @@ export default {
             this.commentList = res.data.records
           })
         }
-      })
+      }).catch(err=>err)
       this.commentInput = ''
     },
     toDetailPage(videoId){
@@ -275,7 +287,7 @@ export default {
             })
             videoInfo.isLike = !videoInfo.isLike
           }
-        })
+        }).catch(err=>err)
       }else{
         dislikeVideo(videoInfo.videoId).then((res)=>{
           if(res.code === 200) {
@@ -285,7 +297,7 @@ export default {
             })
             videoInfo.isLike = !videoInfo.isLike
           }
-        })
+        }).catch(err=>err)
       }
       this.info.isLike = !this.info.isLike
     },

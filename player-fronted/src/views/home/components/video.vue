@@ -101,7 +101,7 @@ export default {
             message:'点赞成功',
             duration:400
           })
-        })
+        }).catch(err=>err)
       }else{
         dislikeVideo(this.info.videoId).then((res)=>{
           console.log(res)
@@ -109,7 +109,7 @@ export default {
             message:'取消点赞',
             duration:400
           })
-        })
+        }).catch(err=>err)
       }
       this.info.isLike = !this.info.isLike
     },

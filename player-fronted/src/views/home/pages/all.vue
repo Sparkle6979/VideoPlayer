@@ -15,11 +15,13 @@
           <el-row :gutter="20">
             <el-col :span="17">
               <videoPlayer
+                  class="video-player vjs-custom-skin"
                   :ref="`videoPlayer_${index}`"
                   :options="video.playerOptions"
+                  :playsinline="true"
               ></videoPlayer>
             </el-col>
-            <el-col :span="7">
+            <el-col :span="7" >
               <h4>{{video.title}}</h4>
               <span>{{video.description}}</span>
               <el-card style="background-color: #eeeeee;margin-top: 20px">
@@ -95,7 +97,8 @@ export default {
         prevEl: ".swiper-button-prev",
         nextEl: ".swiper-button-next",
       },
-      direction: 'vertical'
+      direction: 'vertical',
+      allowTouchMove:false
     }
 
     const testItem = {"id":3,"title":"踩水教学","categoryId":5,"likeCount":4,"description":"3分钟教会你如何踩水","createTime":1698387660000,"videoUrl":"http://s33fgajdq.hd-bkt.clouddn.com/%E8%B8%A9%E6%B0%B4%E6%95%99%E5%AD%A6.mp4","coverUrl":"http://s33fgajdq.hd-bkt.clouddn.com/%E8%B8%A9%E6%B0%B4%E6%95%99%E5%AD%A6.jpg","playerOptions":{"controls":true,"muted":true,"autoplay":true,"language":"zh-CN","preload":"auto","playbackRates":[0.5,1,1.5,2],"aspectRatio":"16:9","fluid":true,"notSupportedMessage":"此视频暂无法播放，请稍后再试","sources":[{"type":"video/mp4","src":"http://s33fgajdq.hd-bkt.clouddn.com/%E8%B8%A9%E6%B0%B4%E6%95%99%E5%AD%A6.mp4"}],"height":"100%"},"creater":{"id":1,"username":"admin","avatarPath":"http://s33fgajdq.hd-bkt.clouddn.com/头像.jpg"},"userFollows":[2,1,43]}
@@ -123,7 +126,7 @@ export default {
             // videojs options
             controls:true,
             muted: true,
-            autoplay: true,
+            autoplay: false,
             language: 'zh-CN',
             preload: 'auto',
             playbackRates: [0.5, 1.0, 1.5, 2.0],
@@ -266,6 +269,7 @@ export default {
   },
   mounted() {
     this.getPlayerVideoList()
+    this.curPage = Math.floor(Math.random() * Math.floor(5))
     this.$refs.myDiv.focus()
     this.$notify({
       title: '提示',

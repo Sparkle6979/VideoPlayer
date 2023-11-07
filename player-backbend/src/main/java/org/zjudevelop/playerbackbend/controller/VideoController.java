@@ -110,7 +110,6 @@ public class VideoController {
     public RestResult<List<VideoSearchInfoDTO>> getVideoSearchInfoByKeyword(@RequestParam String keyword) {
         List<VideoSearchInfoDTO> videoInfoByKeyword = videoService.getVideoInfoByKeyword(keyword);
 
-        Long userIdFromRequest = getUserIdFromRequest(request, jwtProperties);
         Long currentUserId = getUserIdFromRequest(request, jwtProperties);
 
         for (VideoSearchInfoDTO videoSearchInfoDTO : videoInfoByKeyword) {
@@ -155,7 +154,7 @@ public class VideoController {
         String token  = request.getHeader(jwtProperties.getUserTokenName());
 
         Long currentUserId = null;
-        if(StringUtils.isNotBlank(token)){
+        if(StringUtils.isNotBlank(token) && !("null".equals(token))){
             Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
             currentUserId = Long.valueOf(claims.get("user").toString());
         }

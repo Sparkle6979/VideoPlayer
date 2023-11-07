@@ -92,9 +92,10 @@ public class HomeController {
         }
         return RestResult.success(result);
     }
-    @CheckAuth(check = false)
+
     @ApiOperation("根据videoId获取视频信息")
     @RequestMapping(value = "/videoinfo", method = RequestMethod.GET)
+    @CheckAuth(check = false)
     public RestResult<VideoDetailInfoDTO> getVideoInfoByVideoId(@RequestParam Long videoId){
         VideoInfoDTO videoInfo = videoService.getVideoInfoById(videoId);
         UserInfoDTO createrInfoById = videoService.getCreaterInfoById(videoId);
@@ -146,7 +147,7 @@ public class HomeController {
         String token  = request.getHeader(jwtProperties.getUserTokenName());
 
         Long currentUserId = null;
-        if(StringUtils.isNotBlank(token)){
+        if(StringUtils.isNotBlank(token) && !("null".equals(token))){
             Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
             currentUserId = Long.valueOf(claims.get("user").toString());
         }

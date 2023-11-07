@@ -20,7 +20,7 @@ public class FileProcessUtil {
     public static String getFileOriginName(String url){
         // 除去filepath前后空格
         String filename = getFileName(url);
-        int ind = filename.indexOf('.');
+        int ind = filename.indexOf('.') == -1 ? filename.length() : filename.indexOf('.');
         return filename.substring(0,ind);
     }
 

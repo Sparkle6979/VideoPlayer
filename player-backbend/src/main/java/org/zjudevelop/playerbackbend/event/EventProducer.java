@@ -14,6 +14,10 @@ import org.zjudevelop.playerbackbend.pojo.Event;
  * @version 1.0
  * @data 2023/11/5 10:44
  */
+
+/**
+ * 事件通知的生产者，通过KafkaTemplate实现
+ */
 @Component
 public class EventProducer {
 

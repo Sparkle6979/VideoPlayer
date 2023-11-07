@@ -21,7 +21,7 @@
                 drag
                 action=""
                 :auto-upload="false"
-                :show-file-list="false"
+                :show-file-list="true"
                 :on-change="beforeVideoUpload"
                 :on-remove="handleVideoRemove"
                 accept=".mp4">
@@ -33,7 +33,7 @@
             <el-upload
                 drag
                 :auto-upload="false"
-                :show-file-list="false"
+                :show-file-list="true"
                 :on-change="beforeCoverUpload"
                 :on-remove="handleCoverRemove"
                 action=""

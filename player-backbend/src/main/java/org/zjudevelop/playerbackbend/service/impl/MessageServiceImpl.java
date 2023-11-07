@@ -90,4 +90,19 @@ public class MessageServiceImpl extends MessageConstant implements MessageServic
         messageMapper.updateById(messagePO);
         return messagePO;
     }
+
+
+    @Override
+    public MessagePO readMessage(String entityType,Long entityId) {
+
+        QueryWrapper<MessagePO> wrapper = new QueryWrapper<>();
+        wrapper.eq("conversation_type", entityType);
+        wrapper.like("content",entityId.toString());
+
+
+        MessagePO messagePO = messageMapper.selectOne(wrapper);
+        messagePO.setStatus((long) 1);
+        messageMapper.updateById(messagePO);
+        return messagePO;
+    }
 }

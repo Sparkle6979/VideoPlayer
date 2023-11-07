@@ -126,7 +126,7 @@ export default {
             // videojs options
             controls:true,
             muted: true,
-            autoplay: false,
+            autoplay: true,
             language: 'zh-CN',
             preload: 'auto',
             playbackRates: [0.5, 1.0, 1.5, 2.0],

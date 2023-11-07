@@ -77,8 +77,9 @@ public class MessageController extends MessageConstant {
 
         List<MessageInfoDTO> result = new ArrayList<>();
         for (MessagePO messagePO : collect) {
+            log.info(JSONObject.parseObject(messagePO.getContent(), Map.class).toString());
             Integer noticeId = (Integer) (JSONObject.parseObject(messagePO.getContent(), Map.class).get("noticeId"));
-
+            log.info("LONIN" + String.valueOf(noticeId.intValue()));
             Long entityId = followService.getFollowById((long) noticeId.intValue()).getFollowingId();
             MessageInfoDTO messageInfoDTO = DTOUtil.makePartialMessageInfoDTO(messagePO, entityId);
             messageInfoDTO.setCurrentUserName(userService.getUserById(messagePO.getToId()).getUsername());

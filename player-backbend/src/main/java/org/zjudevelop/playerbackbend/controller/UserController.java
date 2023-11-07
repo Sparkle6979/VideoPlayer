@@ -56,6 +56,9 @@ public class UserController extends MessageConstant {
     @Autowired
     JwtProperties jwtProperties;
 
+    @Autowired
+    MessageService messageService;
+
     @Value("${tmp_file_path}")
     String tmpFilePath;
 
@@ -255,6 +258,7 @@ public class UserController extends MessageConstant {
         if (returnValue <= 0) {
             return RestResult.fail("取关失败");
         }
+        messageService.readMessage(EVENT_USER_FOLLOW,followingId);
         return RestResult.success("取关成功");
     }
 
@@ -322,6 +326,8 @@ public class UserController extends MessageConstant {
         if (returnValue <= 0) {
             RestResult.fail("取消点赞失败");
         }
+        messageService.readMessage(EVENT_VIDEO_LIKE,videoId);
+
         return RestResult.success("取消点赞成功");
     }
 

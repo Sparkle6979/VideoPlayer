@@ -25,4 +25,6 @@ public interface MessageService {
     int insertMessage(MessagePO messagePO);
 
     MessagePO readMessage(Long MessageId);
+
+    MessagePO readMessage(String entityType,Long entityId);
 }

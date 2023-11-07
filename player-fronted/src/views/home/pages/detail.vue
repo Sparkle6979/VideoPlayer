@@ -250,13 +250,8 @@ export default {
         console.log(res)
         if (res.code === 200) {
           this.$message.success(`关注${this.creater.username}成功！`)
+          this.userFollows.push(this.creater.id)
         }
-        followListById(this.user.id).then((res) => {
-          console.log(res)
-          this.userFollows = res.data.followingIds
-        }).catch(err => {
-          console.log("showFollow",err)
-        })
       }).catch(err=>{
         console.log("follow",err)
       })
@@ -269,7 +264,7 @@ export default {
         }
         followListById(this.user.id).then((res) => {
           console.log(res)
-          this.userFollows = res.data.followingIds
+          this.userFollows = res.data.records
         }).catch(err => {
           console.log("showFollow",err)
         })
@@ -299,7 +294,6 @@ export default {
           }
         }).catch(err=>err)
       }
-      this.info.isLike = !this.info.isLike
     },
     collection(videoInfo){
       console.log(this.checkedDirs)
@@ -317,10 +311,11 @@ export default {
     getCollectionDir(){
       this.collectionData = []
       getCollection(1,100).then((res)=>{
+        console.log(res)
         res.data.records.forEach((item)=>{
+          this.collectionData.push(item)
           getVideoByCollectionId(item.id,1,100).then((res)=>{
             item.videos = res.data.records
-            this.collectionData.push(item)
           })
         })
       })
@@ -328,12 +323,14 @@ export default {
     unCollected(){
       let foundId;
       this.collectionData.forEach((dir)=>{
-        dir.videos.forEach((video)=>{
-          console.log(video.videoId,this.videoInfo.videoId)
-          if (video.videoId === this.videoInfo.videoId) {
-            foundId = dir.id
-          }
-        })
+        if(dir.videos){
+          dir.videos.forEach((video)=>{
+            console.log(video.videoId,this.videoInfo.videoId)
+            if (video.videoId === this.videoInfo.videoId) {
+              foundId = dir.id
+            }
+          })
+        }
       })
       undoCollection(foundId,this.videoInfo.videoId).then((res)=>{
         if(res.code === 200) {
@@ -347,28 +344,34 @@ export default {
     }
   },
   computed:{
-    ...mapState(['user']),
+    ...mapState(['user','isLogin']),
     showFollow(){
-      return !this.userFollows.includes(this.creater.id)
+      if(this.userFollows){
+        return !this.userFollows.includes(this.creater.id)
+      }
+      return true
     },
     isCollected(){
       let found = false
       this.collectionData.forEach((dir)=>{
-        dir.videos.forEach((video)=>{
-          console.log(video.videoId,this.videoInfo.videoId)
-          if (video.videoId === this.videoInfo.videoId) {
-            found = true
-          }
-        })
+        if (dir.videos){
+          dir.videos.forEach((video)=>{
+            console.log(video.videoId,this.videoInfo.videoId)
+            if (video.videoId === this.videoInfo.videoId) {
+              found = true
+            }
+          })
+        }
       })
       return found
     },
   },
-  mounted() {
-    this.initData(this.$route.params.id)
-  },
+  // mounted() {
+  //   this.initData(this.$route.params.id)
+  // },
   watch:{
     "$route.params.id":{
+      immediate:true,
       handler(){
         this.initData(this.$route.params.id)
       }

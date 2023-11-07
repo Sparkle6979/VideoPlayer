@@ -41,7 +41,7 @@
 
 <script>
 
-import {mapMutations} from "vuex";
+import {mapMutations, mapState} from "vuex";
 import {getUserInfo, userLogin, userRegister} from "@/api/user";
 
 export default {

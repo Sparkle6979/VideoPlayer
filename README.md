@@ -8,6 +8,7 @@ Demo讲解及演示视频链接：
 
 七牛云外链：[点击这里](http://s33fgajdq.hd-bkt.clouddn.com/demo.mp4) （可能需要缓冲一段时间）
 
+![开发组件工具图](./resources/images/开发组件工具.png)
 
 ---
 ### 目录

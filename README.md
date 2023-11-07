@@ -1,20 +1,24 @@
 ## VideoPlayer - ZJU5oftwar3
 
+[TOC]
 
-## 数据库说明
+## **数据库说明**
 
-#### 数据库ER图
+### 数据库ER图
 
 ![videoplayerfin](./resources/images/数据库ER图.png)
 
 
 ### 数据库建立说明
+可通过该项目静态资源文件夹 `resources/sql` 文件夹下找到建表对应的SQL语句
+
+启动`Mysql`服务后，执行以下命令：
+```sql
+source  ${project_path}/resources/sql/create_table.sql
+```
 
 
-
-
-
-## 架构说明
+## **架构说明**
 
 ### 功能模块图
 
@@ -185,12 +189,13 @@ PageResult getCollectionVideoByCollectionId(Long collectionId, PageQueryDTO page
 - 基本功能：实现用户对视频进行评论，同时支持用户对他人评论进行评论
 - 核心接口定义（选一些有代表性的）：
 
-```java
+```
 // 用户对实体（视频/评论）进行评论
 Long comment(CommentPO commentPO);
 // 获得某一视频下的所有评论信息
 List<VideoCommentDTO> getCommentByVideoId(Long videoId);
 ```
+
 
 - 实现细节
 
@@ -243,7 +248,7 @@ public class EventConsumer extends MessageConstant {
     - 点赞、收藏、评论等频繁的交互动作，如果系统通知每次都与底层 `DB` 交互会十分耗时，通过引入消息队列Kafka，用于实时流数据的发布和订阅，达到低数据延迟的目的
     - 不同的交互在Kafka中对应不同的Topic，在进行信息消费时，使用 `Json` 方式对数据进行反序列化
 
-**鉴权**
+#### 登陆鉴权
 
 - 基本功能：根据token进行鉴权
 - 核心接口定义：
@@ -252,12 +257,6 @@ public class EventConsumer extends MessageConstant {
 public static Claims parseJWT(String secretKey, String token);
 ```
 
-## 可改进的地方
-
--
-
-## 项目运行
-
-后端配置
-
-前端配置
+## **后续**
+- 前后端交互时个别请求会超时，可以考虑引入缓存 `Redis`
+- 增加推荐及直播功能，向用户精准推荐

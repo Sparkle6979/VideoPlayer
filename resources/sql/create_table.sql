@@ -1,3 +1,5 @@
+CREATE DATABASE `videoplayer` /*!40100 DEFAULT CHARACTER SET utf8 */;
+
 -- videoplayer.video definition
 
 CREATE TABLE `video` (

@@ -4,9 +4,6 @@
           <span style="cursor: pointer" @click="$router.push('/home')">VideoPlayer</span>
     </el-header>
     <el-main>
-      <el-button class="categoryBtn" style="margin-left: 10px" round @click="$router.push('/home/discover')" icon="el-icon-search">
-        发现
-      </el-button>
       <el-button class="categoryBtn" style="margin-left: 10px" round
                  v-for="c in categoryList" :key="c.categoryId" @click="toCategoryPage(c.categoryId)">{{ c.categoryName }}</el-button>
     </el-main>

@@ -19,3 +19,35 @@ export function getVideoById(videoId){
         methods:'GET'
     })
 }
+
+export function likeVideo(videoId){
+    return request({
+        url:`/user/likes/${videoId}`,
+        method:'POST'
+    })
+}
+
+export function dislikeVideo(videoId){
+    return request({
+        url:`/user/likes/${videoId}`,
+        method:'DELETE'
+    })
+}
+
+export function getVideoBySearch(keyword){
+    return request({
+        url:'/video/search',
+        params:{
+            keyword:keyword
+        },
+        method:'GET',
+    })
+}
+
+export function uploadVideo(data){
+    return request({
+        url:'/video/upload',
+        data: data,
+        method:'PUT',
+    })
+}

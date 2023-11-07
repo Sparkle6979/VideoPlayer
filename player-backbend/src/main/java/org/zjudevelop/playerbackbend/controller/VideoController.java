@@ -147,7 +147,7 @@ public class VideoController {
     @ApiOperation("分页查看视频评论")
     @CheckAuth(check = false)
     @RequestMapping(value = "/comment",method = RequestMethod.POST)
-    public RestResult<PageResult> getVideoCommentsInfoByKeyword(@RequestBody VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
+    public RestResult<PageResult> getVideoCommentsInfo(@RequestBody VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
         return RestResult.success(videoService.getCommentByVideoId(videoCommentsPageQueryDTO));
     }
 

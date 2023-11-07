@@ -153,6 +153,7 @@ public class VideoServiceImpl extends MessageConstant implements VideoService {
                     .commentId(comment.getId())
                     .commentUserId(comment.getUserId())
                     .commentUserName(userMapper.selectById(comment.getUserId()).getUsername())
+                    .commentUserAvatarPath(userMapper.selectById(comment.getUserId()).getAvatarPath())
                     .content(comment.getContent())
                     .createTime(comment.getCreateTime().toString())
                     .build();
@@ -169,6 +170,7 @@ public class VideoServiceImpl extends MessageConstant implements VideoService {
                         .commentId(comment.getId())
                         .commentUserId(commentPO.getUserId())
                         .commentUserName(userMapper.selectById(commentPO.getUserId()).getUsername())
+                        .commentUserAvatarPath(userMapper.selectById(commentPO.getUserId()).getAvatarPath())
                         .content(commentPO.getContent())
                         .createTime(commentPO.getCreateTime().toString())
                         .targetUserId(commentPO.getTargetId())

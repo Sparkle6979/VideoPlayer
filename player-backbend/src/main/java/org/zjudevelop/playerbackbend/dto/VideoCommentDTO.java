@@ -23,6 +23,9 @@ public class VideoCommentDTO {
     @ApiModelProperty(value = "评论者的userName")
     String commentUserName;
 
+    @ApiModelProperty(value = "评论者的头像URL")
+    String commentUserAvatarPath;
+
     @ApiModelProperty(value = "评论内容")
     String content;
 
@@ -34,6 +37,9 @@ public class VideoCommentDTO {
 
     @ApiModelProperty(value = "评论时间")
     String createTime;
+
+    @ApiModelProperty(value = "展示对话框")
+    boolean isdisplay;
 
     @ApiModelProperty(value = "追评")
     List<VideoCommentDTO> commentReply;

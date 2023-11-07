@@ -135,7 +135,6 @@ public class VideoServiceImpl extends MessageConstant implements VideoService {
 
     @Override
     public PageResult getCommentByVideoId(VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
-        log.info("进入service");
         Page<CommentPO> page = new Page<>(videoCommentsPageQueryDTO.getPage(), videoCommentsPageQueryDTO.getPageSize());
         QueryWrapper wrapper = new QueryWrapper<>();
         wrapper.eq("entity_type", COMMENT_TYPE_VIDEO);
@@ -154,6 +153,7 @@ public class VideoServiceImpl extends MessageConstant implements VideoService {
                     .commentId(comment.getId())
                     .commentUserId(comment.getUserId())
                     .commentUserName(userMapper.selectById(comment.getUserId()).getUsername())
+                    .commentUserAvatarPath(userMapper.selectById(comment.getUserId()).getAvatarPath())
                     .content(comment.getContent())
                     .createTime(comment.getCreateTime().toString())
                     .build();
@@ -170,6 +170,7 @@ public class VideoServiceImpl extends MessageConstant implements VideoService {
                         .commentId(comment.getId())
                         .commentUserId(commentPO.getUserId())
                         .commentUserName(userMapper.selectById(commentPO.getUserId()).getUsername())
+                        .commentUserAvatarPath(userMapper.selectById(commentPO.getUserId()).getAvatarPath())
                         .content(commentPO.getContent())
                         .createTime(commentPO.getCreateTime().toString())
                         .targetUserId(commentPO.getTargetId())

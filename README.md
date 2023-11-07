@@ -4,9 +4,10 @@
 
 Demo讲解及演示视频链接：
 
+哔哩哔哩：[点击这里](https://www.bilibili.com/video/BV1wu4y1h76i/?vd_source=b10cb586f9c4a450167223f4abe5d3c7) 
+
 七牛云外链：[点击这里](http://s33fgajdq.hd-bkt.clouddn.com/demo.mp4) （可能需要缓冲一段时间）
 
-哔哩哔哩：
 
 ---
 ### 目录

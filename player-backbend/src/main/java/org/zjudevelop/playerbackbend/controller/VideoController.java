@@ -148,7 +148,6 @@ public class VideoController {
     @CheckAuth(check = false)
     @RequestMapping(value = "/comment",method = RequestMethod.POST)
     public RestResult<PageResult> getVideoCommentsInfoByKeyword(@RequestBody VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
-        log.info("进入controller");
         return RestResult.success(videoService.getCommentByVideoId(videoCommentsPageQueryDTO));
     }
 

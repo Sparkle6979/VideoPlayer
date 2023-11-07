@@ -135,7 +135,6 @@ public class VideoServiceImpl extends MessageConstant implements VideoService {
 
     @Override
     public PageResult getCommentByVideoId(VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
-        log.info("进入service");
         Page<CommentPO> page = new Page<>(videoCommentsPageQueryDTO.getPage(), videoCommentsPageQueryDTO.getPageSize());
         QueryWrapper wrapper = new QueryWrapper<>();
         wrapper.eq("entity_type", COMMENT_TYPE_VIDEO);

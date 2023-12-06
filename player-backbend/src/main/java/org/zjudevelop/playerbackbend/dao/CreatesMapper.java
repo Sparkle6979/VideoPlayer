@@ -1,7 +1,7 @@
 package org.zjudevelop.playerbackbend.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.zjudevelop.playerbackbend.domain.Creates;
+import org.zjudevelop.playerbackbend.domain.po.Creates;
 
 /**
  * @author sparkle6979l

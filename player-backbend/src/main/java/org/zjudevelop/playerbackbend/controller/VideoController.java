@@ -8,8 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.zjudevelop.playerbackbend.common.context.BaseContext;
-import org.zjudevelop.playerbackbend.domain.Creates;
-import org.zjudevelop.playerbackbend.dto.*;
+import org.zjudevelop.playerbackbend.domain.po.Creates;
+import org.zjudevelop.playerbackbend.domain.dto.*;
 import org.zjudevelop.playerbackbend.pojo.CheckAuth;
 import org.zjudevelop.playerbackbend.pojo.JwtProperties;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
@@ -21,12 +21,10 @@ import org.zjudevelop.playerbackbend.utils.JwtUtil;
 import org.zjudevelop.playerbackbend.utils.PageResult;
 import org.zjudevelop.playerbackbend.utils.RestResult;
 import org.zjudevelop.playerbackbend.utils.FileProcessUtil;
-import org.zjudevelop.playerbackbend.utils.VideoProcessUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author sparkle6979l

@@ -1,6 +1,6 @@
 package org.zjudevelop.playerbackbend.service;
 
-import org.zjudevelop.playerbackbend.domain.Follows;
+import org.zjudevelop.playerbackbend.domain.po.Follows;
 
 /**
  * @author sparkle6979l

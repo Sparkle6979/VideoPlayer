@@ -7,17 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zjudevelop.playerbackbend.dao.CollectionMapper;
 import org.zjudevelop.playerbackbend.dao.CollectionVideoMapper;
-import org.zjudevelop.playerbackbend.domain.Collection;
-import org.zjudevelop.playerbackbend.domain.CollectionVideo;
-import org.zjudevelop.playerbackbend.domain.VideoPO;
-import org.zjudevelop.playerbackbend.dto.CollectionInfoDTO;
-import org.zjudevelop.playerbackbend.dto.PageQueryDTO;
-import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
+import org.zjudevelop.playerbackbend.domain.po.Collection;
+import org.zjudevelop.playerbackbend.domain.po.CollectionVideo;
+import org.zjudevelop.playerbackbend.domain.dto.PageQueryDTO;
+import org.zjudevelop.playerbackbend.domain.dto.VideoInfoDTO;
 import org.zjudevelop.playerbackbend.service.CollectionService;
 import org.zjudevelop.playerbackbend.utils.PageResult;
-
-import java.sql.Wrapper;
-import java.util.List;
 
 @Service
 @Slf4j

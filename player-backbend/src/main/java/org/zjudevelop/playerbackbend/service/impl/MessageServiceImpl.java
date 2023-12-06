@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zjudevelop.playerbackbend.dao.MessageMapper;
-import org.zjudevelop.playerbackbend.domain.MessagePO;
+import org.zjudevelop.playerbackbend.domain.po.MessagePO;
 import org.zjudevelop.playerbackbend.pojo.MessageConstant;
 import org.zjudevelop.playerbackbend.service.MessageService;
 

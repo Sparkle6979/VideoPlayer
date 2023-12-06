@@ -1,11 +1,7 @@
 package org.zjudevelop.playerbackbend.service;
 
-import org.zjudevelop.playerbackbend.domain.Collection;
-import org.zjudevelop.playerbackbend.dto.CollectionInfoDTO;
-import org.zjudevelop.playerbackbend.dto.PageQueryDTO;
+import org.zjudevelop.playerbackbend.domain.dto.PageQueryDTO;
 import org.zjudevelop.playerbackbend.utils.PageResult;
-
-import java.util.List;
 
 public interface CollectionService {
     int createCollection(Long userId, String collectionName);

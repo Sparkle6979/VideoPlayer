@@ -32,6 +32,11 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
+        // 请求方式发生错误
+        if("/error".equals(request.getRequestURI())){
+            return false;
+        }
+
         // check annotation of CheckAuth
         HandlerMethod hm = (HandlerMethod) handler;
         boolean check = true;
@@ -51,6 +56,7 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             BaseContext.setCurrentUserId(userId);
             return true;
         } catch (Exception ex) {
+            log.warn(request.getRequestURI() + " 请求失败，无有效token");
             response.setStatus(401);
             return false;
         }

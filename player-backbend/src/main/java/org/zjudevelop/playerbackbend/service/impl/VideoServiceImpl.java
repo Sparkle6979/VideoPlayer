@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zjudevelop.playerbackbend.dao.*;
-import org.zjudevelop.playerbackbend.domain.*;
-import org.zjudevelop.playerbackbend.dto.*;
+import org.zjudevelop.playerbackbend.domain.po.*;
+import org.zjudevelop.playerbackbend.domain.dto.*;
 import org.zjudevelop.playerbackbend.pojo.MessageConstant;
 import org.zjudevelop.playerbackbend.service.VideoService;
 import org.zjudevelop.playerbackbend.utils.DTOUtil;
@@ -16,7 +16,6 @@ import org.zjudevelop.playerbackbend.utils.PageResult;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author sparkle6979l

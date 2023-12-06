@@ -1,6 +1,6 @@
 package org.zjudevelop.playerbackbend.service;
 
-import org.zjudevelop.playerbackbend.domain.MessagePO;
+import org.zjudevelop.playerbackbend.domain.po.MessagePO;
 
 import java.util.List;
 

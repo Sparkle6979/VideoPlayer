@@ -2,7 +2,7 @@ package org.zjudevelop.playerbackbend.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.zjudevelop.playerbackbend.domain.MessagePO;
+import org.zjudevelop.playerbackbend.domain.po.MessagePO;
 
 /**
  * @author sparkle6979l

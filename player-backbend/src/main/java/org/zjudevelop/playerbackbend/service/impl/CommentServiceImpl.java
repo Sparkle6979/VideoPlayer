@@ -6,15 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zjudevelop.playerbackbend.dao.CommentMapper;
 import org.zjudevelop.playerbackbend.dao.UserMapper;
-import org.zjudevelop.playerbackbend.domain.CommentPO;
-import org.zjudevelop.playerbackbend.dto.VideoCommentDTO;
+import org.zjudevelop.playerbackbend.domain.po.CommentPO;
+import org.zjudevelop.playerbackbend.domain.dto.VideoCommentDTO;
 import org.zjudevelop.playerbackbend.pojo.MessageConstant;
 import org.zjudevelop.playerbackbend.service.CommentService;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author sparkle6979l

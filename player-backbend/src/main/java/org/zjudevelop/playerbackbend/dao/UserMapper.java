@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.zjudevelop.playerbackbend.domain.User;
+import org.zjudevelop.playerbackbend.domain.po.User;
 
 @Mapper
 public interface UserMapper extends BaseMapper<User> {

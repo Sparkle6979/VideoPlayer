@@ -1,6 +1,6 @@
 package org.zjudevelop.playerbackbend.service;
 
-import org.zjudevelop.playerbackbend.dto.CategoryInfoDTO;
+import org.zjudevelop.playerbackbend.domain.dto.CategoryInfoDTO;
 
 import java.util.List;
 

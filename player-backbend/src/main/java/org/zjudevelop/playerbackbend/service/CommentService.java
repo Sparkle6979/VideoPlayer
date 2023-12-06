@@ -1,7 +1,7 @@
 package org.zjudevelop.playerbackbend.service;
 
-import org.zjudevelop.playerbackbend.domain.CommentPO;
-import org.zjudevelop.playerbackbend.dto.VideoCommentDTO;
+import org.zjudevelop.playerbackbend.domain.po.CommentPO;
+import org.zjudevelop.playerbackbend.domain.dto.VideoCommentDTO;
 
 import java.util.List;
 

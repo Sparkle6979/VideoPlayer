@@ -1,13 +1,14 @@
 package org.zjudevelop.playerbackbend.utils;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.zjudevelop.playerbackbend.domain.*;
-import org.zjudevelop.playerbackbend.dto.*;
+import org.zjudevelop.playerbackbend.domain.po.CategoryPO;
+import org.zjudevelop.playerbackbend.domain.po.MessagePO;
+import org.zjudevelop.playerbackbend.domain.po.User;
+import org.zjudevelop.playerbackbend.domain.po.VideoPO;
+import org.zjudevelop.playerbackbend.domain.dto.*;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Map;
 
 /**
  * @author sparkle6979l
@@ -48,7 +49,7 @@ public class DTOUtil {
         return categoryInfoDTO;
     }
 
-    public static VideoSearchInfoDTO makeVideoSearchInfoDTO(String keyword, VideoPO videoPO,CategoryPO categoryPO){
+    public static VideoSearchInfoDTO makeVideoSearchInfoDTO(String keyword, VideoPO videoPO, CategoryPO categoryPO){
         VideoInfoDTO videoInfoDTO = makeVideoInfoDTO(videoPO, categoryPO);
         VideoSearchInfoDTO videoSearchInfoDTO = VideoSearchInfoDTO.builder()
                 .keyword(keyword)

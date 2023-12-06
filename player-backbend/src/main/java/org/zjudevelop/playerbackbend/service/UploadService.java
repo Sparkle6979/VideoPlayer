@@ -1,7 +1,7 @@
 package org.zjudevelop.playerbackbend.service;
 
 
-import org.zjudevelop.playerbackbend.dto.UploadFileInfoDTO;
+import org.zjudevelop.playerbackbend.domain.dto.UploadFileInfoDTO;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 
 /**

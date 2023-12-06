@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zjudevelop.playerbackbend.dao.LikesMapper;
-import org.zjudevelop.playerbackbend.domain.Likes;
+import org.zjudevelop.playerbackbend.domain.po.Likes;
 import org.zjudevelop.playerbackbend.service.LikeService;
 
 /**

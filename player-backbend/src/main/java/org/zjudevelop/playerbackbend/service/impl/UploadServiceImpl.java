@@ -11,7 +11,7 @@ import com.qiniu.util.Auth;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.zjudevelop.playerbackbend.dto.UploadFileInfoDTO;
+import org.zjudevelop.playerbackbend.domain.dto.UploadFileInfoDTO;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 import org.zjudevelop.playerbackbend.service.UploadService;
 import org.zjudevelop.playerbackbend.utils.FileProcessUtil;

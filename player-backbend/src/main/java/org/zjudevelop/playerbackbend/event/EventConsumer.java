@@ -6,12 +6,11 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-import org.zjudevelop.playerbackbend.domain.MessagePO;
+import org.zjudevelop.playerbackbend.domain.po.MessagePO;
 import org.zjudevelop.playerbackbend.pojo.Event;
 import org.zjudevelop.playerbackbend.pojo.MessageConstant;
 import org.zjudevelop.playerbackbend.service.MessageService;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 

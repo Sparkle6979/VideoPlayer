@@ -12,6 +12,8 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="backbend-player" target="1.8" />
+      <module name="player-backbend (1)" target="1.8" />
+      <module name="player-backbend (2)" target="1.8" />
       <module name="videoplayer" target="1.8" />
     </bytecodeTargetLevel>
   </component>
@@ -19,6 +21,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="backbend-player" options="-parameters" />
       <module name="player-backbend" options="-parameters" />
+      <module name="player-backbend (1)" options="-parameters" />
       <module name="videoplayer" options="-parameters" />
     </option>
   </component>

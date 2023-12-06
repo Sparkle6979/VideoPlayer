@@ -3,7 +3,7 @@ package org.zjudevelop.playerbackbend.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.zjudevelop.playerbackbend.dto.UploadFileInfoDTO;
+import org.zjudevelop.playerbackbend.domain.dto.UploadFileInfoDTO;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 import org.zjudevelop.playerbackbend.service.impl.UploadServiceImpl;
 import org.zjudevelop.playerbackbend.utils.RestResult;

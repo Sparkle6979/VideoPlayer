@@ -1,7 +1,7 @@
 package org.zjudevelop.playerbackbend.service;
 
-import org.zjudevelop.playerbackbend.domain.*;
-import org.zjudevelop.playerbackbend.dto.*;
+import org.zjudevelop.playerbackbend.domain.po.*;
+import org.zjudevelop.playerbackbend.domain.dto.*;
 import org.zjudevelop.playerbackbend.utils.PageResult;
 
 import java.util.List;

@@ -5,8 +5,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.zjudevelop.playerbackbend.domain.VideoPO;
-import org.zjudevelop.playerbackbend.dto.VideoUploadDTO;
+import org.zjudevelop.playerbackbend.domain.po.VideoPO;
 
 import java.util.List;
 

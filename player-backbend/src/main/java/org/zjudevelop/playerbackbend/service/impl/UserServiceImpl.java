@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.zjudevelop.playerbackbend.dao.*;
-import org.zjudevelop.playerbackbend.domain.*;
-import org.zjudevelop.playerbackbend.dto.*;
+import org.zjudevelop.playerbackbend.domain.po.*;
+import org.zjudevelop.playerbackbend.domain.dto.*;
 import org.zjudevelop.playerbackbend.utils.PageResult;
 import org.zjudevelop.playerbackbend.pojo.exception.AccountNotFoundException;
 import org.zjudevelop.playerbackbend.pojo.exception.BaseException;
@@ -18,7 +18,6 @@ import org.zjudevelop.playerbackbend.service.UserService;
 import org.zjudevelop.playerbackbend.utils.DTOUtil;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 

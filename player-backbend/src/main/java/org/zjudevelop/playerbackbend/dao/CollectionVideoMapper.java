@@ -1,16 +1,11 @@
 package org.zjudevelop.playerbackbend.dao;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.zjudevelop.playerbackbend.domain.CollectionVideo;
-import org.zjudevelop.playerbackbend.dto.VideoInfoDTO;
-
-import java.sql.Wrapper;
-import java.util.List;
+import org.zjudevelop.playerbackbend.domain.po.CollectionVideo;
+import org.zjudevelop.playerbackbend.domain.dto.VideoInfoDTO;
 
 @Mapper
 public interface CollectionVideoMapper extends BaseMapper<CollectionVideo> {

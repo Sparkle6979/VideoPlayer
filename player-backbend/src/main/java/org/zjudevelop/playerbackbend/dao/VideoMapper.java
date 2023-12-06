@@ -17,6 +17,7 @@ import java.util.List;
 @Mapper
 public interface VideoMapper extends BaseMapper<VideoPO> {
 
+    @Deprecated
     @Select(" select * from video "
             + "where category_id = #{categoryId} order by id")
     List<VideoPO> selectByCategoryId(@Param("categoryId") Long categoryId);
@@ -25,6 +26,7 @@ public interface VideoMapper extends BaseMapper<VideoPO> {
             "where id = #{id} for update")
     VideoPO selectByIdWithLock(@Param("id") Long id);
 
+    @Deprecated
     @Insert("INSERT INTO video " +
             "(title, category_id, like_count, description, create_time, video_url, cover_url) " +
             "VALUES(#{title}, #{categoryId}, 0, #{description}, CURRENT_TIMESTAMP, #{videoUrl}, #{coverUrl})")

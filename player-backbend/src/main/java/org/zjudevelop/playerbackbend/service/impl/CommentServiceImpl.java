@@ -1,6 +1,7 @@
 package org.zjudevelop.playerbackbend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class CommentServiceImpl extends MessageConstant implements CommentService{
+public class CommentServiceImpl extends ServiceImpl<CommentMapper,CommentPO> implements CommentService{
     @Autowired
     private UserMapper userMapper;
     @Autowired
@@ -29,7 +30,7 @@ public class CommentServiceImpl extends MessageConstant implements CommentServic
     @Override
     public List<VideoCommentDTO> getCommentByVideoId(Long videoId) {
         QueryWrapper wrapper = new QueryWrapper<>();
-        wrapper.eq("entity_type", COMMENT_TYPE_VIDEO);
+        wrapper.eq("entity_type", MessageConstant.COMMENT_TYPE_VIDEO);
         wrapper.eq("entity_id", videoId);
         List<CommentPO> comments = commentMapper.selectList(wrapper);
         List<VideoCommentDTO> result = new ArrayList<>();
@@ -45,7 +46,7 @@ public class CommentServiceImpl extends MessageConstant implements CommentServic
 
             Long commentId = comment.getId();
             QueryWrapper commentwrapper = new QueryWrapper<>();
-            commentwrapper.eq("entity_type", COMMENT_TYPE_COMMENT);
+            commentwrapper.eq("entity_type", MessageConstant.COMMENT_TYPE_COMMENT);
             commentwrapper.eq("entity_id", commentId);
             List<CommentPO> commentPOS = commentMapper.selectList(commentwrapper);
 

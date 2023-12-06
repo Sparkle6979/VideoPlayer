@@ -9,6 +9,7 @@ import org.zjudevelop.playerbackbend.domain.po.User;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 
+    @Deprecated
     @Select(" select * from user where username = #{username}")
     User selectByUsername(@Param("username") String username);
 }

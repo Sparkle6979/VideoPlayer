@@ -1,6 +1,7 @@
 package org.zjudevelop.playerbackbend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ import org.zjudevelop.playerbackbend.service.LikeService;
  */
 @Service
 @Slf4j
-public class LikeServiceImpl implements LikeService {
+public class LikeServiceImpl extends ServiceImpl<LikesMapper,Likes> implements LikeService {
     @Autowired
     LikesMapper likesMapper;
 
@@ -26,12 +27,13 @@ public class LikeServiceImpl implements LikeService {
     }
     @Override
     public Likes getLikesByUserIdAndVideoId(Long userId,Long videoId){
-        QueryWrapper wrapper = new QueryWrapper<>();
+        QueryWrapper<Likes> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId);
         wrapper.eq("video_id", videoId);
         return likesMapper.selectOne(wrapper);
     }
 
+    @Deprecated
     @Override
     public Likes getLikesById(Long likeId) {
         return likesMapper.selectById(likeId);

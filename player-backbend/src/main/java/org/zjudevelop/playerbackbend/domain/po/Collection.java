@@ -6,10 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @TableName(value = "collection")
-public class Collection {
+public class Collection implements Serializable {
 
     @TableId(type = IdType.AUTO)
     private Long id;

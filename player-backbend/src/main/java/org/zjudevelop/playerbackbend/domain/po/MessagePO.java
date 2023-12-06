@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
@@ -18,7 +19,7 @@ import java.sql.Timestamp;
 @Data
 @Builder
 @TableName(value = "message")
-public class MessagePO {
+public class MessagePO implements Serializable {
     @TableId(type = IdType.AUTO)
     Long id;
 

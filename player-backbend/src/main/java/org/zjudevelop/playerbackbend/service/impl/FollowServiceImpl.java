@@ -1,6 +1,7 @@
 package org.zjudevelop.playerbackbend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ import org.zjudevelop.playerbackbend.service.FollowService;
  */
 @Service
 @Slf4j
-public class FollowServiceImpl implements FollowService {
+public class FollowServiceImpl extends ServiceImpl<FollowsMapper,Follows> implements FollowService {
     @Autowired
     FollowsMapper followsMapper;
     @Override
@@ -27,6 +28,7 @@ public class FollowServiceImpl implements FollowService {
         return followsMapper.selectOne(wrapper);
     }
 
+    @Deprecated
     @Override
     public Follows getFollowById(Long followId) {
         return followsMapper.selectById(followId);

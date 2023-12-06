@@ -10,11 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.zjudevelop.playerbackbend.dao.*;
 import org.zjudevelop.playerbackbend.domain.po.*;
 import org.zjudevelop.playerbackbend.domain.dto.*;
+import org.zjudevelop.playerbackbend.service.*;
 import org.zjudevelop.playerbackbend.utils.PageResult;
 import org.zjudevelop.playerbackbend.pojo.exception.AccountNotFoundException;
 import org.zjudevelop.playerbackbend.pojo.exception.BaseException;
 import org.zjudevelop.playerbackbend.pojo.exception.PasswordErrorException;
-import org.zjudevelop.playerbackbend.service.UserService;
 import org.zjudevelop.playerbackbend.utils.DTOUtil;
 
 import java.util.ArrayList;
@@ -28,23 +28,34 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
+//    @Autowired
+//    private LikesMapper likesMapper;
     @Autowired
-    private LikesMapper likesMapper;
+    private LikeService likeService;
 
+//    @Autowired
+//    private FollowsMapper followsMapper;
     @Autowired
-    private FollowsMapper followsMapper;
+    private FollowService followService;
 
+//    @Autowired
+//    private CreatesMapper createsMapper;
     @Autowired
-    private CreatesMapper createsMapper;
+    private CreateService createService;
 
+//    @Autowired
+//    private VideoMapper videoMapper;
     @Autowired
-    private VideoMapper videoMapper;
+    private VideoService videoService;
 
-    @Autowired
-    private CategoryMapper categoryMapper;
+//    @Autowired
+//    private CategoryMapper categoryMapper;
+    private CategoryService categoryService;
 
+//    @Autowired
+//    private CommentMapper commentMapper;
     @Autowired
-    private CommentMapper commentMapper;
+    private CommentService commentService;
 
     @Override
     public User login(UserLoginDTO userLoginDTO){
@@ -99,12 +110,15 @@ public class UserServiceImpl implements UserService {
             return 0;
         }
 
-        // update likeCount
-        VideoPO videoPO = videoMapper.selectByIdWithLock(videoId);
+        // TODO: update likeCount
+//        VideoPO videoPO = videoMapper.selectByIdWithLock(videoId);
+        VideoPO videoPO = videoService.getById(videoId);
         videoPO.setLikeCount(videoPO.getLikeCount() + 1);
-        videoMapper.updateById(videoPO);
+        videoService.updateById(videoPO);
+//        videoMapper.updateById(videoPO);
 
-        return likesMapper.insert(likes);
+//        return likesMapper.insert(likes);
+        return Boolean.TRUE == likeService.save(likes) ? 1 : 0;
     }
 
     @Override

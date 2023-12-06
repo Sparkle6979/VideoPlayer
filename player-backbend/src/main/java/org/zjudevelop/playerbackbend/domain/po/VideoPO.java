@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -15,7 +16,8 @@ import java.util.Objects;
 @Data
 @Builder
 @TableName(value = "video")
-public class VideoPO {
+public class VideoPO implements Serializable {
+
     @TableId(type = IdType.AUTO)
     private Long id;
     /**

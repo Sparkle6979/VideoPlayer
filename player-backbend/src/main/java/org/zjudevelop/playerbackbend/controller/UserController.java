@@ -188,7 +188,9 @@ public class UserController extends MessageConstant {
                 .content(userCommentDTO.getContent())
                 .build();
 
-        Long commentId = userService.comment(build);
+//        Long commentId = userService.comment(build);
+
+        Long commentId = commentService.comment(build);
 
 
         Event event = Event.builder()
@@ -200,7 +202,8 @@ public class UserController extends MessageConstant {
         // 如果对视频进行评论，entityUserId为视频作者Id，否则为targetId
         if(COMMENT_TYPE_VIDEO.equals(userCommentDTO.getEntityType())){
             event.setEntityType(EVENT_VIDEO_COMMENT);
-            event.setEntityUserId(videoService.getCreaterInfoById(userCommentDTO.getEntityId()).getId());
+//            event.setEntityUserId(videoService.getCreaterInfoById(userCommentDTO.getEntityId()).getId());
+            event.setEntityId(userService.getCreaterInfoById(userCommentDTO.getEntityId()).getId());
         }else if(COMMENT_TYPE_COMMENT.equals(userCommentDTO.getEntityType())){
             event.setEntityType(EVENT_USER_COMMENT);
             event.setEntityUserId(userCommentDTO.getTargetId());
@@ -298,7 +301,8 @@ public class UserController extends MessageConstant {
                 .userId(currentUserId)
                 .entityType(EVENT_VIDEO_LIKE)
                 .entityId(likeService.getLikesByUserIdAndVideoId(currentUserId, videoId).getId())
-                .entityUserId(videoService.getCreaterInfoById(videoId).getId())
+//                .entityUserId(videoService.getCreaterInfoById(videoId).getId())
+                .entityUserId(userService.getCreaterInfoById(videoId).getId())
                 .build();
 
         eventProducer.fireEvent(build);

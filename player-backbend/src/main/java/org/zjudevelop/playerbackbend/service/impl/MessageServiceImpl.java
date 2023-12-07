@@ -1,6 +1,7 @@
 package org.zjudevelop.playerbackbend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class MessageServiceImpl extends MessageConstant implements MessageService {
+public class MessageServiceImpl extends ServiceImpl<MessageMapper,MessagePO> implements MessageService {
     @Autowired
     MessageMapper messageMapper;
 
@@ -50,7 +51,7 @@ public class MessageServiceImpl extends MessageConstant implements MessageServic
         QueryWrapper wrapper = new QueryWrapper<>();
         wrapper.eq("to_id", userId);
         wrapper.eq("status",0);
-        wrapper.eq("conversation_type",EVENT_VIDEO_LIKE);
+        wrapper.eq("conversation_type",MessageConstant.EVENT_VIDEO_LIKE);
 
         return messageMapper.selectList(wrapper);
     }
@@ -60,7 +61,7 @@ public class MessageServiceImpl extends MessageConstant implements MessageServic
         QueryWrapper wrapper = new QueryWrapper<>();
         wrapper.eq("to_id", userId);
         wrapper.eq("status",0);
-        wrapper.eq("conversation_type",EVENT_USER_FOLLOW);
+        wrapper.eq("conversation_type",MessageConstant.EVENT_USER_FOLLOW);
 
         return messageMapper.selectList(wrapper);
     }
@@ -71,9 +72,9 @@ public class MessageServiceImpl extends MessageConstant implements MessageServic
         wrapper.eq("to_id", userId);
         wrapper.eq("status",0);
         wrapper.and( wq -> {
-           wq.eq("conversation_type",EVENT_USER_COMMENT)
+           wq.eq("conversation_type",MessageConstant.EVENT_USER_COMMENT)
                    .or()
-                   .eq("conversation_type",EVENT_VIDEO_COMMENT);
+                   .eq("conversation_type",MessageConstant.EVENT_VIDEO_COMMENT);
         });
         return messageMapper.selectList(wrapper);
     }

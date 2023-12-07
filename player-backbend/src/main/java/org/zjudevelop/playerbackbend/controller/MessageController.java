@@ -57,6 +57,7 @@ public class MessageController extends MessageConstant {
             Integer noticeId = (Integer) (JSONObject.parseObject(messagePO.getContent(), Map.class).get("noticeId"));
 
             Long entityId = likeService.getLikesById((long) noticeId.intValue()).getVideoId();
+
             MessageInfoDTO messageInfoDTO = DTOUtil.makePartialMessageInfoDTO(messagePO, entityId);
             messageInfoDTO.setCurrentUserName(userService.getUserById(messagePO.getToId()).getUsername());
             messageInfoDTO.setEventUserName(userService.getUserById(messageInfoDTO.getEventUserId()).getUsername());

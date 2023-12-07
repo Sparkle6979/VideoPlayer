@@ -19,11 +19,13 @@ public interface VideoService extends IService<VideoPO> {
 
     List<VideoSearchInfoDTO> getVideoInfoByKeyword(String keyword);
 
-    UserInfoDTO getCreaterInfoById(Long videoId);
+//    UserInfoDTO getCreaterInfoById(Long videoId);
 
     PageResult getVideos(VideosPageQueryDTO videosPageQueryDTO);
 
-    List<VideoCommentDTO> getCommentByVideoId(Long videoId);
+//    List<VideoCommentDTO> getCommentByVideoId(Long videoId);
 
-    PageResult getCommentByVideoId(VideoCommentsPageQueryDTO videoCommentsPageQueryDTO);
+//    PageResult getCommentByVideoId(VideoCommentsPageQueryDTO videoCommentsPageQueryDTO);
+
+    List<VideoInfoDTO> getVideosByCreatorId(Long userId);
 }

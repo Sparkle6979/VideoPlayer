@@ -2,7 +2,6 @@ package org.zjudevelop.playerbackbend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,32 +32,32 @@ import java.util.List;
 public class VideoServiceImpl extends ServiceImpl<VideoMapper,VideoPO> implements VideoService {
 
     @Autowired
-    private VideoMapper videoMapper;
+    VideoMapper videoMapper;
 
 //    @Autowired
 //    private CategoryMapper categoryMapper;
 
     @Autowired
-    private CategoryService categoryService;
+    CategoryService categoryService;
 
 //
 //    @Autowired
 //    private CreatesMapper createsMapper;
 
     @Autowired
-    private CreateService createService;
+    CreateService createService;
 //
 //    @Autowired
 //    private UserMapper userMapper;
 
-    @Autowired
-    private UserService userService;
+//    @Autowired
+//    UserService userService;
 
 //    @Autowired
 //    private CommentMapper commentMapper;
 
-    @Autowired
-    private CommentService commentService;
+//    @Autowired
+//    CommentService commentService;
 
     @Override
     public VideoInfoDTO getVideoInfoById(Long videoId) {
@@ -128,17 +127,17 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper,VideoPO> implement
      * @param videoId
      * @return
      */
-    @Override
-    public UserInfoDTO getCreaterInfoById(Long videoId) {
-        QueryWrapper wrapper = new QueryWrapper<>();
-        wrapper.eq("video_id", videoId);
-
-        Creates creates = createService.getOne(wrapper);
-
-        User user = userService.getUserById(creates.getUserId());
-
-        return DTOUtil.makeUserInfoDTO(user);
-    }
+//    @Override
+//    public UserInfoDTO getCreaterInfoById(Long videoId) {
+//        QueryWrapper wrapper = new QueryWrapper<>();
+//        wrapper.eq("video_id", videoId);
+//
+//        Creates creates = createService.getOne(wrapper);
+//
+//        User user = userService.getUserById(creates.getUserId());
+//
+//        return DTOUtil.makeUserInfoDTO(user);
+//    }
 
     @Override
     public PageResult getVideos(VideosPageQueryDTO videosPageQueryDTO) {
@@ -152,81 +151,105 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper,VideoPO> implement
      * @param videoId
      * @return
      */
-    @Override
-    public List<VideoCommentDTO> getCommentByVideoId(Long videoId) {
-        QueryWrapper<CommentPO> wrapper = new QueryWrapper<>();
-        wrapper.eq("entity_type", MessageConstant.COMMENT_TYPE_VIDEO);
-        wrapper.eq("entity_id", videoId);
-        List<CommentPO> comments = commentService.list(wrapper);
-//        List<CommentPO> comments = commentMapper.selectList(wrapper);
-        List<VideoCommentDTO> result = makeVideoCommentDTO(comments);
-
-        return  result;
-    }
+//    @Override
+//    public List<VideoCommentDTO> getCommentByVideoId(Long videoId) {
+//        QueryWrapper<CommentPO> wrapper = new QueryWrapper<>();
+//        wrapper.eq("entity_type", MessageConstant.COMMENT_TYPE_VIDEO);
+//        wrapper.eq("entity_id", videoId);
+//        List<CommentPO> comments = commentService.list(wrapper);
+////        List<CommentPO> comments = commentMapper.selectList(wrapper);
+//        List<VideoCommentDTO> result = makeVideoCommentDTO(comments);
+//
+//        return  result;
+//    }
 
     /**
      * 分页查询视频评论
      * @param videoCommentsPageQueryDTO
      * @return
      */
+//    @Override
+//    public PageResult getCommentByVideoId(VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
+//        Page<CommentPO> page = new Page<>(videoCommentsPageQueryDTO.getPage(), videoCommentsPageQueryDTO.getPageSize());
+//        QueryWrapper<CommentPO> wrapper = new QueryWrapper<>();
+//        wrapper.eq("entity_type", MessageConstant.COMMENT_TYPE_VIDEO);
+//        wrapper.eq("entity_id", videoCommentsPageQueryDTO.getVideoId());
+//
+//        Page<CommentPO> pageResult = commentService.page(page, wrapper);
+////        Page<CommentPO> pageResult = commentMapper.selectPage(page, wrapper);
+//
+//        List<VideoCommentDTO> result = makeVideoCommentDTO(pageResult.getRecords());
+//        return new PageResult(result.size(),result);
+//    }
+
     @Override
-    public PageResult getCommentByVideoId(VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
-        Page<CommentPO> page = new Page<>(videoCommentsPageQueryDTO.getPage(), videoCommentsPageQueryDTO.getPageSize());
-        QueryWrapper<CommentPO> wrapper = new QueryWrapper<>();
-        wrapper.eq("entity_type", MessageConstant.COMMENT_TYPE_VIDEO);
-        wrapper.eq("entity_id", videoCommentsPageQueryDTO.getVideoId());
+    public List<VideoInfoDTO> getVideosByCreatorId(Long userId) {
+        QueryWrapper<Creates> createsWrapper = new QueryWrapper<>();
+        createsWrapper.eq("user_id", userId);
 
-        Page<CommentPO> pageResult = commentService.page(page, wrapper);
-//        Page<CommentPO> pageResult = commentMapper.selectPage(page, wrapper);
+//        List<Creates> createsList = createsMapper.selectList(createsWrapper);
+        List<Creates> createsList = createService.list(createsWrapper);
 
-        List<VideoCommentDTO> result = makeVideoCommentDTO(pageResult.getRecords());
-        return new PageResult(result.size(),result);
-    }
+        List<VideoInfoDTO> result = new ArrayList<>();
+        for (Creates creates : createsList) {
+//            VideoPO videoPO = videoMapper.selectById(creates.getVideoId());
+//            VideoPO videoPO = videoService.getById(creates.getVideoId());
+            VideoPO videoPO = videoMapper.selectById(creates.getVideoId());
+
+            String categoryName = categoryService.getById(videoPO.getCategoryId()).getCategoryName();
+//            CategoryPO categoryPO = categoryMapper.selectById(videoPO.getCategoryId());
 
 
-    public List<VideoCommentDTO> makeVideoCommentDTO(List<CommentPO> comments){
-        List<VideoCommentDTO> result = new ArrayList<>();
-        for (CommentPO comment : comments) {
-            VideoCommentDTO build = VideoCommentDTO.builder()
-                    .commentId(comment.getId())
-                    .commentUserId(comment.getUserId())
-                    .commentUserName(userService.getUserById(comment.getUserId()).getUsername())
-//                    .commentUserName(userMapper.selectById(comment.getUserId()).getUsername())
-                    .commentUserAvatarPath(userService.getUserById(comment.getUserId()).getAvatarPath())
-                    .content(comment.getContent())
-                    .createTime(comment.getCreateTime().toString())
-                    .build();
-
-            Long commentId = comment.getId();
-
-            QueryWrapper<CommentPO> commentwrapper = new QueryWrapper<>();
-            commentwrapper.eq("entity_type", MessageConstant.COMMENT_TYPE_COMMENT);
-            commentwrapper.eq("entity_id", commentId);
-            List<CommentPO> commentPOS = commentService.list(commentwrapper);
-//            List<CommentPO> commentPOS = commentMapper.selectList(commentwrapper);
-
-            List<VideoCommentDTO> commentReply = new ArrayList<>();
-            for (CommentPO commentPO : commentPOS) {
-                VideoCommentDTO commentbuild = VideoCommentDTO.builder()
-                        .commentId(comment.getId())
-                        .commentUserId(commentPO.getUserId())
-                        .commentUserName(userService.getUserById(commentPO.getUserId()).getUsername())
-//                        .commentUserName(userMapper.selectById(commentPO.getUserId()).getUsername())
-                        .commentUserAvatarPath(userService.getUserById(commentPO.getUserId()).getAvatarPath())
-//                        .commentUserAvatarPath(userMapper.selectById(commentPO.getUserId()).getAvatarPath())
-                        .content(commentPO.getContent())
-                        .createTime(commentPO.getCreateTime().toString())
-                        .targetUserId(commentPO.getTargetId())
-                        .targetUserName(userService.getUserById(commentPO.getTargetId()).getUsername())
-//                        .targetUserName(userMapper.selectById(commentPO.getTargetId()).getUsername())
-                        .build();
-
-                commentReply.add(commentbuild);
-            }
-            build.setCommentReply(commentReply);
-
-            result.add(build);
+            VideoInfoDTO videoInfoDTO = DTOUtil.makeVideoInfoDTO(videoPO,categoryName);
+            result.add(videoInfoDTO);
         }
         return result;
     }
+
+
+//    public List<VideoCommentDTO> makeVideoCommentDTO(List<CommentPO> comments){
+//        List<VideoCommentDTO> result = new ArrayList<>();
+//        for (CommentPO comment : comments) {
+//            VideoCommentDTO build = VideoCommentDTO.builder()
+//                    .commentId(comment.getId())
+//                    .commentUserId(comment.getUserId())
+//                    .commentUserName(userService.getUserById(comment.getUserId()).getUsername())
+////                    .commentUserName(userMapper.selectById(comment.getUserId()).getUsername())
+//                    .commentUserAvatarPath(userService.getUserById(comment.getUserId()).getAvatarPath())
+//                    .content(comment.getContent())
+//                    .createTime(comment.getCreateTime().toString())
+//                    .build();
+//
+//            Long commentId = comment.getId();
+//
+//            QueryWrapper<CommentPO> commentwrapper = new QueryWrapper<>();
+//            commentwrapper.eq("entity_type", MessageConstant.COMMENT_TYPE_COMMENT);
+//            commentwrapper.eq("entity_id", commentId);
+//            List<CommentPO> commentPOS = commentService.list(commentwrapper);
+////            List<CommentPO> commentPOS = commentMapper.selectList(commentwrapper);
+//
+//            List<VideoCommentDTO> commentReply = new ArrayList<>();
+//            for (CommentPO commentPO : commentPOS) {
+//                VideoCommentDTO commentbuild = VideoCommentDTO.builder()
+//                        .commentId(comment.getId())
+//                        .commentUserId(commentPO.getUserId())
+//                        .commentUserName(userService.getUserById(commentPO.getUserId()).getUsername())
+////                        .commentUserName(userMapper.selectById(commentPO.getUserId()).getUsername())
+//                        .commentUserAvatarPath(userService.getUserById(commentPO.getUserId()).getAvatarPath())
+////                        .commentUserAvatarPath(userMapper.selectById(commentPO.getUserId()).getAvatarPath())
+//                        .content(commentPO.getContent())
+//                        .createTime(commentPO.getCreateTime().toString())
+//                        .targetUserId(commentPO.getTargetId())
+//                        .targetUserName(userService.getUserById(commentPO.getTargetId()).getUsername())
+////                        .targetUserName(userMapper.selectById(commentPO.getTargetId()).getUsername())
+//                        .build();
+//
+//                commentReply.add(commentbuild);
+//            }
+//            build.setCommentReply(commentReply);
+//
+//            result.add(build);
+//        }
+//        return result;
+//    }
 }

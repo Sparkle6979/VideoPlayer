@@ -1,12 +1,13 @@
 package org.zjudevelop.playerbackbend.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.zjudevelop.playerbackbend.domain.po.*;
 import org.zjudevelop.playerbackbend.domain.dto.*;
 import org.zjudevelop.playerbackbend.utils.PageResult;
 
 import java.util.List;
 
-public interface UserService {
+public interface UserService extends IService<User> {
     public User login(UserLoginDTO userLoginDTO);
 
     User registry(UserRegisterDTO userRegisterDTO);
@@ -31,7 +32,7 @@ public interface UserService {
 
     int unfollow(Follows follows);
 
-    Long comment(CommentPO commentPO);
+//    Long comment(CommentPO commentPO);
 
     List<Follows> getFollowings(Long userId);
 
@@ -41,9 +42,9 @@ public interface UserService {
 
     PageResult getFollowers(FollowersPageQueryDTO followersPageQueryDTO);
 
-    List<VideoInfoDTO> getOwnVideosById(Long userId);
-
     boolean isAlreadyLiked(Long userId, Long videoId);
 
     boolean isAlreadyFollowed(Long followerId, Long followingId);
+
+    UserInfoDTO getCreaterInfoById(Long videoId);
 }

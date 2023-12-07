@@ -49,8 +49,8 @@ public class HomeController {
     @Autowired
     private HttpServletRequest request;
 
-    @Autowired
-    private LikeService likeService;
+//    @Autowired
+//    private LikeService likeService;
 
     @Autowired
     private JwtProperties jwtProperties;
@@ -83,7 +83,8 @@ public class HomeController {
                     .videoUrl(videoInfoDTO.getVideoUrl())
                     .coverUrl(videoInfoDTO.getCoverUrl())
                     .build();
-            if(null != currentUserId && likeService.IfLikes(currentUserId,videoInfoDTO.getVideoId())){
+//            if(null != currentUserId && likeService.IfLikes(currentUserId,videoInfoDTO.getVideoId())){
+            if(null != currentUserId && userService.isAlreadyLiked(currentUserId,videoInfoDTO.getVideoId())){
                 build.setIsLike(Boolean.TRUE);
             }else {
                 build.setIsLike(Boolean.FALSE);
@@ -98,13 +99,14 @@ public class HomeController {
     @CheckAuth(check = false)
     public RestResult<VideoDetailInfoDTO> getVideoInfoByVideoId(@RequestParam Long videoId){
         VideoInfoDTO videoInfo = videoService.getVideoInfoById(videoId);
-        UserInfoDTO createrInfoById = videoService.getCreaterInfoById(videoId);
+//        UserInfoDTO createrInfoById = videoService.getCreaterInfoById(videoId);
+        UserInfoDTO createrInfoById = userService.getCreaterInfoById(videoId);
 
         Long currentUserId = getUserIdFromRequest(request, jwtProperties);
 
 
         // 取前3个作为代表作
-        List<VideoInfoDTO> ownVideosById = userService.getOwnVideosById(createrInfoById.getId())
+        List<VideoInfoDTO> ownVideosById = videoService.getVideosByCreatorId(createrInfoById.getId())
                 .stream()
                 .filter(videoInfoDTO -> videoInfoDTO.getVideoId() != videoId)
                 .sorted(new Comparator<VideoInfoDTO>() {
@@ -129,7 +131,8 @@ public class HomeController {
                 .coverUrl(videoInfo.getCoverUrl())
                 .createrId(createrInfoById.getId())
                 .createrWorks(ownVideosById)
-                .isLike(Boolean.TRUE ? likeService.IfLikes(currentUserId,videoId) : Boolean.FALSE)
+//                .isLike(Boolean.TRUE ? likeService.IfLikes(currentUserId,videoId) : Boolean.FALSE)
+                .isLike(userService.isAlreadyLiked(currentUserId,videoId) ? Boolean.TRUE : Boolean.FALSE)
                 .build();
 
         return RestResult.success(build);

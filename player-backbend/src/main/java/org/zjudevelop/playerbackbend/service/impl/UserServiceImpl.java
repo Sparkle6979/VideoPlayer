@@ -2,6 +2,7 @@ package org.zjudevelop.playerbackbend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,39 +24,39 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements UserService {
 
     @Autowired
-    private UserMapper userMapper;
+    UserMapper userMapper;
 
 //    @Autowired
 //    private LikesMapper likesMapper;
     @Autowired
-    private LikeService likeService;
+    LikeService likeService;
 
 //    @Autowired
 //    private FollowsMapper followsMapper;
     @Autowired
-    private FollowService followService;
+    FollowService followService;
 
 //    @Autowired
 //    private CreatesMapper createsMapper;
     @Autowired
-    private CreateService createService;
+    CreateService createService;
 
 //    @Autowired
 //    private VideoMapper videoMapper;
     @Autowired
-    private VideoService videoService;
+    VideoService videoService;
 
 //    @Autowired
 //    private CategoryMapper categoryMapper;
-    private CategoryService categoryService;
+    CategoryService categoryService;
 
 //    @Autowired
 //    private CommentMapper commentMapper;
-    @Autowired
-    private CommentService commentService;
+//    @Autowired
+//    CommentService commentService;
 
     @Override
     public User login(UserLoginDTO userLoginDTO){
@@ -131,45 +132,58 @@ public class UserServiceImpl implements UserService {
             return 0;
         }
 
+        // TODO: 加锁
         // update likeCount
-        VideoPO videoPO = videoMapper.selectByIdWithLock(videoId);
-        videoPO.setLikeCount(videoPO.getLikeCount() - 1);
-        videoMapper.updateById(videoPO);
+//        VideoPO videoPO = videoMapper.selectByIdWithLock(videoId);
+        VideoPO videoPO = videoService.getById(videoId);
 
-        QueryWrapper wrapper = new QueryWrapper<>();
+        videoPO.setLikeCount(videoPO.getLikeCount() - 1);
+
+        videoService.save(videoPO);
+//        videoMapper.updateById(videoPO);
+
+        QueryWrapper<Likes> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", likes.getUserId());
         wrapper.eq("video_id", likes.getVideoId());
-        return likesMapper.delete(wrapper);
+
+//        return likesMapper.delete(wrapper);
+        return Boolean.TRUE == likeService.remove(wrapper) ? 1 : 0;
     }
 
     @Override
     public List<Likes> getLikes(Long userId) {
-        QueryWrapper wrapper = new QueryWrapper<>();
+        QueryWrapper<Likes> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId);
-        List<Likes> likesList = likesMapper.selectList(wrapper);
+
+//        List<Likes> likesList = likesMapper.selectList(wrapper);
+        List<Likes> likesList = likeService.list(wrapper);
         return likesList;
     }
 
     @Override
     public PageResult getLikes(Long userId, LikesPageQueryDTO likesPageQueryDTO) {
         Page<Likes> page = new Page<>(likesPageQueryDTO.getPage(), likesPageQueryDTO.getPageSize());
-        QueryWrapper queryWrapper = new QueryWrapper<>();
+        QueryWrapper<Likes> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);
-        Page<Likes> pageResult = likesMapper.selectPage(page, queryWrapper);
+//        Page<Likes> pageResult = likesMapper.selectPage(page, queryWrapper);
+        Page<Likes> pageResult = likeService.page(page, queryWrapper);
         List<Long>  likesList = pageResult.getRecords().stream().map(Likes::getVideoId).collect(Collectors.toList());
         return new PageResult(pageResult.getTotal(), likesList);
     }
 
+
     @Override
     public int create(Creates creates) {
-        return createsMapper.insert(creates);
+//        return createsMapper.insert(creates);
+        return Boolean.TRUE == createService.save(creates) ? 1 : 0;
     }
 
     @Override
     public List<Creates> getCreates(Long userId) {
-        QueryWrapper wrapper = new QueryWrapper<>();
+        QueryWrapper<Creates> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId);
-        List<Creates> createsList = createsMapper.selectList(wrapper);
+//        List<Creates> createsList = createsMapper.selectList(wrapper);
+        List<Creates> createsList = createService.list(wrapper);
         return createsList;
     }
 
@@ -178,55 +192,70 @@ public class UserServiceImpl implements UserService {
         if (this.isAlreadyFollowed(follows.getFollowerId(), follows.getFollowingId())) {
             return 0;
         }
-        return followsMapper.insert(follows);
+        return Boolean.TRUE == followService.save(follows) ? 1 : 0;
+//        return followsMapper.insert(follows);
     }
 
     @Override
     public int unfollow(Follows follows) {
-        QueryWrapper wrapper = new QueryWrapper<>();
+        QueryWrapper<Follows> wrapper = new QueryWrapper<>();
         wrapper.eq("follower_id", follows.getFollowerId());
         wrapper.eq("following_id", follows.getFollowingId());
-        return followsMapper.delete(wrapper);
+
+        return Boolean.TRUE == followService.remove(wrapper) ? 1 : 0;
+//        return followsMapper.delete(wrapper);
     }
 
-    @Override
-    public Long comment(CommentPO commentPO) {
-         commentMapper.insert(commentPO);
-         return commentPO.getId();
-    }
+//    @Override
+//    public Long comment(CommentPO commentPO) {
+////         commentMapper.insert(commentPO);
+//         commentService.save(commentPO);
+//         return commentPO.getId();
+//    }
 
     @Override
     public List<Follows> getFollowings(Long userId) {
-        QueryWrapper wrapper = new QueryWrapper<>();
+        QueryWrapper<Follows> wrapper = new QueryWrapper<>();
         wrapper.eq("follower_id", userId);
-        List<Follows> followsList = followsMapper.selectList(wrapper);
+
+//        List<Follows> followsList = followsMapper.selectList(wrapper);
+        List<Follows> followsList = followService.list(wrapper);
         return followsList;
     }
 
     @Override
     public PageResult getFollowings(FollowingsPageQueryDTO followingsPageQueryDTO) {
         Page<Follows> page = new Page<>(followingsPageQueryDTO.getPage(), followingsPageQueryDTO.getPageSize());
-        QueryWrapper queryWrapper = new QueryWrapper<>();
+        QueryWrapper<Follows> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("follower_id", followingsPageQueryDTO.getId());
-        Page<Follows> pageResult = followsMapper.selectPage(page, queryWrapper);
+
+        Page<Follows> pageResult = followService.page(page, queryWrapper);
+//        Page<Follows> pageResult = followsMapper.selectPage(page, queryWrapper);
         List<Long> followingsList = pageResult.getRecords().stream().map(Follows::getFollowingId).collect(Collectors.toList());
         return new PageResult(pageResult.getTotal(), followingsList);
     }
 
     @Override
     public List<Follows> getFollowers(Long userId) {
-        QueryWrapper wrapper = new QueryWrapper<>();
+        QueryWrapper<Follows> wrapper = new QueryWrapper<>();
         wrapper.eq("following_id", userId);
-        List<Follows> followsList = followsMapper.selectList(wrapper);
+
+//        List<Follows> followsList = followsMapper.selectList(wrapper);
+        List<Follows> followsList = followService.list(wrapper);
+
         return followsList;
     }
 
     @Override
     public PageResult getFollowers(FollowersPageQueryDTO followersPageQueryDTO) {
         Page<Follows> page = new Page<>(followersPageQueryDTO.getPage(), followersPageQueryDTO.getPageSize());
-        QueryWrapper queryWrapper = new QueryWrapper<>();
+
+        QueryWrapper<Follows> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("following_id", followersPageQueryDTO.getId());
-        Page<Follows> pageResult = followsMapper.selectPage(page, queryWrapper);
+
+//        Page<Follows> pageResult = followsMapper.selectPage(page, queryWrapper);
+        Page<Follows> pageResult = followService.page(page, queryWrapper);
+
         List<Follows> records = pageResult.getRecords();
         List<Long> followersList = records.stream().map(Follows::getFollowerId).collect(Collectors.toList());
         return new PageResult(pageResult.getTotal(), followersList);
@@ -238,40 +267,61 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    @Override
-    public List<VideoInfoDTO> getOwnVideosById(Long userId) {
-        QueryWrapper createsWrapper = new QueryWrapper<>();
-        createsWrapper.eq("user_id", userId);
-        List<Creates> createsList = createsMapper.selectList(createsWrapper);
-
-
-        List<VideoInfoDTO> result = new ArrayList<>();
-        for (Creates creates : createsList) {
-            VideoPO videoPO = videoMapper.selectById(creates.getVideoId());
-            CategoryPO categoryPO = categoryMapper.selectById(videoPO.getCategoryId());
-            VideoInfoDTO videoInfoDTO = DTOUtil.makeVideoInfoDTO(videoPO,categoryPO);
-            result.add(videoInfoDTO);
-        }
-        return result;
-    }
+//    @Override
+//    public List<VideoInfoDTO> getOwnVideosById(Long userId) {
+//        QueryWrapper<Creates> createsWrapper = new QueryWrapper<>();
+//        createsWrapper.eq("user_id", userId);
+//
+////        List<Creates> createsList = createsMapper.selectList(createsWrapper);
+//        List<Creates> createsList = createService.list(createsWrapper);
+//
+//        List<VideoInfoDTO> result = new ArrayList<>();
+//        for (Creates creates : createsList) {
+////            VideoPO videoPO = videoMapper.selectById(creates.getVideoId());
+//            VideoPO videoPO = videoService.getById(creates.getVideoId());
+//
+//            String categoryName = categoryService.getById(videoPO.getCategoryId()).getCategoryName();
+////            CategoryPO categoryPO = categoryMapper.selectById(videoPO.getCategoryId());
+//
+//
+//            VideoInfoDTO videoInfoDTO = DTOUtil.makeVideoInfoDTO(videoPO,categoryName);
+//            result.add(videoInfoDTO);
+//        }
+//        return result;
+//    }
 
     @Override
     public boolean isAlreadyLiked(Long userId, Long videoId) {
-        QueryWrapper wrapper = new QueryWrapper<>();
+        QueryWrapper<Likes> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId);
         wrapper.eq("video_id", videoId);
 
-        Long count = likesMapper.selectCount(wrapper);
+//        Long count = likesMapper.selectCount(wrapper);
+        long count = likeService.count(wrapper);
         return count > 0;
     }
 
     @Override
     public boolean isAlreadyFollowed(Long followerId, Long followingId) {
-        QueryWrapper wrapper = new QueryWrapper<>();
+        QueryWrapper<Follows> wrapper = new QueryWrapper<>();
         wrapper.eq("follower_id", followerId);
         wrapper.eq("following_id", followingId);
 
-        Long count = followsMapper.selectCount(wrapper);
+//        Long count = followsMapper.selectCount(wrapper);
+        long count = followService.count(wrapper);
         return count > 0;
+    }
+
+    @Override
+    public UserInfoDTO getCreaterInfoById(Long videoId) {
+        QueryWrapper<Creates> wrapper = new QueryWrapper<>();
+        wrapper.eq("video_id", videoId);
+
+        Creates creates = createService.getOne(wrapper);
+
+//        User user = userService.getUserById(creates.getUserId());
+        User user = userMapper.selectById(creates.getUserId());
+
+        return DTOUtil.makeUserInfoDTO(user);
     }
 }

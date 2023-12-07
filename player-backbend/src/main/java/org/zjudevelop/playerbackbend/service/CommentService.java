@@ -1,8 +1,10 @@
 package org.zjudevelop.playerbackbend.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.zjudevelop.playerbackbend.domain.dto.VideoCommentsPageQueryDTO;
 import org.zjudevelop.playerbackbend.domain.po.CommentPO;
 import org.zjudevelop.playerbackbend.domain.dto.VideoCommentDTO;
+import org.zjudevelop.playerbackbend.utils.PageResult;
 
 import java.util.List;
 
@@ -12,7 +14,10 @@ import java.util.List;
  * @data 2023/11/6 10:12
  */
 public interface CommentService extends IService<CommentPO> {
-    List<VideoCommentDTO> getCommentByVideoId(Long videoId);
+    Long comment(CommentPO commentPO);
 
     CommentPO getCommentById(Long commentId);
+
+    PageResult getCommentByVideoId(VideoCommentsPageQueryDTO videoCommentsPageQueryDTO);
+
 }

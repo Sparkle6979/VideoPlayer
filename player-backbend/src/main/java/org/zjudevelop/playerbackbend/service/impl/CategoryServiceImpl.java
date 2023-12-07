@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 public class CategoryServiceImpl extends ServiceImpl<CategoryMapper,CategoryPO> implements CategoryService {
     @Autowired
-    private CategoryMapper categoryMapper;
+    CategoryMapper categoryMapper;
     @Override
     public CategoryInfoDTO getCategoryInfoById(Long categoryId) {
         CategoryPO categoryPO = categoryMapper.selectById(categoryId);

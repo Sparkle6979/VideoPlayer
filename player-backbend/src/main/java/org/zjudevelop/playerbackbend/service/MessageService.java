@@ -1,5 +1,6 @@
 package org.zjudevelop.playerbackbend.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.zjudevelop.playerbackbend.domain.po.MessagePO;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
  * @version 1.0
  * @data 2023/11/5 10:58
  */
-public interface MessageService {
+public interface MessageService extends IService<MessagePO> {
 
     List<MessagePO> getAllPublishMessageByUserId(Long userId);
     List<MessagePO> getAllReceiveMessageByUserId(Long userId);

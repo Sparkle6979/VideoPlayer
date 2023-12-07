@@ -1,9 +1,11 @@
 package org.zjudevelop.playerbackbend.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.zjudevelop.playerbackbend.domain.dto.PageQueryDTO;
+import org.zjudevelop.playerbackbend.domain.po.Collection;
 import org.zjudevelop.playerbackbend.utils.PageResult;
 
-public interface CollectionService {
+public interface CollectionService extends IService<Collection> {
     int createCollection(Long userId, String collectionName);
 
     int removeCollection(Long collectionId);

@@ -13,10 +13,7 @@ import org.zjudevelop.playerbackbend.domain.dto.*;
 import org.zjudevelop.playerbackbend.pojo.CheckAuth;
 import org.zjudevelop.playerbackbend.pojo.JwtProperties;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
-import org.zjudevelop.playerbackbend.service.LikeService;
-import org.zjudevelop.playerbackbend.service.UploadService;
-import org.zjudevelop.playerbackbend.service.UserService;
-import org.zjudevelop.playerbackbend.service.VideoService;
+import org.zjudevelop.playerbackbend.service.*;
 import org.zjudevelop.playerbackbend.utils.JwtUtil;
 import org.zjudevelop.playerbackbend.utils.PageResult;
 import org.zjudevelop.playerbackbend.utils.RestResult;
@@ -45,7 +42,11 @@ public class VideoController {
     @Autowired
     private UserService userService;
     @Autowired
-    private LikeService likeService;
+    private CommentService commentService;
+
+//    @Autowired
+//    private LikeService likeService;
+
     @Autowired
     private HttpServletRequest request;
     @Autowired
@@ -111,7 +112,8 @@ public class VideoController {
         Long currentUserId = getUserIdFromRequest(request, jwtProperties);
 
         for (VideoSearchInfoDTO videoSearchInfoDTO : videoInfoByKeyword) {
-            if(null != currentUserId && likeService.IfLikes(currentUserId,videoSearchInfoDTO.getVideoId())){
+//            if(null != currentUserId && likeService.IfLikes(currentUserId,videoSearchInfoDTO.getVideoId())){
+            if(null != currentUserId && userService.isAlreadyLiked(currentUserId,videoSearchInfoDTO.getVideoId())){
                 videoSearchInfoDTO.setIsLike(Boolean.TRUE);
             }else {
                 videoSearchInfoDTO.setIsLike(Boolean.FALSE);
@@ -145,7 +147,7 @@ public class VideoController {
     @CheckAuth(check = false)
     @RequestMapping(value = "/comment",method = RequestMethod.POST)
     public RestResult<PageResult> getVideoCommentsInfo(@RequestBody VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
-        return RestResult.success(videoService.getCommentByVideoId(videoCommentsPageQueryDTO));
+        return RestResult.success(commentService.getCommentByVideoId(videoCommentsPageQueryDTO));
     }
 
     public static Long getUserIdFromRequest(HttpServletRequest request, JwtProperties jwtProperties){

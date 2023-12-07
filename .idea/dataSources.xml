@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:mysql://47.107.78.73:3306</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="videoplayer@toyserver" uuid="098ff6dc-1e53-4dba-b3f4-e97b70cd8f52">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://toyserver:3306/videoplayer?characterEncoding=utf-8&amp;useSSL=false</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

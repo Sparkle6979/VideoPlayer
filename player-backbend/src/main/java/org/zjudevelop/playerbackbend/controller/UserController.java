@@ -194,26 +194,6 @@ public class UserController extends MessageConstant {
 
         Long commentId = commentService.comment(build);
 
-
-        Event event = Event.builder()
-                .topic(TOPIC_COMMENT)
-                .userId(currentUserId)
-                .entityId(commentId)
-                .build();
-
-        // 如果对视频进行评论，entityUserId为视频作者Id，否则为targetId
-        if(COMMENT_TYPE_VIDEO.equals(userCommentDTO.getEntityType())){
-            event.setEntityType(EVENT_VIDEO_COMMENT);
-//            event.setEntityUserId(videoService.getCreaterInfoById(userCommentDTO.getEntityId()).getId());
-            event.setEntityId(userService.getCreaterInfoById(userCommentDTO.getEntityId()).getId());
-        }else if(COMMENT_TYPE_COMMENT.equals(userCommentDTO.getEntityType())){
-            event.setEntityType(EVENT_USER_COMMENT);
-            event.setEntityUserId(userCommentDTO.getTargetId());
-        }
-
-        eventProducer.fireEvent(event);
-
-
         return RestResult.success();
     }
 
@@ -229,16 +209,6 @@ public class UserController extends MessageConstant {
                 .followingId(followingId)
                 .build();
         userService.follow(follows);
-
-        Event build = Event.builder()
-                .topic(TOPIC_FOLLOW)
-                .userId(currentUserId)
-                .entityType(EVENT_USER_FOLLOW)
-                .entityId(followService.getFollowByFollowerIdAndFollowingId(currentUserId,followingId).getId())
-                .entityUserId(followingId)
-                .build();
-
-        eventProducer.fireEvent(build);
 
         return RestResult.success();
     }
@@ -297,17 +267,6 @@ public class UserController extends MessageConstant {
                 .videoId(videoId)
                 .build();
         userService.like(likes);
-
-        Event build = Event.builder()
-                .topic(TOPIC_LIKE)
-                .userId(currentUserId)
-                .entityType(EVENT_VIDEO_LIKE)
-                .entityId(likeService.getLikesByUserIdAndVideoId(currentUserId, videoId).getId())
-//                .entityUserId(videoService.getCreaterInfoById(videoId).getId())
-                .entityUserId(userService.getCreaterInfoById(videoId).getId())
-                .build();
-
-        eventProducer.fireEvent(build);
 
         return RestResult.success();
     }

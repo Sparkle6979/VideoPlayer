@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.zjudevelop.playerbackbend.dao.*;
 import org.zjudevelop.playerbackbend.domain.po.*;
 import org.zjudevelop.playerbackbend.domain.dto.*;
+import org.zjudevelop.playerbackbend.event.EventProducer;
+import org.zjudevelop.playerbackbend.pojo.Event;
+import org.zjudevelop.playerbackbend.pojo.MessageConstant;
 import org.zjudevelop.playerbackbend.service.*;
 import org.zjudevelop.playerbackbend.utils.PageResult;
 import org.zjudevelop.playerbackbend.pojo.exception.AccountNotFoundException;
@@ -57,6 +60,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
 //    private CommentMapper commentMapper;
 //    @Autowired
 //    CommentService commentService;
+
+    @Autowired
+    EventProducer eventProducer;
 
     @Override
     public User login(UserLoginDTO userLoginDTO){
@@ -118,8 +124,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
         videoService.updateById(videoPO);
 //        videoMapper.updateById(videoPO);
 
-//        return likesMapper.insert(likes);
-        return Boolean.TRUE == likeService.save(likes) ? 1 : 0;
+        likeService.save(likes);
+
+        // 获取点赞视频作者Id
+        Long targetUserId = createService.getCreatesInfoByVideoId(videoId).getUserId();
+        // 发送消息
+        Event build = Event.builder()
+                .topic(MessageConstant.TOPIC_LIKE)
+                .userId(userId)
+                .entityType(MessageConstant.EVENT_VIDEO_LIKE)
+                .entityId(likes.getId())
+//                .entityUserId(videoService.getCreaterInfoById(videoId).getId())
+                .entityUserId(targetUserId)
+                .build();
+
+        eventProducer.fireEvent(build);
+
+        return likes.getId().intValue();
     }
 
     @Override
@@ -127,7 +148,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
         Long userId = likes.getUserId();
         Long videoId = likes.getVideoId();
 
-        // check if already liked
+        // check if already not liked
         if (!this.isAlreadyLiked(userId, videoId)) {
             return 0;
         }
@@ -192,8 +213,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
         if (this.isAlreadyFollowed(follows.getFollowerId(), follows.getFollowingId())) {
             return 0;
         }
-        return Boolean.TRUE == followService.save(follows) ? 1 : 0;
+
+        followService.save(follows);
+
+
+        // 发送通知信息
+        Event build = Event.builder()
+                .topic(MessageConstant.TOPIC_FOLLOW)
+                .userId(follows.getFollowerId())
+                .entityType(MessageConstant.EVENT_USER_FOLLOW)
+//                .entityId(followService.getFollowByFollowerIdAndFollowingId(follows.getFollowerId(), follows.getFollowingId()).getId())
+                .entityId(follows.getId())
+                .entityUserId(follows.getFollowingId())
+                .build();
+
+        eventProducer.fireEvent(build);
+
+//        return Boolean.TRUE == followService.save(follows) ? 1 : 0;
 //        return followsMapper.insert(follows);
+        return follows.getId().intValue();
     }
 
     @Override

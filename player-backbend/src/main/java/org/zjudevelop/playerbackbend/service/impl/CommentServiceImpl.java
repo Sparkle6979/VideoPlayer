@@ -14,6 +14,8 @@ import org.zjudevelop.playerbackbend.domain.po.CommentPO;
 import org.zjudevelop.playerbackbend.domain.dto.VideoCommentDTO;
 import org.zjudevelop.playerbackbend.domain.po.Creates;
 import org.zjudevelop.playerbackbend.domain.po.VideoPO;
+import org.zjudevelop.playerbackbend.event.EventProducer;
+import org.zjudevelop.playerbackbend.pojo.Event;
 import org.zjudevelop.playerbackbend.pojo.MessageConstant;
 import org.zjudevelop.playerbackbend.service.CommentService;
 import org.zjudevelop.playerbackbend.service.UserService;
@@ -44,10 +46,33 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper,CommentPO> imp
     @Autowired
     VideoService videoService;
 
+    @Autowired
+    EventProducer eventProducer;
+
     @Override
     public Long comment(CommentPO commentPO) {
-         commentMapper.insert(commentPO);
-         return commentPO.getId();
+        commentMapper.insert(commentPO);
+
+        Event event = Event.builder()
+                .topic(MessageConstant.TOPIC_COMMENT)
+                .userId(commentPO.getUserId())
+                .entityId(commentPO.getId())
+                .build();
+
+        // 如果对视频进行评论，entityUserId为视频作者Id，否则为targetId
+        if(MessageConstant.COMMENT_TYPE_VIDEO.equals(commentPO.getEntityType())){
+            event.setEntityType(MessageConstant.EVENT_VIDEO_COMMENT);
+//            event.setEntityUserId(videoService.getCreaterInfoById(userCommentDTO.getEntityId()).getId());
+            event.setEntityId(userService.getCreaterInfoById(commentPO.getEntityId()).getId());
+        }else if(MessageConstant.COMMENT_TYPE_COMMENT.equals(commentPO.getEntityType())){
+            event.setEntityType(MessageConstant.EVENT_USER_COMMENT);
+            event.setEntityUserId(commentPO.getTargetId());
+        }
+
+        eventProducer.fireEvent(event);
+
+
+        return commentPO.getId();
     }
 
     @Override

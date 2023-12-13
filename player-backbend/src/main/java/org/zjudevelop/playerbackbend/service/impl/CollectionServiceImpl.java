@@ -38,6 +38,12 @@ public class CollectionServiceImpl extends ServiceImpl<CollectionMapper,Collecti
     @Autowired
     private VideoService videoService;
 
+    /**
+     * 创建收藏夹，insert
+     * @param userId
+     * @param collectionName
+     * @return
+     */
     @Override
     public int createCollection(Long userId, String collectionName) {
         Collection collection = Collection.builder()

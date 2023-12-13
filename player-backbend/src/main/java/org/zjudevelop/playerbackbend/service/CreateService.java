@@ -9,4 +9,5 @@ import org.zjudevelop.playerbackbend.domain.po.Creates;
  * @data 2023/12/6 20:58
  */
 public interface CreateService extends IService<Creates> {
+    Creates getCreatesInfoByVideoId(Long videoId);
 }

@@ -14,10 +14,7 @@ import org.zjudevelop.playerbackbend.pojo.CheckAuth;
 import org.zjudevelop.playerbackbend.pojo.JwtProperties;
 import org.zjudevelop.playerbackbend.pojo.QNDataServer;
 import org.zjudevelop.playerbackbend.service.*;
-import org.zjudevelop.playerbackbend.utils.JwtUtil;
-import org.zjudevelop.playerbackbend.utils.PageResult;
-import org.zjudevelop.playerbackbend.utils.RestResult;
-import org.zjudevelop.playerbackbend.utils.FileProcessUtil;
+import org.zjudevelop.playerbackbend.utils.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -35,8 +32,8 @@ import java.util.List;
 public class VideoController {
     @Autowired
     private QNDataServer qnDataServer;
-    @Autowired
-    private UploadService uploadService;
+//    @Autowired
+//    private UploadService uploadService;
     @Autowired
     private VideoService videoService;
     @Autowired
@@ -57,11 +54,17 @@ public class VideoController {
     public RestResult<VideoInfoDTO> uploadVideo(@ModelAttribute VideoUploadDTO videoUploadDTO){
 
         try {
-            UploadFileInfoDTO videoServerFile = uploadService.uploadfile(null,
+//            UploadFileInfoDTO videoServerFile = uploadService.uploadfile(null,
+//                    videoUploadDTO.getVideoFile().getBytes(),qnDataServer);
+
+            UploadFileInfoDTO videoServerFile = UploadUtil.uploadfile(null,
                     videoUploadDTO.getVideoFile().getBytes(),qnDataServer);
 
-            UploadFileInfoDTO coverServerFile = uploadService.uploadfile(null,
-                    videoUploadDTO.getCoverFile().getBytes(), qnDataServer);
+//            UploadFileInfoDTO coverServerFile = uploadService.uploadfile(null,
+//                    videoUploadDTO.getCoverFile().getBytes(), qnDataServer);
+
+            UploadFileInfoDTO coverServerFile = UploadUtil.uploadfile(null,
+                    videoUploadDTO.getCoverFile().getBytes(),qnDataServer);
 //            if(null == videoUploadDTO.getCoverFile()){
 //                byte[] coverFromVideoPath = VideoProcessUtil.getCoverFromVideoPath(videoServerFile.getServerFileUrl(),1146,717);
 //                coverServerFile = uploadService.uploadfile(FileProcessUtil.getFileOriginName(videoServerFile.getServerFileUrl()) + ".jpg",

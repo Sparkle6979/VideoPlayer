@@ -18,6 +18,7 @@ import org.zjudevelop.playerbackbend.utils.PageResult;
 import org.zjudevelop.playerbackbend.event.EventProducer;
 import org.zjudevelop.playerbackbend.utils.JwtUtil;
 import org.zjudevelop.playerbackbend.utils.RestResult;
+import org.zjudevelop.playerbackbend.utils.UploadUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,8 +39,8 @@ public class UserController extends MessageConstant {
     @Autowired
     VideoService videoService;
 
-    @Autowired
-    UploadService uploadService;
+//    @Autowired
+//    UploadService uploadService;
 
     @Autowired
     LikeService likeService;
@@ -142,25 +143,26 @@ public class UserController extends MessageConstant {
      * */
     @PutMapping()
     @ApiOperation("更新用户信息")
-    public RestResult updateUserInfo(@ModelAttribute UserInfoUpdateDTO userInfoUpdateDTO) {
+    public RestResult updateUserInfo(@ModelAttribute UserInfoUpdateDTO userInfoUpdateDTO) throws IOException {
         Long userId = BaseContext.getCurrentUserId();
 
         // save file in local path
         MultipartFile file = userInfoUpdateDTO.getAvatarFile();
         String fileUrl = null;
         if (file != null) {
-            String filePath = tmpFilePath + "/" + file.getOriginalFilename();
-            File localFile = new File(filePath);
-            try {
-                file.transferTo(localFile);
-                log.info("文件保存成功，保存路径为： " + filePath);
-            } catch (IllegalStateException | IOException e) {
-                e.printStackTrace();
-                return RestResult.fail("文件上传失败");
-            }
+//            String filePath = tmpFilePath + "/" + file.getOriginalFilename();
+//            File localFile = new File(filePath);
+//            try {
+//                file.transferTo(localFile);
+//                log.info("文件保存成功，保存路径为： " + filePath);
+//            } catch (IllegalStateException | IOException e) {
+//                e.printStackTrace();
+//                return RestResult.fail("文件上传失败");
+//            }
 
             // upload file to server
-            fileUrl = uploadService.uploadfile(filePath, qnDataServer).getServerFileUrl();
+             fileUrl = UploadUtil.uploadfile(null,file.getBytes(),qnDataServer).getServerFileUrl();
+//            fileUrl = uploadService.uploadfile(filePath, qnDataServer).getServerFileUrl();
             log.info("文件上传成功, url为： " + fileUrl);
         }
 

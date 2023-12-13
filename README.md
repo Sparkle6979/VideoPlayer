@@ -6,9 +6,22 @@ Demo讲解及演示视频链接：
 
 哔哩哔哩：[点击这里](https://www.bilibili.com/video/BV1wu4y1h76i/?vd_source=b10cb586f9c4a450167223f4abe5d3c7) 
 
-七牛云外链：[点击这里](http://s33fgajdq.hd-bkt.clouddn.com/demo.mp4) （可能需要缓冲一段时间）
 
 ![开发组件工具图](./resources/images/开发组件工具.png)
+
+### TODOs
+
+- [x] 重构Serivce层，更符合日常开发规范
+
+- [ ] 引入Redis分担DB压力 
+
+- [x] 项目部署上线服务器
+
+- [ ] 规范异常处理
+
+- [ ] 高并发高可用优化
+
+- [ ] 规范项目文档
 
 ---
 ### 目录

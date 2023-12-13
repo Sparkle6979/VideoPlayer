@@ -120,6 +120,7 @@ fabric.properties
 
 # Log file
 *.log
+*.logs
 
 # BlueJ files
 *.ctxt
@@ -147,7 +148,8 @@ replay_pid*
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*

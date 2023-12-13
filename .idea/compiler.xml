@@ -22,6 +22,7 @@
       <module name="backbend-player" options="-parameters" />
       <module name="player-backbend" options="-parameters" />
       <module name="player-backbend (1)" options="-parameters" />
+      <module name="player-backbend (2)" options="-parameters" />
       <module name="videoplayer" options="-parameters" />
     </option>
   </component>

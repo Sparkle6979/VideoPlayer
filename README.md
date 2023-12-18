@@ -13,7 +13,7 @@ Demo讲解及演示视频链接：
 
 - [x] 重构Serivce层，更符合日常开发规范
 
-- [ ] 引入Redis分担DB压力 
+- [x] 引入Redis分担DB压力 (videoId -> videoInfo)
 
 - [x] 项目部署上线服务器
 

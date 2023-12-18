@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.zjudevelop.playerbackbend.dao.VideoMapper;
 
@@ -18,10 +19,12 @@ import org.zjudevelop.playerbackbend.pojo.MessageConstant;
 import org.zjudevelop.playerbackbend.service.*;
 import org.zjudevelop.playerbackbend.utils.DTOUtil;
 import org.zjudevelop.playerbackbend.utils.PageResult;
+import org.zjudevelop.playerbackbend.utils.RedisKeyUtil;
 
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author sparkle6979l
@@ -60,22 +63,25 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper,VideoPO> implement
 //    @Autowired
 //    CommentService commentService;
 
+    @Autowired
+    RedisTemplate redisTemplate;
+
     @Override
     public VideoInfoDTO getVideoInfoById(Long videoId) {
-        VideoPO videoPO = videoMapper.selectById(videoId);
-        CategoryInfoDTO categoryInfoDTO = categoryService.getCategoryInfoById(videoPO.getCategoryId());
 
-        return DTOUtil.makeVideoInfoDTO(videoPO,categoryInfoDTO.getCategoryName());
+        VideoInfoDTO videoCache = getVideoCache(videoId);
+        return videoCache != null ? videoCache : initVideoCache(videoId);
     }
 
     @Override
     public List<VideoInfoDTO> getVideoInfoListByCategoryId(Long categoryId) {
         List<VideoPO> videoPOS = videoMapper.selectByCategoryId(categoryId);
-        CategoryInfoDTO categoryInfoDTO = categoryService.getCategoryInfoById(categoryId);
+//        CategoryInfoDTO categoryInfoDTO = categoryService.getCategoryInfoById(categoryId);
 
         List<VideoInfoDTO> result = new ArrayList<>();
         for (VideoPO videoPO : videoPOS) {
-            VideoInfoDTO videoInfoDTO = DTOUtil.makeVideoInfoDTO(videoPO, categoryInfoDTO.getCategoryName());
+            VideoInfoDTO videoInfoDTO = getVideoInfoById(videoPO.getId());
+//            VideoInfoDTO videoInfoDTO = DTOUtil.makeVideoInfoDTO(videoPO, categoryInfoDTO.getCategoryName());
             result.add(videoInfoDTO);
         }
         return result;
@@ -125,23 +131,6 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper,VideoPO> implement
         return videoSearchInfoDTOS;
     }
 
-    /**
-     * 通过videoId获取作者信息
-     * @param videoId
-     * @return
-     */
-//    @Override
-//    public UserInfoDTO getCreaterInfoById(Long videoId) {
-//        QueryWrapper wrapper = new QueryWrapper<>();
-//        wrapper.eq("video_id", videoId);
-//
-//        Creates creates = createService.getOne(wrapper);
-//
-//        User user = userService.getUserById(creates.getUserId());
-//
-//        return DTOUtil.makeUserInfoDTO(user);
-//    }
-
     @Override
     public PageResult getVideos(VideosPageQueryDTO videosPageQueryDTO) {
         Page<VideoPO> page = new Page<>(videosPageQueryDTO.getPage(), videosPageQueryDTO.getPageSize());
@@ -149,41 +138,6 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper,VideoPO> implement
         return new PageResult(pageResult.getTotal(), pageResult.getRecords());
     }
 
-    /**
-     * 通过videoId获取该视频下评论相关信息
-     * @param videoId
-     * @return
-     */
-//    @Override
-//    public List<VideoCommentDTO> getCommentByVideoId(Long videoId) {
-//        QueryWrapper<CommentPO> wrapper = new QueryWrapper<>();
-//        wrapper.eq("entity_type", MessageConstant.COMMENT_TYPE_VIDEO);
-//        wrapper.eq("entity_id", videoId);
-//        List<CommentPO> comments = commentService.list(wrapper);
-////        List<CommentPO> comments = commentMapper.selectList(wrapper);
-//        List<VideoCommentDTO> result = makeVideoCommentDTO(comments);
-//
-//        return  result;
-//    }
-
-    /**
-     * 分页查询视频评论
-     * @param videoCommentsPageQueryDTO
-     * @return
-     */
-//    @Override
-//    public PageResult getCommentByVideoId(VideoCommentsPageQueryDTO videoCommentsPageQueryDTO) {
-//        Page<CommentPO> page = new Page<>(videoCommentsPageQueryDTO.getPage(), videoCommentsPageQueryDTO.getPageSize());
-//        QueryWrapper<CommentPO> wrapper = new QueryWrapper<>();
-//        wrapper.eq("entity_type", MessageConstant.COMMENT_TYPE_VIDEO);
-//        wrapper.eq("entity_id", videoCommentsPageQueryDTO.getVideoId());
-//
-//        Page<CommentPO> pageResult = commentService.page(page, wrapper);
-////        Page<CommentPO> pageResult = commentMapper.selectPage(page, wrapper);
-//
-//        List<VideoCommentDTO> result = makeVideoCommentDTO(pageResult.getRecords());
-//        return new PageResult(result.size(),result);
-//    }
 
     @Override
     public List<VideoInfoDTO> getVideosByCreatorId(Long userId) {
@@ -197,62 +151,39 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper,VideoPO> implement
         for (Creates creates : createsList) {
 //            VideoPO videoPO = videoMapper.selectById(creates.getVideoId());
 //            VideoPO videoPO = videoService.getById(creates.getVideoId());
-            VideoPO videoPO = videoMapper.selectById(creates.getVideoId());
+//            VideoPO videoPO = videoMapper.selectById(creates.getVideoId());
+//
+//            String categoryName = categoryService.getById(videoPO.getCategoryId()).getCategoryName();
+////            CategoryPO categoryPO = categoryMapper.selectById(videoPO.getCategoryId());
+//
+//
+//            VideoInfoDTO videoInfoDTO = DTOUtil.makeVideoInfoDTO(videoPO,categoryName);
 
-            String categoryName = categoryService.getById(videoPO.getCategoryId()).getCategoryName();
-//            CategoryPO categoryPO = categoryMapper.selectById(videoPO.getCategoryId());
-
-
-            VideoInfoDTO videoInfoDTO = DTOUtil.makeVideoInfoDTO(videoPO,categoryName);
+            VideoInfoDTO videoInfoDTO = getVideoInfoById(creates.getVideoId());
             result.add(videoInfoDTO);
         }
         return result;
     }
 
+    // 当缓存中没有相关信息时，进行存储
+    private VideoInfoDTO initVideoCache(Long videoId){
+        VideoPO videoPO = videoMapper.selectById(videoId);
+        CategoryInfoDTO categoryInfoDTO = categoryService.getCategoryInfoById(videoPO.getCategoryId());
+        VideoInfoDTO videoInfoDTO = DTOUtil.makeVideoInfoDTO(videoPO, categoryInfoDTO.getCategoryName());
 
-//    public List<VideoCommentDTO> makeVideoCommentDTO(List<CommentPO> comments){
-//        List<VideoCommentDTO> result = new ArrayList<>();
-//        for (CommentPO comment : comments) {
-//            VideoCommentDTO build = VideoCommentDTO.builder()
-//                    .commentId(comment.getId())
-//                    .commentUserId(comment.getUserId())
-//                    .commentUserName(userService.getUserById(comment.getUserId()).getUsername())
-////                    .commentUserName(userMapper.selectById(comment.getUserId()).getUsername())
-//                    .commentUserAvatarPath(userService.getUserById(comment.getUserId()).getAvatarPath())
-//                    .content(comment.getContent())
-//                    .createTime(comment.getCreateTime().toString())
-//                    .build();
-//
-//            Long commentId = comment.getId();
-//
-//            QueryWrapper<CommentPO> commentwrapper = new QueryWrapper<>();
-//            commentwrapper.eq("entity_type", MessageConstant.COMMENT_TYPE_COMMENT);
-//            commentwrapper.eq("entity_id", commentId);
-//            List<CommentPO> commentPOS = commentService.list(commentwrapper);
-////            List<CommentPO> commentPOS = commentMapper.selectList(commentwrapper);
-//
-//            List<VideoCommentDTO> commentReply = new ArrayList<>();
-//            for (CommentPO commentPO : commentPOS) {
-//                VideoCommentDTO commentbuild = VideoCommentDTO.builder()
-//                        .commentId(comment.getId())
-//                        .commentUserId(commentPO.getUserId())
-//                        .commentUserName(userService.getUserById(commentPO.getUserId()).getUsername())
-////                        .commentUserName(userMapper.selectById(commentPO.getUserId()).getUsername())
-//                        .commentUserAvatarPath(userService.getUserById(commentPO.getUserId()).getAvatarPath())
-////                        .commentUserAvatarPath(userMapper.selectById(commentPO.getUserId()).getAvatarPath())
-//                        .content(commentPO.getContent())
-//                        .createTime(commentPO.getCreateTime().toString())
-//                        .targetUserId(commentPO.getTargetId())
-//                        .targetUserName(userService.getUserById(commentPO.getTargetId()).getUsername())
-////                        .targetUserName(userMapper.selectById(commentPO.getTargetId()).getUsername())
-//                        .build();
-//
-//                commentReply.add(commentbuild);
-//            }
-//            build.setCommentReply(commentReply);
-//
-//            result.add(build);
-//        }
-//        return result;
-//    }
+
+        redisTemplate.opsForValue().set(RedisKeyUtil.getVideoKey(videoId),videoInfoDTO,3000, TimeUnit.SECONDS);
+        return videoInfoDTO;
+    }
+    // 向缓存中存储对应数据
+    private VideoInfoDTO getVideoCache(Long videoId){
+        String videoKey = RedisKeyUtil.getVideoKey(videoId);
+
+        return (VideoInfoDTO) redisTemplate.opsForValue().get(videoKey);
+    }
+    // 当修改数据库数据时，删除缓存
+    private void clearCache(Long videoId){
+        String videoKey = RedisKeyUtil.getVideoKey(videoId);
+        redisTemplate.delete(videoKey);
+    }
 }

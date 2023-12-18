@@ -150,6 +150,7 @@ public class HomeController {
         String token  = request.getHeader(jwtProperties.getUserTokenName());
 
         Long currentUserId = null;
+
         if(StringUtils.isNotBlank(token) && !("null".equals(token))){
             Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
             currentUserId = Long.valueOf(claims.get("user").toString());

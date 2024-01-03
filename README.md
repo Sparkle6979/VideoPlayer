@@ -7,13 +7,13 @@ Demo讲解及演示视频链接：
 哔哩哔哩：[点击这里](https://www.bilibili.com/video/BV1wu4y1h76i/?vd_source=b10cb586f9c4a450167223f4abe5d3c7) 
 
 
-![开发组件工具图](./resources/images/开发组件工具.png)
+![开发组件工具图](./resources/images/tools.png)
 
 ### TODOs
 
-- [x] 重构Serivce层，更符合日常开发规范
+- [x] 重构Serivce层，更符合开发规范
 
-- [x] 引入Redis分担DB压力 (videoId -> videoInfo)
+- [x] 引入Redis分担DB压力
 
 - [x] 项目部署上线服务器
 

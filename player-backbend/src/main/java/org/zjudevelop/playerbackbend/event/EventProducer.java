@@ -26,7 +26,8 @@ public class EventProducer {
 
     // 发布事件
     public void fireEvent(Event event){
-        // 将事件发送到指定主题
-        kafkaTemplate.send(event.getTopic(), JSONObject.toJSONString(event));
+        // 将事件发送到指定主题，且指定Key，保证消息的有序性
+        //        kafkaTemplate.send(event.getTopic(), JSONObject.toJSONString(event));
+        kafkaTemplate.send(event.getTopic(), 1 ,JSONObject.toJSONString(event));
     }
 }
